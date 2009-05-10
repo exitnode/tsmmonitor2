@@ -85,8 +85,8 @@ function initialize() {
 	$configarray = $_SESSION['configarray'];
 
 	// timeout
-	if( !ini_get('safe_mode') && ini_get('max_execution_time') != $configarray["timeout"]) {
-		ini_set('max_execution_time', $configarray["timeout"]);
+	if( !ini_get('safe_mode') && ini_get('max_execution_time') != $configarray["settings"]["timeout"]) {
+		ini_set('max_execution_time', $configarray["settings"]["timeout"]);
 	}
 
 	// set defaults if vars are empty
@@ -1318,7 +1318,7 @@ function getConfigArray() {
     global $conn;
     $retArray = array();
 
-    //Navigation
+    // Navigation
     $query = "SELECT * from cfg_mainmenu";
     $mainmenutablerows = fetchArrayDB($query, $conn);
 
@@ -1387,7 +1387,7 @@ function getConfigArray() {
     $adminmenuarray["q=logout"] = "Logout";
     $retArray["adminmenuarray"] = $adminmenuarray;
 
-    //Overview Boxes
+    // Overview Boxes
     $ret = array();
     
     $query = "SELECT * from cfg_overviewboxes order by sortorder asc";
@@ -1405,7 +1405,7 @@ function getConfigArray() {
     }
     $retArray["infoboxarray"] = $ret;
 
-    //Queries
+    // Queries
     $dbret = array();
     $query = "SELECT * from cfg_queries";
     $querytablerows = fetchArrayDB($query, $conn);
@@ -1414,17 +1414,21 @@ function getConfigArray() {
     }
     $retArray["queryarray"] = $dbret;
     
-    // Set Timeout
-    $query = "SELECT * from cfg_config where confkey='timeout'";
-    $row = fetchArrayDB($query, $conn);
-    $retArray["timeout"] = $row[0]['confval'];
+    // General settings
+    $query = "SELECT * from cfg_config";
+    $rows = fetchArrayDB($query, $conn);
+    $ret = array();
+    foreach ($rows as $key => $val) {
+        $ret[$val['confkey']] = $val['confval'];
+    }
+    $retArray["settings"] = $ret;
 
     // Set Stylesheet
     $query = "SELECT stylesheet from cfg_users where username='".$_SESSION["logindata"]["user"]."'";
     $row = fetchArrayDB($query, $conn);
     $retArray["stylesheet"] = $row[0]['stylesheet'];
 
-    //Colors
+    // Colors
     $query = "SELECT * from cfg_colors";
     $rows = fetchArrayDB($query, $conn);
 
@@ -1448,6 +1452,22 @@ function getConfigArray() {
 
     $retArray["serverlist"] = $ret;
     return $retArray;
+}
+
+
+/**
+ * findPath - find a external program in the search path
+ *
+ * @param string $binary the external program to search for
+ * @param string $search_path the search path in which to look for the external program
+ * @return string the full path to the external program or empty string if not found
+ */
+function findPath($binary, $search_path) {
+    foreach ($search_path as $path) {
+        if ((file_exists($path . "/" . $binary)) && (is_readable($path . "/" . $binary))) {
+            return($path . "/" . $binary);
+        }
+    }
 }
 
 
@@ -1670,7 +1690,7 @@ function fetchSplitArrayDB($sql, $DBconn = FALSE, $rows_per_page = '20') {
  * @return string Auto-increment ID if insert was performed
  */
 function updateDB($table, $cells, $keys, $DBconn = FALSE, $autoquote = TRUE) {
-//    $DBconn->debug = true;
+    //$DBconn->debug = true;
     $DBconn->Replace($table, $cells, $keys, $autoquote);
 
     return $DBconn->Insert_ID();

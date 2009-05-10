@@ -57,7 +57,18 @@ $config = array();
 // ** Current TSM Monitor version ** //
 $config["tsm_monitor_version"] = '0.1.0';
 
+// ** Set TSM Monitor server OS to a general value (only 'unix' or 'win32') ** //
+$config["server_os"] = (strstr(PHP_OS, "WIN")) ? "win32" : "unix";
+
+// ** Search paths for external programs (dsmadmc, php, ...) ** //
+if ($config["server_os"] == "win32") {
+    $config["search_path"] = array('c:/php', 'c:/progra~1/php', 'd:/php', 'd:/progra~1/php', 'c:/progra~1/tivoli/tsm/baclient', 'd:/progra~1/tivoli/tsm/baclient');
+} elseif ($config["server_os"] == "unix") {
+    $config["search_path"] = array('/bin', '/sbin', '/usr/bin', '/usr/sbin', '/usr/local/bin', '/usr/local/sbin', '/usr/tivoli/tsm/client/admin/bin', '/opt/tivoli/tsm/client/ba/bin');
+}
+
 // ** Paths (libraries, includes, ...) ** //
+$config["base_path"] = ereg_replace("(.*[\\\/])includes", "\\1", dirname(__FILE__));
 $config["library_path"] = ereg_replace("(.*[\\\/])includes", "\\1extlib", dirname(__FILE__));
 $config["include_path"] = dirname(__FILE__);
 
