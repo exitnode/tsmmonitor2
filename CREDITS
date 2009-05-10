@@ -1,0 +1,36 @@
+************************************************************************
+    This file is part of TSM Monitor.
+
+    TSM Monitor is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    TSM Monitor is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
+************************************************************************
+
+
+
+Thanks to the following people for their help with this software:
+-----------------------------------------------------------------
+
+* BBB - general design ideas
+* Martin Mohr - Beautifying, CSS, GUI improvements
+
+
+
+Third party products included/shipped with this software:
+---------------------------------------------------------
+
+* FPDF 1.6 by Olivier Plathey (http://www.fpdf.org)
+* DateChooser 2.9 by y5 (http://yellow5.us/projects/datechooser)
+* ADOdb by John Lim (jlim#natsoft.com)
+
+
+
