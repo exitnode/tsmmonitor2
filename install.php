@@ -92,7 +92,6 @@ if ($old_tsm_monitor_version == $config["tsm_monitor_version"]) {
 }
 
 // dsmadmc binary path
-$input["path_dsmadmc"] = $configarray["settings"]["path_dsmadmc"];
 $input["path_dsmadmc"]["name"] = "dsmadmc Binary Path";
 $input["path_dsmadmc"]["desc"] = "The path to the TSM admin client binary.";
 $which_dsmadmc = findPath("dsmadmc", $config["search_path"]);
@@ -105,7 +104,6 @@ if (isset($configarray["settings"]["path_dsmadmc"])) {
 }
 
 // php/php5 binary path
-$input["path_php"] = $configarray["settings"]["path_php"];
 $input["path_php"]["name"] = "PHP Binary Path";
 $input["path_php"]["desc"] = "The path to the PHP binary.";
 $which_php = findPath("php", $config["search_path"]);
@@ -121,7 +119,6 @@ if (isset($configarray["settings"]["path_php"])) {
 }
 
 // logfile path
-$input["path_tmlog"] = $configarray["settings"]["path_tmlog"];
 $input["path_tmlog"]["name"] = "TSM Monitor Logfile Path";
 $input["path_tmlog"]["desc"] = "The path to the TSM Monitor log file.";
 if (isset($configarray["settings"]["path_tmlog"])) {
@@ -317,7 +314,7 @@ if ($_REQUEST["step"] == "90") {
                                     $resStr = "";
                                     $capStr = "";
 
-                                    if (file_exists($file)) {
+                                    if (file_exists($file) && is_file($file)) {
                                         $resStr = "<font color='#008000'>[FOUND]</font> ";
                                         $capStr = "<span style='color:green'><br>[OK: FILE FOUND]</span>";
                                     } else {
@@ -350,6 +347,85 @@ if ($_REQUEST["step"] == "90") {
                           <br>
                           If you did choose to upgrade from a previous version of TSM Monitor, the
                           database will also be upgraded by clicking "Finish".
+                        </p>
+
+                        <p>
+                          <strong>PHP memory_limit settings</strong>: Default or configured PHP limits
+                          <table width="90%" align="center" border="0">
+
+                        <?php
+                            $mem_recommend = 64;
+                            $mem_limit = ini_get(memory_limit);
+                            if ($mem_limit != "") {
+                                $mem_val = ereg_replace("([0-9]*).*", "\\1", $mem_limit);
+                                $mem_unit = ereg_replace("([0-9]*)(.*)", "\\2", $mem_limit);
+                            }
+                            else {
+                                $mem_val = "unknown";
+                                $mem_unit = "";
+                            }
+
+                            $php_cli = $input["path_php"]["default"]." -r 'echo ini_get(memory_limit);'";
+                            $mem_cli_recommend = 64;
+                            $mem_cli_limit = exec("$php_cli");
+                            if ($mem_cli_limit != "") {
+                                $mem_cli_val = ereg_replace("([0-9]*).*", "\\1", $mem_cli_limit);
+                                $mem_cli_unit = ereg_replace("([0-9]*)(.*)", "\\2", $mem_cli_limit);
+                            }
+                            else {
+                                $mem_cli_val = "unknown";
+                                $mem_cli_unit = "";
+                            }
+
+                            if ($mem_val < $mem_recommend) {
+                                $mem_color = "#FF0000";
+                                $mem_text = "Warning: at least";
+                            } else {
+                                $mem_color = "#008000";
+                                $mem_text = "OK:";
+                            }
+                            echo "
+                            <tr>
+                              <td>
+                                Webserver:
+                              </td>
+                              <td>
+                                $mem_val $mem_unit
+                              </td>
+                              <td>
+                                <font color='$mem_color'>[$mem_text $mem_recommend M recommended]</font>
+                              </td>
+                            </tr>";
+
+                            if ($mem_cli_val < $mem_cli_recommend) {
+                                $mem_color = "#FF0000";
+                                $mem_text = "Warning: at least";
+                            } else {
+                                $mem_color = "#008000";
+                                $mem_text = "OK:";
+                            }
+                            echo "
+                            <tr>
+                              <td>
+                                Command line:
+                              </td>
+                              <td>
+                                $mem_cli_val $mem_cli_unit
+                              </td>
+                              <td>
+                                <font color='$mem_color'>[$mem_text $mem_cli_recommend M recommended]</font>
+                              </td>
+                            </tr>";
+                        ?>
+                          </table>
+                        </p>
+
+                        <p>
+                          <strong>NOTE:</strong> Depending on the volume of data gathered from your
+                          TSM servers by TSM Monitor, the PHP memory_limit settings shown above may
+                          not be sufficient. Please edit your php.ini configuration files to at least
+                          match the recommended values shown above and restart your webserver. This
+                          has to be done manually and is not part of the TSM Monitor configuration!
                         </p>
                         <?php
                             }
