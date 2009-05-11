@@ -73,7 +73,43 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 
         // show overview page
         if ($GETVars['qq'] == "index") {
-            //include_once "includes/overview.php" ;
+		// do nothing
+	// show settings page
+        } else if ($GETVars['qq'] == "settings") {
+		$tmonpolld = new PollD();
+		$tmonpolld->setDBParams($db_host, $db_name, $db_user, $db_password);
+		$tmonpolld->initialize();
+
+		// If start/stop button was pressed
+		if ($_POST["PollDControl"] != "") {
+			if ($_POST["PollDControl"] == "Start") {
+				$tmonpolld->controlPollD("on");	
+			} else if ($_POST["PollDControl"] == "Stop") {
+				$tmonpolld->controlPollD("off");	
+			}
+		}
+
+		if ($tmonpolld->isEnabled()=="1") {
+			$polldenabled = "enabled and ".$tmonpolld->getStatus();
+			$cellcolor = "green";
+		} else {
+			$polldenabled = "disabled";
+			$cellcolor = "red";
+		}
+
+		echo "<b>PollD Control</b><br>";
+		echo "<form action=".$_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']." method='post'>";
+		echo "<table class='zebra'>";
+		echo "<tr><th>Start/Stop</th><th>Status</th></tr>";
+		echo "<tr class='d0'><td>";
+		echo "<input type='submit' class='button' name='PollDControl' value='Start' onclick='submit();'>";
+		echo "<input type='submit' class='button' name='PollDControl' value='Stop' onclick='submit();'>";
+		echo "</td></td><td bgcolor=".$cellcolor.">PollD is ".$polldenabled."</td></tr>";
+		echo "</table>";
+		echo "<br><br>";
+
+		
+		echo "</form>";
         } else {
 
             if ( ($_GET['action'] != "" && ($_GET['action'] == "edit" && $_GET['id'] != "")) || $_POST['Add'] == "Add") {

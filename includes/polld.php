@@ -481,9 +481,9 @@ function setPollDStatus($status, $lastrun, $nextrun) {
 function isEnabled() {
 
         $sql = "select enabled from log_polldstat WHERE `id`='1'";
-        $enabled = $this->fireMySQLQuery($sql, TRUE);
+        $result = $this->fireMySQLQuery($sql, TRUE);
 	
-	if ($enabled != "" && $enabled[0]->enabled == "1"){
+	if ($result != "" && $result[0]->enabled == "1"){
 		return TRUE;
 	} else {
  		return FALSE;
@@ -491,6 +491,43 @@ function isEnabled() {
 
 }
 
+
+/**
+ * controlPollD - enables or disables polld
+ *
+ * @param string switch on or off
+ */
+
+function controlPollD($switch = "") {
+
+	if ($switch == "on") {
+		$val = "1";
+	} else if ($switch == "off") {
+		$val = "0";
+	} else {
+		return "";
+	}
+
+        $sql = "update log_polldstat set `enabled` = '".$val."' WHERE `id`='1'";
+        $this->fireMySQLQuery($sql, FALSE);
+
+}
+
+/**
+ * get Status - returns status of PollD
+ *
+ * @returns string
+ */
+
+function getStatus() {
+
+        $sql = "select status from log_polldstat WHERE `id`='1'";
+        $result = $this->fireMySQLQuery($sql, TRUE);
+
+        return $result[0]->status;
+	
+
+}
 
 
 /**
@@ -500,6 +537,8 @@ function isEnabled() {
  */
 
 function poll(){
+
+	$this->controlPollD("off");
 
 	$sleeptime = $this->getSleeptime();
 

@@ -127,7 +127,7 @@ function initialize() {
 	}
 
 
-        if (($_POST['Poll'] == "Poll Now!" || $_SESSION['timemachine']['date'] == "") && $queryarray[$GETVars['qq']]["polltype"]=="snapshot" || $_POST['s'] != "" && $GETVars['qq'] != "overview") {
+        if (($_POST['Poll'] == "Poll Now!" || $_SESSION['timemachine']['date'] == "") && $queryarray[$GETVars['qq']]["polltype"]=="snapshot" || $_POST['s'] != "" && $GETVars['qq'] != "overview" && $GETVars['qq'] != "index") {
                 $qtable = $configarray["queryarray"][$GETVars['qq']]["name"];
                 $sql = "SELECT MAX(TimeStamp) FROM res_".$qtable."_".$GETVars["server"];
                 $res = fetchArrayDB($sql, $conn);
@@ -1405,6 +1405,8 @@ function getConfigArray() {
     $adminmenuarray["q=mainmenu&m=main"] = "Mainmenu";
     $adminmenuarray["q=queries&m=main"] = "Queries";
     $adminmenuarray["trennlinie"] = "trennlinie";
+    $adminmenuarray["q=settings&m=main"] = "Settings";
+    $adminmenuarray["trennlinie2"] = "trennlinie";
     $adminmenuarray["tsmmonitor"] = "TSM Monitor";
     $adminmenuarray["q=logout"] = "Logout";
     $retArray["adminmenuarray"] = $adminmenuarray;
