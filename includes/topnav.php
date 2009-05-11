@@ -31,7 +31,7 @@
 
 ?>
 
-<form action="<?php echo $_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']; ?>" method="post">
+<form action="<?php echo $_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']."&s=".$GETVars['server']; ?>" method="post">
 <?php 
 if ($GETVars['qq'] != "admin" && !$_POST["edit"] == "edit") {
 	if ($GETVars['qq'] != "index" && $GETVars['qq'] != "overview") {  

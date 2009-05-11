@@ -127,7 +127,7 @@ function initialize() {
 	}
 
 
-        if (($_POST['Poll'] == "Poll Now!" || $_SESSION['timemachine']['date'] == "") && $queryarray[$GETVars['qq']]["polltype"]=="snapshot") {
+        if (($_POST['Poll'] == "Poll Now!" || $_SESSION['timemachine']['date'] == "") && $queryarray[$GETVars['qq']]["polltype"]=="snapshot" || $_POST['s'] != "") {
                 $qtable = $configarray["queryarray"][$GETVars['qq']]["name"];
                 $sql = "SELECT MAX(TimeStamp) FROM res_".$qtable."_".$GETVars["server"];
                 $res = fetchArrayDB($sql, $conn);
@@ -166,6 +166,7 @@ function showPageNavigation($links_per_page = "1") {
 	global $GETVars;
 
 	$page = intval($_GET['page']);
+	if ($page == "") $page = 1;
 	$so = $_GET['so'];
 	$sortcol = $_GET['sort'];
 
@@ -213,7 +214,7 @@ function showPageNavigation($links_per_page = "1") {
 	$numbers = '';
 
 	for( $i=$start ; $i<=$end ; $i++) {
-		if($i == $page) {
+		if($i == $page ) {
 			$numbers .= " $i ";
 		}
 		else {
@@ -267,7 +268,7 @@ function GetTimemachine() {
 
 	if ($queryarray[$GETVars['qq']]["polltype"]=="snapshot") {
                 $ret .= "<div class='sidebarinfo'><b>Time Machine</b><br><br><div id='datechooser'>";
-                $ret .= "<form name='calform' action='".$_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']."' method='post'>";
+                $ret .= "<form name='calform' action='".$_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']."&s=".$GETVars['server']."' method='post'>";
                 $ret .= "<input id='dateinput' class='textfield' name='dateinput' type='text' style='width: 100px' value='".strftime("%Y/%m/%d", $_SESSION['timemachine']['date'])."'>";
 		$ret .= "<br>";
 		$ret .=  "<select name='timestamps' class='button' size=1 style='width: 103px' onchange='submit()'>";
@@ -563,7 +564,7 @@ function getTimestampsOfADay($timestamp = "") {
 
 	global $GETVars;
 	global $configarray;
-    global $conn;
+	global $conn;
 	
 	$server = $GETVars['server'];
 	$ret = array();
@@ -723,10 +724,10 @@ function execute($type = 'table') {
 	$colorsarray = $configarray["colorsarray"];
 	$queryarray = $configarray["queryarray"][$GETVars['qq']];
 
-    $now = time();
-    $oneday = 86400;
-    $onehour = 3600;
-    $tolerance = 1200;
+	$now = time();
+	$oneday = 86400;
+	$onehour = 3600;
+	$tolerance = 1200;
 
 	$server = $GETVars['server'];
 	$outp = '';
@@ -751,7 +752,8 @@ function execute($type = 'table') {
 	$polltype = $configarray["queryarray"][$GETVars['qq']]["polltype"];
 
 	if ($polltype == "snapshot") {
-		if ($_SESSION['timemachine']['time'] == date) {
+		//if ($_SESSION['timemachine']['time'] == date) {
+		if ($_SESSION['timemachine']['time'] == $_SESSION['timemachine']['date']) {
 			$timestampquery = " WHERE timestamp=(SELECT MAX(TimeStamp) FROM res_".$qtable."_".$server.")";
 		} else {
 			$timestampquery = " WHERE timestamp = '".$_SESSION['timemachine']['time']."'";
@@ -771,17 +773,17 @@ function execute($type = 'table') {
 			$wc = " WHERE ";
 		}
 		$wc .= "`".$searcharr["field"]."`".$searcharr["op"]."'".$searcharr["val"]."' ";
-    } else if (isset($timetablestarttime)) {
-        $startunix = ((ceil($now/$onehour)*$onehour)-$onehour-$oneday)-(($timetablestarttime-24)*$onehour);
-        $endunix = $startunix + $oneday + $onehour;
-        $start = strftime("%Y-%m-%d %H:%M:%S.000000", $startunix);
-        $end = strftime("%Y-%m-%d %H:%M:%S.000000", $endunix);
-        $wc = " WHERE `End Time` >= '".$start."' AND `Start Time` <= '".$end."'";
+	} else if (isset($timetablestarttime)) {
+		$startunix = ((ceil($now/$onehour)*$onehour)-$onehour-$oneday)-(($timetablestarttime-24)*$onehour);
+		$endunix = $startunix + $oneday + $onehour;
+		$start = strftime("%Y-%m-%d %H:%M:%S.000000", $startunix);
+		$end = strftime("%Y-%m-%d %H:%M:%S.000000", $endunix);
+		$wc = " WHERE `End Time` >= '".$start."' AND `Start Time` <= '".$end."'";
 	} else {
 		$wc= " ";
 	}
 
-        $columnnames = getTableFields("res_".$qtable."_".$server);
+	$columnnames = getTableFields("res_".$qtable."_".$server);
 
 	//execute the constructed query
 	$sql = "SELECT ".$columnnames." from res_".$qtable."_".$server.$timestampquery.$wc.$sqlappend;
@@ -790,10 +792,10 @@ function execute($type = 'table') {
 	if ($sqlres) $message = $sql;
 
 	if ($type == "table") {
-		$i = 1;
-        $rs = fetchSplitArrayDB($sql,$conn,20);
+	$i = 1;
+	$rs = fetchSplitArrayDB($sql,$conn,20);
 
-        foreach ($rs as $row) {
+	foreach ($rs as $row) {
 			$color = "";
 			$col = $queryarray["alert_field"];
 			if ($col != '') {
