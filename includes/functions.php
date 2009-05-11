@@ -1040,9 +1040,34 @@ function getPollDStat() {
 
     $i=1;
     $outp = "<table class='zebra'>";
+    $outp .= "<tr><th>Status</th><th>Last Run</th><th>Next Run</th></tr>";
+
+    $sql = "SELECT enabled, status, lastrun, nextrun from log_polldstat";
+    $sqlres = fetchArrayDB($sql, $conn);
+    foreach ($sqlres as $row) {
+	if ($row['enabled'] == "1") {
+		if ($row['status'] == "running") {
+			$cellcolor = "green";
+		} else if ($row['status'] == "sleeping") {
+			$cellcolor = "yellow";
+		} else {
+			$cellcolor = "red";
+		}
+		if ($row['nextrun'] != "") $nextrun = strftime("%Y/%m/%d %H:%M:%S", $row['nextrun']);
+		$status = $row['status'];
+	} else {
+		$status = "disabled";
+		$cellcolor = "red";
+	}
+	if ($row['lastrun'] != "") $lastrun = strftime("%Y/%m/%d %H:%M:%S", $row['lastrun']);
+	$outp .= "<tr class='d1'><td bgcolor='".$cellcolor."'>".$status."</td><td>".$lastrun."</td><td>".$nextrun."</td></tr>";
+    }
+    $outp .= "</table><br><br>";
+
+    $outp .= "<table class='zebra'>";
     $outp .= "<tr><th>Time</th><th>Servername</th><th>Updated</th><th>Unchanged</th><th>Pollfreq not reached</th><th>Time needed (s)</th></tr>";
 
-    $sql = "SELECT * from log_polldstat where timestamp > '".(time()-86400)."' order by timestamp desc";
+    $sql = "SELECT * from log_polldlog where timestamp > '".(time()-86400)."' order by timestamp desc";
     $_SESSION["lastsql"] = $sql;
     $rs = fetchSplitArrayDB($sql,$conn,20);
     foreach ($rs as $row) {

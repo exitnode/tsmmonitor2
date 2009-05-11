@@ -337,14 +337,6 @@ function pollQuery($query = "", $server = "", $ignorePollFreq = FALSE, $timestam
 
 	$tablename = "res_".$query["name"]."_".$server["servername"];
 	if (!$ignorePollFreq) echo "---------".$query["name"].": ";
-	// drop result table if init=yes
-	if ($init == "yes") {
-		$dropsql = "drop table ".$tablename;
-		$this->fireMySQLQuery($dropsql, FALSE);
-		$updatehashsql = "delete from log_hashes where tablename='".$tablename."'";
-		$this->fireMySQLQuery($updatehashsql, FALSE);
-		//echo "------------deleted hash for ".$tablename."\n";
-	}
 	// create table if not exists
 	$showsql = "SHOW TABLES LIKE '".$tablename."'";
 	$res = $this->fireMySQLQuery($showsql, TRUE);
@@ -399,9 +391,6 @@ function pollOverviewQuery($query = "", $server = "", $timestamp){
 
 	$tablename = "res_overview_".$server["servername"];
 	echo "---------".$query["name"].": ";
-	if ($init == "yes") {
-
-	}
 	//$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." LIKE smp_overview";
 	$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." ( `name` varchar(35) collate utf8_unicode_ci NOT NULL, `result` varchar(255) collate utf8_unicode_ci NOT NULL, UNIQUE KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 	$this->fireMySQLQuery($ctsql, FALSE);
@@ -419,14 +408,98 @@ function pollOverviewQuery($query = "", $server = "", $timestamp){
 
 
 
+
+/**
+ * cleanupDatabase - cleans up database (single result tables and/or hash entry)
+ *
+ * @param string $servername 
+ * @param string $queryname
+ * @param string $overviewqueryname
+ * @param string $hashonly do not drop table, just delete entry in log_hashes
+ */
+
+function cleanupDatabase($servername = "", $queryname = "", $overviewqueryname = "", $hashonly = "yes"){
+
+	if ($servername != "" && $queryname != "" && $overviewqueryname != "") {
+		foreach ($this->servers as $server) { 
+			if ($servername == "all" || $server["servername"] == $servername) {
+				foreach ($this->queries as $query) {
+					if (($queryname == "all" || $query["name"] == $queryname) && $queryname != "none") {
+						$tablename = "res_".$query["name"]."_".$server["servername"];
+						if ($hashonly != "yes") {
+							$dropsql = "drop table ".$tablename;
+							echo $dropsql;
+							$bla = $this->fireMySQLQuery($dropsql, TRUE);
+							var_dump($bla);
+						}
+						$delsql = "DELETE FROM log_hashes where `tablename` = '".$tablename."'";
+						$this->fireMySQLQuery($delsql, FALSE);
+					}
+				}
+				foreach ($this->overviewqueries as $query) {
+					if (($overviewqueryname == "all" || $query["name"] == $overviewqueryname) && $overviewqueryname != "none") {
+						$tablename = "res_overview_".$server["servername"];
+						$dropsql = "drop table ".$tablename;
+						$this->fireMySQLQuery($dropsql, FALSE);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+/**
+ * setPollDStatus
+ *
+ * @param string $status
+ * @param string $lastrun
+ * @param string $nextrun
+ */
+
+function setPollDStatus($status, $lastrun, $nextrun) {
+
+	if ($status != "") $status = "`status`='".$status."'";
+	if ($lastrun != "") $lastrun = ", `lastrun`='".$lastrun."'";
+	if ($nextrun != "") $nextrun = ", `nextrun`='".$nextrun."'";
+	
+	$sql = "update log_polldstat set ".$status." ".$lastrun." ".$nextrun." WHERE `id`='1'";
+	$this->fireMySQLQuery($sql, FALSE);
+
+}
+
+
+
+/**
+ * isEnabled - returns true if PollD is enabled
+ *
+ * @returns boolean
+ */
+
+function isEnabled() {
+
+        $sql = "select enabled from log_polldstat WHERE `id`='1'";
+        $enabled = $this->fireMySQLQuery($sql, TRUE);
+	
+	if ($enabled != "" && $enabled[0]->enabled == "1"){
+		return TRUE;
+	} else {
+ 		return FALSE;
+	}
+
+}
+
+
+
 /**
  * poll - the main function that polls the data
  *
- * @param string $init deletes all result tables and sets TSM Monitor back to the state of virginity if "yes" is given
  * @return boolean
  */
 
-function poll($init = "no"){
+function poll(){
 
 	$sleeptime = $this->getSleeptime();
 
@@ -436,47 +509,54 @@ function poll($init = "no"){
 
 	// infinite loop
 	while(true) {
+
+		if ($this->isEnabled()) {	
 	
-		$timestamp = time();
+			$timestamp = time();
 
-		echo "running!\n";
-		echo "timestamp for this run is ".$timestamp."\n";
+			echo "running!\n";
+			echo "timestamp for this run is ".$timestamp."\n";
+			
+			$this->setPollDStatus("running", "", "");
+
+			foreach ($this->servers as $server) {
+				$this->log_timeneeded = time();
+				$this->log_unchangedresult = 0;
+				$this->log_pollfreqnoreached = 0;
+				$this->log_updated = 0;
+				// go through all queries defined in xml file
+				echo "---querying server ".$server["servername"]."\n";
+				echo "------querying normal queries\n";
+				foreach ($this->queries as $query) {
+					$this->pollQuery($query, $server, FALSE, $timestamp);
+				}
+				echo "------querying overview queries\n";
+				foreach ($this->overviewqueries as $query) {
+					$this->pollOverviewQuery($query, $server, $timestamp);
+				}
+				$sql = 'INSERT INTO log_polldlog VALUES ("'.$timestamp.'", "'.$server["servername"].'", "'.$log_updated.'", "'.$log_unchangedresult.'", "'.$log_pollfreqnoreached.'", "'.(time()-$log_timeneeded).'")';
+				$this->fireMySQLQuery($sql, FALSE);
+			}
+			$init = "no";
+
+			
+			echo "needed ".(time()-$timestamp)." seconds for this run.\n";
+			//$tempsleeptime = $sleeptime-(time()-$timestamp);
+			$tempsleeptime = 900 -(time()-$timestamp);
+			echo "sleeping for ".$tempsleeptime." seconds...\n";
+			echo "next run will be at ".strftime("%H:%M:%S", (time()+$tempsleeptime))."\n\n";
+
+			$this->setPollDStatus("sleeping", $timestamp, (time()+$tempsleeptime));
 
 
-		foreach ($this->servers as $server) {
-			$this->log_timeneeded = time();
-			$this->log_unchangedresult = 0;
-			$this->log_pollfreqnoreached = 0;
-			$this->log_updated = 0;
-			// go through all queries defined in xml file
-			echo "---querying server ".$server["servername"]."\n";
-			echo "------querying normal queries\n";
-			foreach ($this->queries as $query) {
-				$this->pollQuery($query, $server, FALSE, $timestamp);
-			}
-			echo "------querying overview queries\n";
-			if ($init == "yes") {
-				$tablename = "res_overview_".$server["servername"];
-				$dropsql = "drop table ".$tablename;
-				$this->fireMySQLQuery($dropsql, FALSE);
-			}
-			foreach ($this->overviewqueries as $query) {
-				$this->pollOverviewQuery($query, $server, $timestamp);
-			}
-			$sql = 'INSERT INTO log_polldstat VALUES ("'.$timestamp.'", "'.$server["servername"].'", "'.$log_updated.'", "'.$log_unchangedresult.'", "'.$log_pollfreqnoreached.'", "'.(time()-$log_timeneeded).'")';
-			$this->fireMySQLQuery($sql, FALSE);
+			sleep ($tempsleeptime);
+
+		} else {
+
+			echo "PollD is disabled. Sleeping for 5 minutes...\n";
+			sleep (300);
+
 		}
-		$init = "no";
-
-		
-		echo "needed ".(time()-$timestamp)." seconds for this run.\n";
-		//$tempsleeptime = $sleeptime-(time()-$timestamp);
-		$tempsleeptime = 900 -(time()-$timestamp);
-		echo "sleeping for ".$tempsleeptime." seconds...\n";
-		echo "next run will be at ".strftime("%H:%M:%S", (time()+$tempsleeptime))."\n\n";
-
-		sleep ($tempsleeptime);
-
 	}
 
 }
