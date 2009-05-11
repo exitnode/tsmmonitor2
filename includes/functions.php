@@ -127,7 +127,7 @@ function initialize() {
 	}
 
 
-        if (($_POST['Poll'] == "Poll Now!" || $_SESSION['timemachine']['date'] == "") && $queryarray[$GETVars['qq']]["polltype"]=="snapshot" || $_POST['s'] != "") {
+        if (($_POST['Poll'] == "Poll Now!" || $_SESSION['timemachine']['date'] == "") && $queryarray[$GETVars['qq']]["polltype"]=="snapshot" || $_POST['s'] != "" && $GETVars['qq'] != "overview") {
                 $qtable = $configarray["queryarray"][$GETVars['qq']]["name"];
                 $sql = "SELECT MAX(TimeStamp) FROM res_".$qtable."_".$GETVars["server"];
                 $res = fetchArrayDB($sql, $conn);
@@ -734,14 +734,8 @@ function execute($type = 'table') {
 	$outp_cache = '';
 	$stop=FALSE;
 	$tablearray = array(); 
+	$bContinue = TRUE;
 
-	/**
-	$query = ereg_replace("NOTEQUAL","<>",$query);
-	$query = ereg_replace("LESS","<",$query);
-
-    if (isset($timetablestarttime) && $timetablestarttime != "") {
-            $query = ereg_replace("SEARCHFIELD","$timetablestarttime",$query);
-	**/
 	if ($GETVars['ob'] != '' ) {
 		$sqlappend = " order by `".$GETVars['ob']."` ".$GETVars['orderdir'];
 	} elseif ($configarray["queryarray"][$GETVars['qq']]["orderby"] != '') {
@@ -752,7 +746,6 @@ function execute($type = 'table') {
 	$polltype = $configarray["queryarray"][$GETVars['qq']]["polltype"];
 
 	if ($polltype == "snapshot") {
-		//if ($_SESSION['timemachine']['time'] == date) {
 		if ($_SESSION['timemachine']['time'] == $_SESSION['timemachine']['date']) {
 			$timestampquery = " WHERE timestamp=(SELECT MAX(TimeStamp) FROM res_".$qtable."_".$server.")";
 		} else {
@@ -763,8 +756,6 @@ function execute($type = 'table') {
 	}
 
 	// get only latest entry
-
-	//if ($whereclause["field"]!="" && $whereclause["val"]!="") {
 	$searcharr = $_SESSION["search"][$GETVars['qq']];
 	if (isset($searcharr) && $searcharr["field"] != "" && $searcharr["val"] != "") {
 		if ($polltype == "snapshot") {
@@ -785,69 +776,73 @@ function execute($type = 'table') {
 
 	$columnnames = getTableFields("res_".$qtable."_".$server);
 
+	if ($columnnames == "") $bContinue = FALSE;
+
 	//execute the constructed query
 	$sql = "SELECT ".$columnnames." from res_".$qtable."_".$server.$timestampquery.$wc.$sqlappend;
 
 	$_SESSION["lastsql"] = $sql;
 	if ($sqlres) $message = $sql;
 
-	if ($type == "table") {
-	$i = 1;
-	$rs = fetchSplitArrayDB($sql,$conn,20);
+	if ($bContinue) {
+		if ($type == "table") {
+			$i = 1;
+			$rs = fetchSplitArrayDB($sql,$conn,20);
 
-	foreach ($rs as $row) {
-			$color = "";
-			$col = $queryarray["alert_field"];
-			if ($col != '') {
-				$error = checkAlert($queryarray["alert_comp"], $queryarray["alert_val"], $row[$col]);
-				if($error) {
-					$color = $queryarray["alert_col"];
-				} else {
-					$color = "ok";
-				}
-				$colorzebra = $colorsarray[$color][$i];
-			}
-			if ($i % 2 == 0) {
-				$outp = $outp."<tr class='d1'>";
-			}else{
-				$outp = $outp."<tr class='d0'>";
-			}
-			$i++;
-			
-			while(list($keycell, $valcell) = each($row)) {
-				if($color!="" && $col==$keycell) {
-					
-					if ($i % 2 == 0) {
-						$cellcol = $colorsarray[$color."_light"];
+			foreach ($rs as $row) {
+				$color = "";
+				$col = $queryarray["alert_field"];
+				if ($col != '') {
+					$error = checkAlert($queryarray["alert_comp"], $queryarray["alert_val"], $row[$col]);
+					if($error) {
+						$color = $queryarray["alert_col"];
 					} else {
-						$cellcol = $colorsarray[$color."_dark"];
+						$color = "ok";
 					}
-					$outp = $outp."<td bgcolor='".$cellcol."'>".$valcell."</td>";
-				} else {
-					$outp = $outp."<td>".$valcell."</td>";
+					$colorzebra = $colorsarray[$color][$i];
 				}
+				if ($i % 2 == 0) {
+					$outp = $outp."<tr class='d1'>";
+				}else{
+					$outp = $outp."<tr class='d0'>";
+				}
+				$i++;
+				
+				while(list($keycell, $valcell) = each($row)) {
+					if($color!="" && $col==$keycell) {
+						
+						if ($i % 2 == 0) {
+							$cellcol = $colorsarray[$color."_light"];
+						} else {
+							$cellcol = $colorsarray[$color."_dark"];
+						}
+						$outp = $outp."<td bgcolor='".$cellcol."'>".$valcell."</td>";
+					} else {
+						$outp = $outp."<td>".$valcell."</td>";
+					}
 
-			}
-			$outp = $outp."</tr>\n";
-		}
-	}
-	else if ($type == "verticaltable") {
-		$outp = fetchArrayDB($sql, $conn);
-	}
-	else if ($type == "timetable") {
-		$sqlres = fetchArrayDB($sql, $conn);
-		$outp = array();;
-		foreach ($sqlres as $row) {
-			$rowarray2 = array();
-			while(list($keycell, $valcell) = each($row)) {
-				if ($keycell == "Start Time" || $keycell == "End Time") {
-					$date = $row[$keycell];
-					$rowarray2[] = mktime(substr($date,11,2),substr($date,14,2),substr($date,17,2),substr($date,5,2),substr($date,8,2),substr($date,0,4));
-				} else {
-					$rowarray2[] = $valcell;
 				}
+				$outp = $outp."</tr>\n";
 			}
-			array_push($outp, $rowarray2);
+		}
+		else if ($type == "verticaltable") {
+			$outp = fetchArrayDB($sql, $conn);
+		}
+		else if ($type == "timetable") {
+			$sqlres = fetchArrayDB($sql, $conn);
+			$outp = array();;
+			foreach ($sqlres as $row) {
+				$rowarray2 = array();
+				while(list($keycell, $valcell) = each($row)) {
+					if ($keycell == "Start Time" || $keycell == "End Time") {
+						$date = $row[$keycell];
+						$rowarray2[] = mktime(substr($date,11,2),substr($date,14,2),substr($date,17,2),substr($date,5,2),substr($date,8,2),substr($date,0,4));
+					} else {
+						$rowarray2[] = $valcell;
+					}
+				}
+				array_push($outp, $rowarray2);
+			}
 		}
 	}
 
@@ -863,7 +858,7 @@ function execute($type = 'table') {
  *
  * @return string
  */
-
+/**
 function getCustomQuery() {
 
         global $GETVars;
@@ -929,6 +924,8 @@ function getCustomQuery() {
 	return $input.$header.$outp;
 
 }
+**/
+
 
 /**
  * getSearchfield - returns the HTML code of the upper searchfield panel
@@ -1066,7 +1063,7 @@ function getPollDStat() {
     }
     $nav = showPageNavigation("20");
     if ($nav!="") {
-        $outp = $outp."<tr><td colspan='0' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
+        $outp = $outp."<tr><td colspan='6' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
     }
     
     return $outp."</table>";
@@ -1339,7 +1336,6 @@ function getConfigArray() {
     $menuarrayxml = $queryconfigarray["navigation"]["mainmenuitem"];
     $mainmenuarrayxml = $menuarrayxml;
     $mainmenuarray["trennlinie"] = "trennlinie";
-    $mainmenuarray["q=custom&m=main"] = "Custom TSM Query";
     $mainmenuarray["q=polldstat&m=main"] = "Polling Daemon Log";
     $mainmenuarray["q=serverlist&m=main"] = "Change Server";
     if ($_SESSION["logindata"]["role"] == "admin") $mainmenuarray["admin"] = "Admin";
@@ -1366,7 +1362,6 @@ function getConfigArray() {
             $submenuarray[$url] = $submenuitem_label;
         }
         $submenuarray["trennlinie"] = "trennlinie";
-        $submenuarray["q=custom&m=".$submenu['name']] = "Custom TSM Query";
         $submenuarray["q=polldstat&m=".$submenu['name']] = "Polling Daemon Log";
         $submenuarray["q=serverlist&m=".$submenu['name']] = "Change Server";
         if ($_SESSION["logindata"]["role"] == "admin") $submenuarray["admin"] = "Admin";

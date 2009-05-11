@@ -220,6 +220,8 @@ function execute($query = '', $servername = '', $restable = '', $timestamp = '',
 			$read = fgets($handle, 4096);
 			$hashstring .= $read;
 			$stop = strstr($read, 'ANR2034E');
+			$stop = strstr($read, 'ANS1017E');
+			$stop = strstr($read, 'ANS8023E');
 			//$stop = strstr($read, 'ANS8023E');
 			if ($read != ' ' && $read != '' && !$stop) {
 				$read = preg_replace('/[\n]+/', '', $read);
@@ -237,7 +239,11 @@ function execute($query = '', $servername = '', $restable = '', $timestamp = '',
 	}
 	$return["sql"] = $out;
 	$return["md5"] = md5($hashstring);
-	return $return;
+	if (!$stop){
+		return $return;
+	} else {
+		return "";
+	}
 
 }
 
@@ -351,24 +357,28 @@ function pollQuery($query = "", $server = "", $ignorePollFreq = FALSE, $timestam
 		$this->fireMySQLQuery($ctsql, FALSE);
 	}
 	// execute query and store result in mysql db
-	$result = $this->execute($query["tsmquery"], $server["servername"], $tablename, $timestamp);
 	if ($ignorePollFreq || !$this->checkFreq($tablename, $query["pollfreq"], $timestamp)){
-		if (!$this->checkHash($tablename, $result["md5"])) {
-			if ($query["polltype"]=="update") {
-				$dropsql = "truncate table ".$tablename;
-				$this->fireMySQLQuery($dropsql, FALSE);
-				if (!$ignorePollFreq) echo " TRUNCATED TABLE and ";
+		$result = $this->execute($query["tsmquery"], $server["servername"], $tablename, $timestamp);
+		if ($result != "") {
+			if (!$this->checkHash($tablename, $result["md5"])) {
+				if ($query["polltype"]=="update") {
+					$dropsql = "truncate table ".$tablename;
+					$this->fireMySQLQuery($dropsql, FALSE);
+					if (!$ignorePollFreq) echo " TRUNCATED TABLE and ";
+				}
+				foreach ($result["sql"] as $insertquery) {
+					if ($query["name"] == "querysession") echo "\n\n".$insertquery."\n\n";
+					$this->fireMySQLQuery($insertquery, FALSE);
+				}
+				if (!$ignorePollFreq) echo "inserted new rows into ".$tablename."\n";
+				$this->log_updated++;
+			} else {
+				if (!$ignorePollFreq) echo "no need to update result -> result is the same as last time\n";
+				$this->log_unchangedresult++;
 			}
-			foreach ($result["sql"] as $insertquery) {
-				if ($query["name"] == "querysession") echo "\n\n".$insertquery."\n\n";
-				$this->fireMySQLQuery($insertquery, FALSE);
-			}
-			if (!$ignorePollFreq) echo "inserted new rows into ".$tablename."\n";
-			$this->log_updated++;
 		} else {
-			if (!$ignorePollFreq) echo "no need to update result -> result is the same as last time\n";
-			$this->log_unchangedresult++;
-		}
+			echo "There was a problem querying the TSM Server ".$server["servername"]."!\n";
+		} 
 	} else {
 		if (!$ignorePollFreq) echo "no need to update result -> pollfreq not reached!\n";
 		$this->log_pollfreqnoreached++;
@@ -396,10 +406,14 @@ function pollOverviewQuery($query = "", $server = "", $timestamp){
 	$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." ( `name` varchar(35) collate utf8_unicode_ci NOT NULL, `result` varchar(255) collate utf8_unicode_ci NOT NULL, UNIQUE KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 	$this->fireMySQLQuery($ctsql, FALSE);
 	$result = $this->execute($query["query"], $server["servername"], $tablename, '', $query["name"]);
-	foreach ($result["sql"] as $insertquery) {
-		$this->fireMySQLQuery($insertquery, FALSE);
-		echo "inserted row\n";
-	}
+	if ($result != "") {
+		foreach ($result["sql"] as $insertquery) {
+			$this->fireMySQLQuery($insertquery, FALSE);
+			echo "inserted row\n";
+		}
+        } else {
+                echo "There was a problem querying the TSM Server ".$server["servername"]."!\n";
+        }
 
 }
 

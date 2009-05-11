@@ -33,10 +33,11 @@
 
 <form action="<?php echo $_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']."&s=".$GETVars['server']; ?>" method="post">
 <?php 
-if ($GETVars['qq'] != "admin" && !$_POST["edit"] == "edit") {
-	if ($GETVars['qq'] != "index" && $GETVars['qq'] != "overview") {  
-		echo "<input type='button' value='PDF' onclick='genPDF()' class='button'>";
-	}
+//if ($GETVars['qq'] != "admin" && !$_POST["edit"] == "edit") {
+if ($GETVars['qq'] != "index" && $GETVars['qq'] != "overview" && $GETVars['qq'] != "serverlist") {  
+	echo "<input type='button' value='PDF' onclick='genPDF()' class='button'>";
+}
+if ($GETVars['qq'] != "polldstat" && $GETVars['qq'] != "serverlist") {
 
 	echo "<select name='s' size=1 onChange='submit();' class='button'>";
 
