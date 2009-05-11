@@ -428,9 +428,7 @@ function cleanupDatabase($servername = "", $queryname = "", $overviewqueryname =
 						$tablename = "res_".$query["name"]."_".$server["servername"];
 						if ($hashonly != "yes") {
 							$dropsql = "drop table ".$tablename;
-							echo $dropsql;
-							$bla = $this->fireMySQLQuery($dropsql, TRUE);
-							var_dump($bla);
+							$this->fireMySQLQuery($dropsql, FALSE);
 						}
 						$delsql = "DELETE FROM log_hashes where `tablename` = '".$tablename."'";
 						$this->fireMySQLQuery($delsql, FALSE);

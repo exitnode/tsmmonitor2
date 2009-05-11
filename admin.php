@@ -107,11 +107,9 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 		echo "</td></td><td bgcolor=".$cellcolor.">PollD is ".$polldenabled."</td></tr>";
 		echo "</table>";
 		echo "<br><br>";
-
-		
 		echo "</form>";
-        } else {
 
+        } else {
             if ( ($_GET['action'] != "" && ($_GET['action'] == "edit" && $_GET['id'] != "")) || $_POST['Add'] == "Add") {
                 $i = 0;
                 // show Add New Entry Form
@@ -134,7 +132,7 @@ echo "TEST: ".$col['Field']." -> $colval<br>\n";
                             if ($col['Field'] == "password") {
                                 echo "<td><b>".$col['Field']."</b></td><td><input type='password' name='txt".$col['Field']."' value='' /></td></tr>";
                             } else {
-                                echo "<td><b>".$col['Field']."</b></td><td><input type='text' name='txt".$col['Field']."' value='' /></td></tr>";
+                                echo "<td><b>".$col['Field']."</b></td><td><input type='text' size='50' name='txt".$col['Field']."' value='' /></td></tr>";
                             }
                         }
                     }
@@ -164,7 +162,7 @@ echo "TEST: ".$col['Field']." -> $colval<br>\n";
                             } else if ($keycell == "id") {
                                 $id = $valcell;
                             } else {
-                                echo "<td><b>".$keycell."</b></td><td><input type='text' name='txt".$keycell."' value='".$valcell."' /></td></tr>";
+                                echo "<td><b>".$keycell."</b></td><td><input type='text' size='50' name='txt".$keycell."' value='".$valcell."' /></td></tr>";
                             }
                         }
                     }
