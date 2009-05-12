@@ -107,6 +107,39 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 		echo "</td></td><td bgcolor=".$cellcolor.">PollD is ".$polldenabled."</td></tr>";
 		echo "</table>";
 		echo "<br><br>";
+                echo "<b>Cleanup Database</b><br>";
+                echo "<table class='zebra'>";
+                echo "<tr><th>Server</th><th>Query</th><th>Overview Query</th><th>Keep</th><th></th></tr>";
+                echo "<tr class='d0'><td>";
+
+		echo "<select name='cleandbserver' size=1 class='button'>";
+		echo '<option value="all">- all servers -</options>';
+		while(list($servername,$serveritems) = each($tsmmonitor->configarray["serverlist"])) {
+			echo '<option value="'.$servername.'"> '.$servername.' ('.$serveritems["description"].')</option>';
+		}
+		echo "</select>";
+		echo "</td><td>";
+                echo "<select name='cleandbquery' size=1 class='button'>";
+		echo '<option value="all">- all queries -</options>';
+                while(list($queryname,$queryitems) = each($tsmmonitor->queryarray)) {
+                        echo '<option value="'.$queryname.'"> '.$queryname.'</option>';
+                }
+                echo "</select>";
+                echo "</td><td>"; 
+		echo "<select name='cleandbovqueires' size=1 class='button'>";
+		echo '<option value="yes">yes</options>';
+		echo '<option value="no">no</options>';
+                echo "</select>";
+                echo "</td><td>";
+                echo "<select name='cleandbtime' size=1 class='button'>";
+                $times = array("1 month" => "30", "2 months" => "60", "3 months" => "90", "6 months" => "180", "1 year" => "360");
+                while(list($label,$value) = each($times)) {
+                        echo '<option value="'.$value.'"> '.$label.'</option>';
+                }
+                echo "</select>";
+		echo "<td><input type='submit' class='button' name='cleanaction' value='Clean Up' onclick='submit();'></td></tr>";
+                echo "</table>";
+                echo "<br><br>";
 		echo "</form>";
 
         } else {
@@ -115,7 +148,7 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
                 // show Add New Entry Form
                 if ($_POST['Add'] == "Add") {
                     $sqlth = "SHOW COLUMNS from cfg_".$tsmmonitor->GETVars['qq'];
-                    $sqlresth = $tsmmonitor->fetchArrayDB($sqlth, $conn);
+                    $sqlresth = $tsmmonitor->fetchArrayDB($sqlth, $tsmmonitor->conn);
                     echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
                     echo "<table class='zebra'>";
                     echo "<tr><th>Key</th><th>Value</th></tr>";
@@ -182,12 +215,12 @@ echo "TEST: ".$col['Field']." -> $colval<br>\n";
                     if ($_GET['action'] == "delete") {
                         echo $_POST['hidfield'];
                         $sql = "DELETE from cfg_".$_GET['q']." where id='".$_GET['id']."' LIMIT 1";
-                        $tsmmonitor->execDB($sql, $conn);
+                        $tsmmonitor->execDB($sql, $tsmmonitor->conn);
                     }
                 // Process update of an existing item or insert of a new one
                 } else if ($_POST['EditSave'] == "Save" || $_POST['AddSave'] == "Save") {
                     $sqlth = "SHOW COLUMNS from cfg_".$_GET['q'];
-                    $sqlresth = $tsmmonitor->fetchArrayDB($sqlth, $conn);
+                    $sqlresth = $tsmmonitor->fetchArrayDB($sqlth, $tsmmonitor->conn);
                     $colarray = array();
                     $colarray['id'] = $_POST['id'];
                     $set = "";
@@ -228,7 +261,7 @@ echo "TEST: ".$col['Field']." -> $colval<br>\n";
                     } else if ($_POST['EditSave'] == "Save") {
                         $sql = "UPDATE cfg_".$_GET['q']." set ".$set." where id='".$_POST['id']."' LIMIT 1";
                     }
-                    $tsmmonitor->updateDB("cfg_".$_GET['q'], $colarray, 'id', $conn);
+                    $tsmmonitor->updateDB("cfg_".$_GET['q'], $colarray, 'id', $tsmmonitor->conn);
                 }
                 echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
                 echo "<table class='zebra'>";
