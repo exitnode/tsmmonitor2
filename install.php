@@ -62,7 +62,7 @@ $ext_miss
 
 $tsm_monitor_versions = array("0.1.0", "0.1.1");
 
-$old_tsm_monitor_version = $tsmmonitor->fetchCellDB("select confval from cfg_config where confkey='version'", '', $tsmmonitor->conn);
+$old_tsm_monitor_version = $adodb->fetchCellDB("select confval from cfg_config where confkey='version'", '');
 
 // try to find current (old) version in the array
 $old_version_index = array_search($old_tsm_monitor_version, $tsm_monitor_versions);
@@ -173,11 +173,11 @@ if ($_REQUEST["step"] == "90") {
     // Flush updated data to DB
     foreach ($input as $name => $array) {
         if (isset($_POST[$name])) {
-            $tsmmonitor->updateDB('cfg_config', array(confkey => "$name", confval => $_POST[$name], description => $array['name']), 'confkey', $tsmmonitor->conn);
+            $adodb->updateDB('cfg_config', array(confkey => "$name", confval => $_POST[$name], description => $array['name']), 'confkey');
         }
     }
-    $tsmmonitor->updateDB('cfg_config', array(confkey => 'version', confval => $config['tsm_monitor_version']), 'confkey', $tsmmonitor->conn);
-    $tsmmonitor->closeDB($tsmmonitor->conn);
+    $adodb->updateDB('cfg_config', array(confkey => 'version', confval => $config['tsm_monitor_version']), 'confkey');
+    $adodb->closeDB();
     header("Location: index.php");
     exit;
 } elseif (($_REQUEST["step"] == "40") && ($_REQUEST["install_type"] == "20")) {

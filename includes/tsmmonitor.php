@@ -33,7 +33,7 @@
 
 /**
  *
- * Class 
+ * Class TSMMonitor
  *
  */
 
@@ -50,18 +50,19 @@ class TSMMonitor {
 	var $submenu;
 	var $adminmenu;
 	var $message;
-	var $conn;
+	var $adodb;
 
 
 
 
 	/**
-	 * initialize - This function us called every time index.php is refreshed
+	 * TSMMonitor - constructor
 	 *
 	 */
 
-	function initialize() {
+	function TSMMonitor($adodb) {
 
+		$this->adodb = $adodb;
 
 		session_name("tsmmonitordev");
 		session_start();
@@ -142,7 +143,7 @@ class TSMMonitor {
 		if (($_POST['Poll'] == "Poll Now!" || $_SESSION['timemachine']['date'] == "") && $this->queryarray[$this->GETVars['qq']]["polltype"]=="snapshot" || $_POST['s'] != "" && $this->GETVars['qq'] != "overview" && $this->GETVars['qq'] != "index") {
 			$qtable = $this->configarray["queryarray"][$this->GETVars['qq']]["name"];
 			$sql = "SELECT MAX(TimeStamp) FROM res_".$qtable."_".$this->GETVars["server"];
-			$res = $this->fetchArrayDB($sql, $this->conn);
+			$res = $this->adodb->fetchArrayDB($sql);
 			$resarr = (array)$res[0];
 			$_SESSION['timemachine']['date'] = $resarr["MAX(TimeStamp)"];
 			$_SESSION['timemachine']['time'] = $resarr["MAX(TimeStamp)"];
@@ -160,6 +161,49 @@ class TSMMonitor {
 
 	}
 
+
+
+
+        /**
+         * $this->fetchSplitArrayDB - execute a SQL query against the DB via ADODB
+         *                     and return results in an associative array.
+         *
+         * @param string $sql SQL statement to execute
+         * @param string $rows_per_page number of rows per page a result will have
+         * @return array All results in an associative array
+         */
+        function fetchSplitArrayDB($sql, $rows_per_page = '20') {
+        //    $this->conn->debug = true;
+            $this->page = intval($_GET['page']);
+
+            $sql = $this->adodb->sanitizeSQL($sql);
+
+            $recordArray = array();
+            $this->adodb->conn->SetFetchMode(ADODB_FETCH_ASSOC);
+            $recordSet = $this->adodb->conn->Execute($sql);
+
+            if (($recordSet) || ($this->adodb->conn->ErrorNo() == 0)) {
+                    $total_rows = $recordSet->RecordCount($recordSet);
+		    $this->max_pages = ceil($total_rows/$rows_per_page);
+
+                    if($this->page > $this->max_pages || $this->page <= 0) {
+                        $this->page = 1;
+                    }
+                    $offset = $rows_per_page * ($this->page-1);
+                $endset = $offset + $rows_per_page;
+                $recordSet->Move($offset);
+
+                while (($recordSet->CurrentRow() < $endset) && ($recordSet->CurrentRow() < $total_rows) && ($recordSet)) {
+                    $recordArray{sizeof($recordArray)} = $recordSet->fields;
+                    $recordSet->MoveNext();
+                }
+                $recordSet->close();
+                return($recordArray);
+            } else {
+                echo "<p style='font-size: 16px; font-weight: bold; color: red;'>Database Error (".$this->conn->ErrorNo().")</p>\n<p>".$this->conn->ErrorMsg()."</p>";
+                exit;
+            }
+        }
 
 
 
@@ -428,7 +472,7 @@ class TSMMonitor {
 	    } else {
 		$sql = "SHOW COLUMNS FROM res_".$this->configarray["queryarray"][$this->GETVars['qq']]["name"]."_".$this->GETVars['server'];
 	    }
-	    $fieldnames = $this->fetchArrayDB($sql, $this->conn);
+	    $fieldnames = $this->adodb->fetchArrayDB($sql);
 
 	    // If table has more than one column
 	    if (sizeof($fieldnames) > 1) {
@@ -483,7 +527,7 @@ class TSMMonitor {
 		
 		if ($user != "" && $pass != "") {
 			$sql = "SELECT password, role from cfg_users where username='".$user."'";
-			$ret = $this->fetchArrayDB($sql, $this->conn);
+			$ret = $this->adodb->fetchArrayDB($sql);
 
 			if ($ret[0] != "" && $ret[0]['password'] == md5($pass)) {
 				$_SESSION["logindata"]["role"] = $ret[0]['role'];
@@ -561,7 +605,7 @@ class TSMMonitor {
 
 		$timestampquery = " WHERE timestamp between ".$startofday." and ".$endofday;
 		$sql = "SELECT distinct timestamp from res_".$qtable."_".$server.$timestampquery;
-		$ret = $this->fetchArrayDB($sql, $this->conn);
+		$ret = $this->adodb->fetchArrayDB($sql);
 
 		return $ret;
 
@@ -582,7 +626,7 @@ class TSMMonitor {
 	    $qtable = $this->configarray["queryarray"][$this->GETVars['qq']]["name"];
 
 	    $sql = "SELECT MAX(TimeStamp) from res_".$qtable."_".$server;
-	    $ret = $this->fetchArrayDB($sql, $this->conn);
+	    $ret = $this->adodb->fetchArrayDB($sql);
 	    $ret = (array)$ret[0];
 
 	    return $ret["MAX(TimeStamp)"];
@@ -601,7 +645,7 @@ class TSMMonitor {
 
 	    $sqlth = "SELECT * from ".$tablename." LIMIT 1";
 
-	    $sqlresth = $this->fetchArrayDB($sqlth, $this->conn);
+	    $sqlresth = $this->adodb->fetchArrayDB($sqlth);
 	    $columnnames = "";
 
 	    // get all table fields to be selected
@@ -644,7 +688,7 @@ class TSMMonitor {
 	    if ($sqlres) $this->message = $sql;
 
 	    $i = 1;
-	    $rs = $this->fetchArrayDB($sql, $this->conn);
+	    $rs = $this->adodb->fetchArrayDB($sql);
 
 	    foreach ($rs as $row) {
 		if ($type=="list") {
@@ -669,7 +713,7 @@ class TSMMonitor {
 
 		    $outp .= "</tr>\n";
 		} else {
-		    $outp = $this->fetchArrayDB($sql, $this->conn);
+		    $outp = $this->adodb->fetchArrayDB($sql);
 		    var_dump($outp);
 		}
 	    }
@@ -752,7 +796,7 @@ class TSMMonitor {
 		if ($bContinue) {
 			if ($type == "table") {
 				$i = 1;
-				$rs = $this->fetchSplitArrayDB($sql,$this->conn,20);
+				$rs = $this->fetchSplitArrayDB($sql,20);
 
 				foreach ($rs as $row) {
 					$color = "";
@@ -791,10 +835,10 @@ class TSMMonitor {
 				}
 			}
 			else if ($type == "verticaltable") {
-				$outp = $this->fetchArrayDB($sql, $this->conn);
+				$outp = $this->adodb->fetchArrayDB($sql);
 			}
 			else if ($type == "timetable") {
-				$sqlres = $this->fetchArrayDB($sql, $this->conn);
+				$sqlres = $this->adodb->fetchArrayDB($sql);
 				$outp = array();;
 				foreach ($sqlres as $row) {
 					$rowarray2 = array();
@@ -838,7 +882,7 @@ class TSMMonitor {
 		$arrop = $searcharr["op"];    
 	    }
 	    $sql = "SHOW COLUMNS FROM res_".$this->configarray["queryarray"][$this->GETVars['qq']]["name"]."_".$this->GETVars['server'];
-	    $fieldnames = $this->fetchArrayDB($sql, $this->conn);
+	    $fieldnames = $this->adodb->fetchArrayDB($sql);
 
 	    // Build Field Name Combobox
 	    $fieldbox = "<select name='wcfield' size=1 onChange='' class='button'>";
@@ -923,7 +967,7 @@ class TSMMonitor {
 	    $outp .= "<tr><th>Status</th><th>Last Run</th><th>Next Run</th></tr>";
 
 	    $sql = "SELECT enabled, status, lastrun, nextrun from log_polldstat";
-	    $sqlres = $this->fetchArrayDB($sql, $this->conn);
+	    $sqlres = $this->adodb->fetchArrayDB($sql);
 	    foreach ($sqlres as $row) {
 		if ($row['enabled'] == "1") {
 			if ($row['status'] == "running") {
@@ -949,7 +993,7 @@ class TSMMonitor {
 
 	    $sql = "SELECT * from log_polldlog where timestamp > '".(time()-86400)."' order by timestamp desc";
 	    $_SESSION["lastsql"] = $sql;
-	    $rs = $this->fetchSplitArrayDB($sql,$this->conn,20);
+	    $rs = $this->fetchSplitArrayDB($sql,20);
 	    foreach ($rs as $row) {
 		if ($i % 2 == 0) {
 		    $outp = $outp."<tr class='d1'>";
@@ -1001,7 +1045,7 @@ class TSMMonitor {
 		} else {
 		    $res = '';
 		    $sql = "SELECT name, result from res_overview_".$this->GETVars['server']." where name='".$subindexqueryarray[$key]["name"]."'";
-		    $sqlres = $this->fetchArrayDB($sql, $this->conn);
+		    $sqlres = $this->adodb->fetchArrayDB($sql);
 		    foreach ($sqlres as $row) {
 			$res .= $row['name']."§§§".$row['result'];
 		    }
@@ -1212,6 +1256,24 @@ class TSMMonitor {
 
 
 
+        /**
+         * findPath - find a external program in the search path
+         *
+         * @param string $binary the external program to search for
+         * @param string $search_path the search path in which to look for the external program
+         * @return string the full path to the external program or empty string if not found
+         */
+        function findPath($binary, $search_path) {
+            foreach ($search_path as $path) {
+                if ((file_exists($path . "/" . $binary)) && (is_readable($path . "/" . $binary))) {
+                    return($path . "/" . $binary);
+                }
+            }
+        }
+
+
+
+
 	/**
 	 * getConfigArray - queries the DB and generates the global config array
 	 *
@@ -1224,7 +1286,7 @@ class TSMMonitor {
 
 	    // Navigation
 	    $query = "SELECT * from cfg_mainmenu";
-	    $mainmenutablerows = $this->fetchArrayDB($query, $this->conn);
+	    $mainmenutablerows = $this->adodb->fetchArrayDB($query);
 
 	    $ret = array();
 
@@ -1248,9 +1310,9 @@ class TSMMonitor {
 	    $menuarray["main"] = $mainmenuarray;
 
 	    $query = "SELECT * from cfg_mainmenu";
-	    $mainmenutablerows = $this->fetchArrayDB($query, $this->conn);
+	    $mainmenutablerows = $this->adodb->fetchArrayDB($query);
 	    $query = "SELECT * from cfg_queries";
-	    $querytablerows = $this->fetchArrayDB($query, $this->conn);
+	    $querytablerows = $this->adodb->fetchArrayDB($query);
 
 
 	    while (list ($key, $val) = each ($mainmenutablerows)) {
@@ -1259,7 +1321,7 @@ class TSMMonitor {
 		$submenuarray = array();
 		$submenuarray[""] = "<---";
 		$query = "SELECT * from cfg_queries where parent='".$menuname."'";
-		$querytablerows = $this->fetchArrayDB($query, $this->conn);
+		$querytablerows = $this->adodb->fetchArrayDB($query);
 		while (list ($subkey, $submenuitem) = each ($querytablerows)) {
 		    $submenuitem_name = $submenuitem['name'];
 		    $submenuitem_label = $submenuitem['label'];
@@ -1295,10 +1357,10 @@ class TSMMonitor {
 	    $ret = array();
 	    
 	    $query = "SELECT * from cfg_overviewboxes order by sortorder asc";
-	    $queryoverviewboxes = $this->fetchArrayDB($query, $this->conn);
+	    $queryoverviewboxes = $this->adodb->fetchArrayDB($query);
 	    while (list ($subkey, $box) = each ($queryoverviewboxes)) {
 		$query = "SELECT * from cfg_overviewqueries where parent='".$box['name']."' order by sortorder asc";
-		$queryoverview = $this->fetchArrayDB($query, $this->conn);
+		$queryoverview = $this->adodb->fetchArrayDB($query);
 		$temp = array ();
 		//print_r($queryoverview);
 		while (list ($subkey, $ovquery) = each ($queryoverview)) {
@@ -1312,7 +1374,7 @@ class TSMMonitor {
 	    // Queries
 	    $dbret = array();
 	    $query = "SELECT * from cfg_queries";
-	    $querytablerows = $this->fetchArrayDB($query, $this->conn);
+	    $querytablerows = $this->adodb->fetchArrayDB($query);
 	    while (list ($subkey, $queryrow) = each ($querytablerows)) {
 		$dbret[$queryrow['name']] = (array)$queryrow;
 	    }
@@ -1320,7 +1382,7 @@ class TSMMonitor {
 	    
 	    // General settings
 	    $query = "SELECT * from cfg_config";
-	    $rows = $this->fetchArrayDB($query, $this->conn);
+	    $rows = $this->adodb->fetchArrayDB($query);
 	    $ret = array();
 	    foreach ($rows as $key => $val) {
 		$ret[$val['confkey']] = $val['confval'];
@@ -1329,12 +1391,12 @@ class TSMMonitor {
 
 	    // Set Stylesheet
 	    $query = "SELECT stylesheet from cfg_users where username='".$_SESSION["logindata"]["user"]."'";
-	    $row = $this->fetchArrayDB($query, $this->conn);
+	    $row = $this->adodb->fetchArrayDB($query);
 	    $retArray["stylesheet"] = $row[0]['stylesheet'];
 
 	    // Colors
 	    $query = "SELECT * from cfg_colors";
-	    $rows = $this->fetchArrayDB($query, $this->conn);
+	    $rows = $this->adodb->fetchArrayDB($query);
 
 	    $ret = array();
 	    while (list ($key, $val) = each ($rows)) {
@@ -1344,7 +1406,7 @@ class TSMMonitor {
 
 	    // Servers
 	    $query = "SELECT * from cfg_servers";
-	    $rows = $this->fetchArrayDB($query, $this->conn);
+	    $rows = $this->adodb->fetchArrayDB($query);
 
 	    $ret = array();
 	    while (list ($key, $val) = each ($rows)) {
@@ -1356,263 +1418,6 @@ class TSMMonitor {
 
 	    $retArray["serverlist"] = $ret;
 	    return $retArray;
-	}
-
-
-	/**
-	 * findPath - find a external program in the search path
-	 *
-	 * @param string $binary the external program to search for
-	 * @param string $search_path the search path in which to look for the external program
-	 * @return string the full path to the external program or empty string if not found
-	 */
-	function findPath($binary, $search_path) {
-	    foreach ($search_path as $path) {
-		if ((file_exists($path . "/" . $binary)) && (is_readable($path . "/" . $binary))) {
-		    return($path . "/" . $binary);
-		}
-	    }
-	}
-
-
-	/**
-	 * connectDB - establish a DB connection via ADODB
-	 *
-	 * @param string $host the hostname of the DB server
-	 * @param string $port the portnumber for the DB connection
-	 * @param string $user the username for the DB connection
-	 * @param string $pass the password for the DB connection
-	 * @param string $db_name the name of the DB
-	 * @param string $db_type the type of the DB (currently only 'mysql')
-	 * @param string $retr the number attempts for the DB connection before a failure is reported
-	 * @return ADOConnection DB connection ID or error code if connection failed
-	 */
-	function connectDB($host, $port = "3306", $user, $pass, $db_name, $db_type, $retr = 20) {
-	    $try = 0;
-	    $hostport = $host . ":" . $port;
-	    $this->conn = NewADOConnection($db_type);
-
-	    while ($try <= $retries) {
-		if ($this->conn->PConnect($hostport,$user,$pass,$db_name)) {
-		    return($this->conn);
-		}
-		$try++;
-		usleep(50000);
-	    }
-
-	    die("FATAL: Cannot connect to database server on '$host':'$port'. Please make sure you have specified a valid database name in 'includes/config.php'\n");
-	    return 0;
-	}
-
-
-	/**
-	 * closeDB - close an open DB connection
-	 *
-	 * @param ADOConnection $DBconn DB connection ID to be closed
-	 * @return string 
-	 */
-	function closeDB($DBconn = FALSE) {
-	    if ($DBconn) {
-		return $DBconn->Close();
-	    }
-	}
-
-
-	/**
-	 * execDB - execute a SQL statement against the DB via ADODB
-	 *
-	 * @param string $sql SQL statement to execute
-	 * @param ADOConnection $DBconn DB connection ID to run the SQL against
-	 * @return ADORecordSet
-	 */
-	function execDB($sql, $DBconn = FALSE) {
-	//    $DBconn->debug = true;
-	    $sql = $this->sanitizeSQL($sql);
-
-	    $recordSet = &$DBconn->Execute($sql);
-	    if (($recordSet) || ($DBconn->ErrorNo() == 0)) {
-		return($recordSet);
-	    } else {
-		echo "<p style='font-size: 16px; font-weight: bold; color: red;'>Database Error (".$DBconn->ErrorNo().")</p>\n<p>".$DBconn->ErrorMsg()."</p>";
-		exit;
-	    }
-	}
-
-
-	/**
-	 * fetchCellDB - execute a SQL query against the DB via ADODB and 
-	 *               return only the first column of the fist row found
-	 *               or a specified column of the fist row found
-	 *
-	 * @param string $sql SQL statement to execute
-	 * @param $column_name Column name to use instead of the first column
-	 * @param ADOConnection $DBconn DB connection ID to run the SQL against
-	 * @return string Content of the cell as a single variable
-	 */
-	function fetchCellDB($sql, $column_name, $DBconn = FALSE) {
-	    //$DBconn->debug = true;
-	    $sql = $this->sanitizeSQL($sql);
-
-	    if ($column_name != '') {
-		$DBconn->SetFetchMode(ADODB_FETCH_ASSOC);
-	    } else {
-		$DBconn->SetFetchMode(ADODB_FETCH_NUM);
-	    }
-	    $recordSet = $DBconn->Execute($sql);
-
-	    if (($recordSet) || ($DBconn->ErrorNo() == 0)) {
-		if (!$recordSet->EOF) {
-		    if ($column_name != '') {
-			$column = $recordSet->fields[$column_name];
-		    }else{
-			$column = $recordSet->fields[0];
-		    }
-		    $recordSet->close();
-
-		    return($column);
-		}
-	    } else {
-		echo "<p style='font-size: 16px; font-weight: bold; color: red;'>Database Error (".$DBconn->ErrorNo().")</p>\n<p>".$DBconn->ErrorMsg()."</p>";
-		exit;
-	    }
-	}
-
-
-	/**
-	 * fetchRowDB - execute a SQL query against the DB via ADODB
-	 *              and return only the first row found
-	 *
-	 * @param string $sql SQL statement to execute
-	 * @param ADOConnection $DBconn DB connection ID to run the SQL against
-	 * @return array First row of results as an associative array
-	 */
-	function fetchRowDB($sql, $DBconn = FALSE) {
-	    //$DBconn->debug = true;
-	    $sql = $this->sanitizeSQL($sql);
-
-	    $DBconn->SetFetchMode(ADODB_FETCH_ASSOC);
-	    $recordSet = $DBconn->Execute($sql);
-
-	    if (($recordSet) || ($DBconn->ErrorNo() == 0)) {
-		if (!$recordSet->EOF) {
-		    $recordFields = $recordSet->fields;
-		    $recordSet->close();
-
-		    return($recordFields);
-		}
-	    } else {
-		echo "<p style='font-size: 16px; font-weight: bold; color: red;'>Database Error (".$DBconn->ErrorNo().")</p>\n<p>".$DBconn->ErrorMsg()."</p>";
-		exit;
-	    }
-	}
-
-
-	/**
-	 * fetchArrayDB - execute a SQL query against the DB via ADODB
-	 *                and return results in an associative array.
-	 *
-	 * @param string $sql SQL statement to execute
-	 * @param ADOConnection $DBconn DB connection ID to run the SQL against
-	 * @return array All results in an associative array
-	 */
-	function fetchArrayDB($sql, $DBconn = FALSE) {
-	    //$DBconn->debug = true;
-	    $sql = $this->sanitizeSQL($sql);
-
-	    $recordArray = array();
-	    $DBconn->SetFetchMode(ADODB_FETCH_ASSOC);
-	    $recordSet = &$DBconn->Execute($sql);
-
-	    if (($recordSet) || ($DBconn->ErrorNo() == 0)) {
-		while ((!$recordSet->EOF) && ($recordSet)) {
-		    $recordArray{sizeof($recordArray)} = $recordSet->fields;
-		    $recordSet->MoveNext();
-		}
-		$recordSet->close();
-		return($recordArray);
-	    } else {
-		echo "<p style='font-size: 16px; font-weight: bold; color: red;'>Database Error (".$DBconn->ErrorNo().")</p>\n<p>".$DBconn->ErrorMsg()."</p>";
-		exit;
-	    }
-	}
-
-
-	/**
-	 * $this->fetchSplitArrayDB - execute a SQL query against the DB via ADODB
-	 *                     and return results in an associative array.
-	 *
-	 * @param string $sql SQL statement to execute
-	 * @param ADOConnection $DBconn DB connection ID to run the SQL against
-	 * @param string $rows_per_page number of rows per page a result will have
-	 * @return array All results in an associative array
-	 */
-	function fetchSplitArrayDB($sql, $DBconn = FALSE, $rows_per_page = '20') {
-	//    $DBconn->debug = true;
-	    $this->page = intval($_GET['page']);
-
-	    $sql = $this->sanitizeSQL($sql);
-
-	    $recordArray = array();
-	    $DBconn->SetFetchMode(ADODB_FETCH_ASSOC);
-	    $recordSet = &$DBconn->Execute($sql);
-
-	    if (($recordSet) || ($DBconn->ErrorNo() == 0)) {
-		    $total_rows = $recordSet->RecordCount($recordSet);
-		$this->max_pages = ceil($total_rows/$rows_per_page);
-
-		    if($this->page > $this->max_pages || $this->page <= 0) {
-			$this->page = 1;
-		    }
-		    $offset = $rows_per_page * ($this->page-1);
-		$endset = $offset + $rows_per_page;
-		$recordSet->Move($offset);
-	       
-		while (($recordSet->CurrentRow() < $endset) && ($recordSet->CurrentRow() < $total_rows) && ($recordSet)) {
-		    $recordArray{sizeof($recordArray)} = $recordSet->fields;
-		    $recordSet->MoveNext();
-		}
-		$recordSet->close();
-		return($recordArray);
-	    } else {
-		echo "<p style='font-size: 16px; font-weight: bold; color: red;'>Database Error (".$DBconn->ErrorNo().")</p>\n<p>".$DBconn->ErrorMsg()."</p>";
-		exit;
-	    }
-	}
-
-
-	/**
-	 * updateDB - execute a SQL update statement against the DB via ADODB
-	 *            to update a record. If the record is not found, an insert
-	 *            statement is generated and executed.
-	 *
-	 * @param string $table The name of the table containing the record to be updated
-	 * @param array $cells An array of columnname/value pairs of the record to be updated
-	 * @param string $keys Name of the primary key
-	 * @param boolean $autoquote Use intelligent auto-quoting
-	 * @param ADOConnection $DBconn DB connection ID to run the SQL against
-	 * @return string Auto-increment ID if insert was performed
-	 */
-	function updateDB($table, $cells, $keys, $DBconn = FALSE, $autoquote = TRUE) {
-	    //$DBconn->debug = true;
-	    $DBconn->Replace($table, $cells, $keys, $autoquote);
-
-	    return $DBconn->Insert_ID();
-	}
-
-
-	/**
-	 * sanitizeSQL - removes unwanted chars in values passed for use in
-	 *               SQL statements
-	 *
-	 * @param string $sql SQL expression to sanitize
-	 * @return string
-	 */
-	function sanitizeSQL($sql) {
-	    $sql = str_replace(";", "\;", $sql);
-	    $sql = str_replace("\n", "", $sql);
-	    $sql = str_replace("\r", "", $sql);
-	    $sql = str_replace("\t", " ", $sql);
-	    return $sql;
 	}
 
 }
