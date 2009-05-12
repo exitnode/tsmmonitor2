@@ -1,5 +1,5 @@
 function genPDF() {
-    window.open( "includes/pdf.php", "myWindow", "status = 1, fullscreen=yes,scrollbars=yes" )
+    window.open( "includes/show_pdf.php", "myWindow", "status = 1, fullscreen=yes,scrollbars=yes" )
 }
 
 function show_confirm($url, $id, $action)

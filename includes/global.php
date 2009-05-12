@@ -84,7 +84,6 @@ header("Pragma: no-cache");
 
 // ** Include generic code and external libraries ** //
 include ($config["library_path"] . "/adodb5/adodb.inc.php");
-//include_once($config["include_path"] . "/functions.php");
 include_once($config["include_path"] . "/tsmmonitor.php");
 include_once($config["include_path"] . "/polld.php");
 
