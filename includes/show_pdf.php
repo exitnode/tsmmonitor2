@@ -44,7 +44,7 @@ $prop=array('HeaderColor'=>array(180,180,180),
 	    'color2'=>array(230,230,230),
 	    'padding'=>2);
 
-$res = $tsmmonitor->fetchArrayDB($_SESSION["lastsql"], $tsmmonitor->conn);
+$res = $adodb->fetchArrayDB($_SESSION["lastsql"]);
 $pdf->Table($_SESSION["lastsql"],$prop,$res);
 $pdf->Output();
 
