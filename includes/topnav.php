@@ -31,19 +31,19 @@
 
 ?>
 
-<form action="<?php echo $_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']."&s=".$GETVars['server']; ?>" method="post">
+<form action="<?php echo $_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']."&s=".$tsmmonitor->GETVars['server']; ?>" method="post">
 <?php 
-//if ($GETVars['qq'] != "admin" && !$_POST["edit"] == "edit") {
-if ($GETVars['qq'] != "index" && $GETVars['qq'] != "overview" && $GETVars['qq'] != "serverlist") {  
+//if ($tsmmonitor->GETVars['qq'] != "admin" && !$_POST["edit"] == "edit") {
+if ($tsmmonitor->GETVars['qq'] != "index" && $tsmmonitor->GETVars['qq'] != "overview" && $tsmmonitor->GETVars['qq'] != "serverlist") {  
 	echo "<input type='button' value='PDF' onclick='genPDF()' class='button'>";
 }
-if ($GETVars['qq'] != "polldstat" && $GETVars['qq'] != "serverlist") {
+if ($tsmmonitor->GETVars['qq'] != "polldstat" && $tsmmonitor->GETVars['qq'] != "serverlist") {
 
 	echo "<select name='s' size=1 onChange='submit();' class='button'>";
 
-	while(list($servername,$serveritems) = each($configarray["serverlist"])) {
+	while(list($servername,$serveritems) = each($tsmmonitor->configarray["serverlist"])) {
 		echo '<option value="'.$servername.'"';
-		if ($GETVars['server'] == $servername){echo "SELECTED";}
+		if ($tsmmonitor->GETVars['server'] == $servername){echo "SELECTED";}
 		echo '> '.$servername.' ('.$serveritems["description"].')</option>';
 	}
 	echo "</select>";

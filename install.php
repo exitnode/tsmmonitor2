@@ -62,7 +62,7 @@ $ext_miss
 
 $tsm_monitor_versions = array("0.1.0", "0.1.1");
 
-$old_tsm_monitor_version = fetchCellDB("select confval from cfg_config where confkey='version'", '', $conn);
+$old_tsm_monitor_version = $tsmmonitor->fetchCellDB("select confval from cfg_config where confkey='version'", '', $tsmmonitor->conn);
 
 // try to find current (old) version in the array
 $old_version_index = array_search($old_tsm_monitor_version, $tsm_monitor_versions);
@@ -94,9 +94,9 @@ if ($old_tsm_monitor_version == $config["tsm_monitor_version"]) {
 // dsmadmc binary path
 $input["path_dsmadmc"]["name"] = "dsmadmc Binary Path";
 $input["path_dsmadmc"]["desc"] = "The path to the TSM admin client binary.";
-$which_dsmadmc = findPath("dsmadmc", $config["search_path"]);
-if (isset($configarray["settings"]["path_dsmadmc"])) {
-    $input["path_dsmadmc"]["default"] = $configarray["settings"]["path_dsmadmc"];
+$which_dsmadmc = $tsmmonitor->findPath("dsmadmc", $config["search_path"]);
+if (isset($tsmmonitor->configarray["settings"]["path_dsmadmc"])) {
+    $input["path_dsmadmc"]["default"] = $tsmmonitor->configarray["settings"]["path_dsmadmc"];
 } else if (!empty($which_dsmadmc)) {
     $input["path_dsmadmc"]["default"] = $which_dsmadmc;
 } else {
@@ -106,12 +106,12 @@ if (isset($configarray["settings"]["path_dsmadmc"])) {
 // php/php5 binary path
 $input["path_php"]["name"] = "PHP Binary Path";
 $input["path_php"]["desc"] = "The path to the PHP binary.";
-$which_php = findPath("php", $config["search_path"]);
+$which_php = $tsmmonitor->findPath("php", $config["search_path"]);
 if(!isset($which_php)) {
-    $which_php = findPath("php5", $config["search_path"]);
+    $which_php = $tsmmonitor->findPath("php5", $config["search_path"]);
 }
-if (isset($configarray["settings"]["path_php"])) {
-    $input["path_php"]["default"] = $configarray["settings"]["path_php"];
+if (isset($tsmmonitor->configarray["settings"]["path_php"])) {
+    $input["path_php"]["default"] = $tsmmonitor->configarray["settings"]["path_php"];
 } else if (!empty($which_php)) {
     $input["path_php"]["default"] = $which_php;
 } else {
@@ -121,8 +121,8 @@ if (isset($configarray["settings"]["path_php"])) {
 // logfile path
 $input["path_tmlog"]["name"] = "TSM Monitor Logfile Path";
 $input["path_tmlog"]["desc"] = "The path to the TSM Monitor log file.";
-if (isset($configarray["settings"]["path_tmlog"])) {
-    $input["path_tmlog"]["default"] = $configarray["settings"]["path_tmlog"];
+if (isset($tsmmonitor->configarray["settings"]["path_tmlog"])) {
+    $input["path_tmlog"]["default"] = $tsmmonitor->configarray["settings"]["path_tmlog"];
 } else {
     $input["path_tmlog"]["default"] = $config["base_path"] . "tsmmonitor.log";
 }
@@ -173,11 +173,11 @@ if ($_REQUEST["step"] == "90") {
     // Flush updated data to DB
     foreach ($input as $name => $array) {
         if (isset($_POST[$name])) {
-            updateDB('cfg_config', array(confkey => "$name", confval => $_POST[$name], description => $array['name']), 'confkey', $conn);
+            $tsmmonitor->updateDB('cfg_config', array(confkey => "$name", confval => $_POST[$name], description => $array['name']), 'confkey', $tsmmonitor->conn);
         }
     }
-    updateDB('cfg_config', array(confkey => 'version', confval => $config['tsm_monitor_version']), 'confkey', $conn);
-    closeDB($conn);
+    $tsmmonitor->updateDB('cfg_config', array(confkey => 'version', confval => $config['tsm_monitor_version']), 'confkey', $tsmmonitor->conn);
+    $tsmmonitor->closeDB($tsmmonitor->conn);
     header("Location: index.php");
     exit;
 } elseif (($_REQUEST["step"] == "40") && ($_REQUEST["install_type"] == "20")) {

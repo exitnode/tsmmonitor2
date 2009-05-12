@@ -39,7 +39,7 @@
 <td width='48%' valign='top'>
 <table class='zebra'>
 <tr><th colspan="2">Health Status</th></tr>
-<?php echo getOverviewRows($configarray["infoboxarray"]["healthdata"]); ?>
+<?php echo $tsmmonitor->getOverviewRows($tsmmonitor->configarray["infoboxarray"]["healthdata"]); ?>
 </table>
 </td>
 <td width='4%'>
@@ -48,7 +48,7 @@
 <table class='zebra'>
 <tr><th colspan="2">TSM Database</th></tr>
 <?php //echo getOverviewRows(getInfobox("database")); ?>
-<?php echo getOverviewRows($configarray["infoboxarray"]["database"]); ?>
+<?php echo $tsmmonitor->getOverviewRows($tsmmonitor->configarray["infoboxarray"]["database"]); ?>
 </table>
 </td>
 </tr>
@@ -58,7 +58,7 @@
 <table class='zebra'>
 <tr><th colspan="2">Total Data</th></tr>
 <?php //echo getOverviewRows(getInfobox("totaldata")); ?>
-<?php echo getOverviewRows($configarray["infoboxarray"]["totaldata"]); ?>
+<?php echo $tsmmonitor->getOverviewRows($tsmmonitor->configarray["infoboxarray"]["totaldata"]); ?>
 </table>
 </td>
 <td width='4%'>
@@ -67,7 +67,7 @@
 <table class='zebra'>
 <tr><th colspan="2">Schedule Status</th></tr>
 <?php //echo getOverviewRows(getInfobox("schedules")); ?>
-<?php echo getOverviewRows($configarray["infoboxarray"]["schedules"]); ?>
+<?php echo $tsmmonitor->getOverviewRows($tsmmonitor->configarray["infoboxarray"]["schedules"]); ?>
 </table>
 </td>
 </tr>

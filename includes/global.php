@@ -84,20 +84,26 @@ header("Pragma: no-cache");
 
 // ** Include generic code and external libraries ** //
 include ($config["library_path"] . "/adodb5/adodb.inc.php");
-include_once($config["include_path"] . "/functions.php");
+//include_once($config["include_path"] . "/functions.php");
+include_once($config["include_path"] . "/tsmmonitor.php");
 include_once($config["include_path"] . "/polld.php");
 
+// ** instantiate TSMMonitor Class ** //
+$tsmmonitor = new TSMMonitor();
+
 // ** Connect to the database ** //
-$conn = connectDB($db_host, $db_port, $db_user, $db_password, $db_name, $db_type);
+//$conn = connectDB($db_host, $db_port, $db_user, $db_password, $db_name, $db_type);
+$tsmmonitor->conn = $tsmmonitor->connectDB($db_host, $db_port, $db_user, $db_password, $db_name, $db_type);
 
 // check to see if this is a new installation
-$version = fetchCellDB("select confval from cfg_config where confkey='version'", '', $conn);
+$version = $tsmmonitor->fetchCellDB("select confval from cfg_config where confkey='version'", '', $tsmmonitor->conn);
 if ($version != $config["tsm_monitor_version"] && basename($_SERVER['REQUEST_URI']) != 'install.php') {
     header("Location: install.php");
     exit;
 }
 // ** Initialize PHP session ** //
-initialize();
+//initialize();
+$tsmmonitor->initialize();
 
 // ** Include generic code and external libraries ** //
 // ... more includes here

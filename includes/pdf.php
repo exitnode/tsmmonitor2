@@ -160,16 +160,16 @@ function AddCol($field=-1,$width=-1,$caption='',$align='L')
  * @param array $prop
  */
 
-function Table($query,$prop=array(),$DBconn)
+function Table($query,$prop=array(),$dbresult)
 {
 	//Issue query
-    $res=fetchArrayDB($query, $DBconn);
+	//$res=fetchArrayDB($query, $DBconn);
 	//Add all columns if none was specified
 	if(count($this->aCols)==0)
 	{
-        foreach($res[0] as $colname => $col) {
+		foreach($dbresult[0] as $colname => $col) {
 			$this->AddCol(-1,-1,ucfirst($colname));
-        }
+		}
 	}
 
 	//Handle properties
@@ -199,7 +199,7 @@ function Table($query,$prop=array(),$DBconn)
 	$this->SetFont('Arial','',6);
 	$this->ColorIndex=0;
 	$this->ProcessingTable=true;
-	foreach($res as $key => $row) {
+	foreach($dbresult as $key => $row) {
         $row_num = array_values($row);
         $row_comb = array_merge($row, $row_num);
         $this->Row($row_comb);
@@ -247,7 +247,6 @@ class PDF extends PDF_MySQL_Table
 	}
 }
 
-
 $pdf=new PDF();
 $pdf->Open();
 $pdf->AddPage();
@@ -257,7 +256,9 @@ $prop=array('HeaderColor'=>array(180,180,180),
 	    'color2'=>array(230,230,230),
 	    'padding'=>2);
 //$pdf->Table('select * from res_'.$_SESSION["GETVars"]["qq"].'_'.$_SESSION["GETVars"]["server"],$prop);
-$pdf->Table($_SESSION["lastsql"],$prop,$conn);
+$res = $tsmmonitor->fetchArrayDB($_SESSION["lastsql"], $tsmmonitor->conn);
+//var_dump($res);
+$pdf->Table($_SESSION["lastsql"],$prop,$res);
 $pdf->Output();
 
 ?>

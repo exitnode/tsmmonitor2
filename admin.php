@@ -57,7 +57,7 @@ if ($_POST["css"] != "") {
 <!-- Start left cik navigation menu -->
     <td id="menue">
         <div class="menuelinks">
-        <?php echo getMenu( $adminmenu, "admin.php?q=".$GETVars['qq']."&m=".$GETVars['menu'], "admin" );  ?>
+        <?php echo $tsmmonitor->getMenu( $tsmmonitor->adminmenu, "admin.php?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu'], "admin" );  ?>
         </div>
     <br>
         <img src="/images/trans.gif" alt="" width="150" height="1" border="0"><br>
@@ -68,14 +68,14 @@ if ($_POST["css"] != "") {
 <?php
 
 // main content, right of menu
-if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"]) && $GETVars['qq'] != "logout" && $_SESSION["logindata"]["loggedin"]) {
-    if ($GETVars['qq'] != "" && $GETVars['qq'] != "overview") {
+if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"]) && $tsmmonitor->GETVars['qq'] != "logout" && $_SESSION["logindata"]["loggedin"]) {
+    if ($tsmmonitor->GETVars['qq'] != "" && $tsmmonitor->GETVars['qq'] != "overview") {
 
         // show overview page
-        if ($GETVars['qq'] == "index") {
+        if ($tsmmonitor->GETVars['qq'] == "index") {
 		// do nothing
 	// show settings page
-        } else if ($GETVars['qq'] == "settings") {
+        } else if ($tsmmonitor->GETVars['qq'] == "settings") {
 		$tmonpolld = new PollD();
 		$tmonpolld->setDBParams($db_host, $db_name, $db_user, $db_password);
 		$tmonpolld->initialize();
@@ -98,7 +98,7 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 		}
 
 		echo "<b>PollD Control</b><br>";
-		echo "<form action=".$_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']." method='post'>";
+		echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
 		echo "<table class='zebra'>";
 		echo "<tr><th>Start/Stop</th><th>Status</th></tr>";
 		echo "<tr class='d0'><td>";
@@ -114,9 +114,9 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
                 $i = 0;
                 // show Add New Entry Form
                 if ($_POST['Add'] == "Add") {
-                    $sqlth = "SHOW COLUMNS from cfg_".$GETVars['qq'];
-                    $sqlresth = fetchArrayDB($sqlth, $conn);
-                    echo "<form action=".$_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']." method='post'>";
+                    $sqlth = "SHOW COLUMNS from cfg_".$tsmmonitor->GETVars['qq'];
+                    $sqlresth = $tsmmonitor->fetchArrayDB($sqlth, $conn);
+                    echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
                     echo "<table class='zebra'>";
                     echo "<tr><th>Key</th><th>Value</th></tr>";
                     foreach ($sqlresth as $col) {
@@ -144,8 +144,8 @@ echo "TEST: ".$col['Field']." -> $colval<br>\n";
 
                 // show Edit Existing Entry Form
                 } else {
-                    $tablearray = getAdminTables("edit");
-                    echo "<form action=".$_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']." method='post'>";
+                    $tablearray = $tsmmonitor->getAdminTables("edit");
+                    echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
                     echo "<table class='zebra'>";
                     echo "<tr><th>Key</th><th>Value</th></tr>";
                     foreach ($tablearray as $row) {
@@ -182,12 +182,12 @@ echo "TEST: ".$col['Field']." -> $colval<br>\n";
                     if ($_GET['action'] == "delete") {
                         echo $_POST['hidfield'];
                         $sql = "DELETE from cfg_".$_GET['q']." where id='".$_GET['id']."' LIMIT 1";
-                        execDB($sql, $conn);
+                        $tsmmonitor->execDB($sql, $conn);
                     }
                 // Process update of an existing item or insert of a new one
                 } else if ($_POST['EditSave'] == "Save" || $_POST['AddSave'] == "Save") {
                     $sqlth = "SHOW COLUMNS from cfg_".$_GET['q'];
-                    $sqlresth = fetchArrayDB($sqlth, $conn);
+                    $sqlresth = $tsmmonitor->fetchArrayDB($sqlth, $conn);
                     $colarray = array();
                     $colarray['id'] = $_POST['id'];
                     $set = "";
@@ -228,13 +228,13 @@ echo "TEST: ".$col['Field']." -> $colval<br>\n";
                     } else if ($_POST['EditSave'] == "Save") {
                         $sql = "UPDATE cfg_".$_GET['q']." set ".$set." where id='".$_POST['id']."' LIMIT 1";
                     }
-                    updateDB("cfg_".$_GET['q'], $colarray, 'id', $conn);
+                    $tsmmonitor->updateDB("cfg_".$_GET['q'], $colarray, 'id', $conn);
                 }
-                echo "<form action=".$_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']." method='post'>";
+                echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
                 echo "<table class='zebra'>";
-                echo getTableheader();
-                echo getAdminTables("list");
-                $nav = showPageNavigation("40");
+                echo $tsmmonitor->getTableheader();
+                echo $tsmmonitor->getAdminTables("list");
+                $nav = $tsmmonitor->showPageNavigation("40");
                 if ($nav!="") {
                     echo "<tr><td colspan='0' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
                 }
@@ -256,7 +256,7 @@ echo "TEST: ".$col['Field']." -> $colval<br>\n";
     include_once "includes/login.php";
 
 }
-$_SESSION['from'] = $GETVars['qq'];
+$_SESSION['from'] = $tsmmonitor->GETVars['qq'];
 session_write_close(void); 
 ?>
 

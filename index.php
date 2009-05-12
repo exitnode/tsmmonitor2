@@ -49,8 +49,8 @@ if ($_POST["css"] != "") {
 	<div id="tnbox1">
 
 	  <?php 
-	    if ( $_SESSION["logindata"]["loggedin"] && !in_array($GETVars['qq'], array("admin", "serverlist", "custom", "polldstat", "index", "overview")) && !strstr($GETVars['qq'], 'table') ) {
-		echo getSearchfield();  
+	    if ( $_SESSION["logindata"]["loggedin"] && !in_array($tsmmonitor->GETVars['qq'], array("admin", "serverlist", "custom", "polldstat", "index", "overview", "")) && !strstr($tsmmonitor->GETVars['qq'], 'table') ) {
+		echo $tsmmonitor->getSearchfield();  
 	    }
 	  ?>
 
@@ -66,15 +66,15 @@ if ($_POST["css"] != "") {
 <!-- Start left cik navigation menu -->
     <td id="menue">
         <div class="menuelinks">
-		<?php echo getMenu( $submenu, "index.php?q=".$GETVars['qq']."&m=".$GETVars['menu']."&s=".$GETVars['server'], "index" );  ?>
+		<?php echo $tsmmonitor->getMenu( $tsmmonitor->submenu, "index.php?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']."&s=".$tsmmonitor->GETVars['server'], "index" );  ?>
         </div>
 	<br>
 	<div class='menuelinks' id='datechooser'>
-		<?php echo getTimemachine();  ?>
+		<?php echo $tsmmonitor->getTimemachine();  ?>
 	</div>
 	<br>
         <div class="menuelinks">
-		<?php echo getInfo();  ?>
+		<?php echo $tsmmonitor->getInfo();  ?>
         </div>
         <img src="/images/trans.gif" alt="" width="150" height="1" border="0"><br>
     </td>
@@ -84,27 +84,23 @@ if ($_POST["css"] != "") {
 <?php
 
 // main content, right of menu
-if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"]) && $GETVars['qq'] != "logout" && $_SESSION["logindata"]["loggedin"]){
-	if ($GETVars['qq'] != "" && $GETVars['qq'] != "overview"){
+if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"]) && $tsmmonitor->GETVars['qq'] != "logout" && $_SESSION["logindata"]["loggedin"]){
+	if ($tsmmonitor->GETVars['qq'] != "" && $tsmmonitor->GETVars['qq'] != "overview"){
 
 		// show overview page
-		if ($GETVars['qq'] == "index") {
+		if ($tsmmonitor->GETVars['qq'] == "index") {
 			include_once "includes/overview.php" ;
 		
 		// show polld status
-		} else if ($GETVars['qq'] == "polldstat") {
-			echo getPollDStat();
+		} else if ($tsmmonitor->GETVars['qq'] == "polldstat") {
+			echo $tsmmonitor->getPollDStat();
 		
-		// show custom query
-		} else if ($GETVars['qq'] == "custom") {
-			echo getCustomQuery();
-
 		// show serverlist
-		} else if ( $GETVars['qq'] == "serverlist" ) {
-			echo getServerlist();
+		} else if ( $tsmmonitor->GETVars['qq'] == "serverlist" ) {
+			echo $tsmmonitor->getServerlist();
 
 		// show graphical chart (timetable)
-		} else if ( strstr($GETVars['qq'], 'timetable'))  {
+		} else if ( strstr($tsmmonitor->GETVars['qq'], 'timetable'))  {
 
 			if ($_POST["back"] != "") {
 				$_SESSION['timeshift'] += $_SESSION['selectedtimestep'];
@@ -116,16 +112,16 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 				$_SESSION['timeshift'] = 0;
 			}
 
-			$tablearray = execute('timetable');	
-			$headerarray = $queryarray[$GETVars['qq']]["header"]["column"];
-			echo generateTimetable($tablearray, $headerarray[0]);
+			$tablearray = $tsmmonitor->execute('timetable');	
+			$headerarray = $queryarray[$tsmmonitor->GETVars['qq']]["header"]["column"];
+			echo $tsmmonitor->generateTimetable($tablearray, $headerarray[0]);
 
 
 		// "vertical" table
-		} else if ( strstr($GETVars['qq'], 'vertical'))  {
+		} else if ( strstr($tsmmonitor->GETVars['qq'], 'vertical'))  {
 
 			$i = 0;
-			$tablearray = execute('verticaltable');
+			$tablearray = $tsmmonitor->execute('verticaltable');
 			echo "<table class='zebra'>";
 			echo "<tr><th>Key</th><th>Value</th></tr>";
 			foreach ($tablearray as $row) {
@@ -156,22 +152,22 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 			//}
 			if ($whereclause["field"]!="" && $whereclause["val"]!="") {
 				if ($_POST["Clear"] == "Clear") {
-					$_SESSION["search"][$GETVars['qq']] = "";
+					$_SESSION["search"][$tsmmonitor->GETVars['qq']] = "";
 				} else {
 					if (!isset($_SESSION["search"])){
 						$temp = array();
-						$temp[$GETVars['qq']] = $whereclause;
+						$temp[$tsmmonitor->GETVars['qq']] = $whereclause;
 						$_SESSION["search"] = $temp;
 					} else {
-						$_SESSION["search"][$GETVars['qq']] = $whereclause;
+						$_SESSION["search"][$tsmmonitor->GETVars['qq']] = $whereclause;
 					}
 				}
 			}
 			echo "<table class='zebra'>";
-			//echo get_tableheader($queryarray[$GETVars['qq']]["header"]["column"]);
-			echo getTableheader();
-			echo execute('table');
-			$nav = showPageNavigation("40");
+			//echo get_tableheader($queryarray[$tsmmonitor->GETVars['qq']]["header"]["column"]);
+			echo $tsmmonitor->getTableheader();
+			echo $tsmmonitor->execute('table');
+			$nav = $tsmmonitor->showPageNavigation("40");
 			if ($nav!="") {
 				echo "<tr><td colspan='999' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
 			}
@@ -192,7 +188,7 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 	include_once "includes/login.php";
 
 }
-$_SESSION['from'] = $GETVars['qq'];
+$_SESSION['from'] = $tsmmonitor->GETVars['qq'];
 session_write_close(void); 
 ?>
 

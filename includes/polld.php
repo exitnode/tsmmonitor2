@@ -85,6 +85,7 @@ function setDBParams($db_host, $db_name, $db_user, $db_password){
 
 function initialize() {
 	
+	$this->setDBParams("localhost", "tsmmonitor", "tsmmonitor", "tsmmonitor");
 	$this->servers = $this->getServers();
 	$this->queries = $this->getQueries();
 	$this->overviewqueries = $this->getOverviewQueries();
