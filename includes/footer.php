@@ -37,28 +37,8 @@
       </tr>
 <?php } ?>
       <tr>
-        <td colspan="2">
-          <table width=100%>
-            <tr>
-              <td width=100% id="footer">TSM Monitor 2 v<?php echo $config["tsm_monitor_version"]?> &copy; 2008 - <?php echo date('Y'); ?> TSM Monitor Development Team (<a class='nav' href="http://www.tsm-monitor.org">www.tsm-monitor.org</a>)</td>
-              <td>
-<?php
-#/**
-echo "                <form action=".$_SERVER['PHP_SELF']."?q=".$GETVars['qq']."&m=".$GETVars['menu']."&s=".$GETVars['server']." method='post'>\n";
-echo "                  <select name='css' size=1 onChange='submit();' class='button'>\n";
-$styles = array('default.css', 'blue.css', 'dark.css', 'grey3d.css', 'horizon.css', 'orange3d');
-foreach ($styles as $style) {
-    echo '                    <option value="'.$style.'"';
-    if ($_SESSION['stylesheet'] == $style){ echo "SELECTED"; }
-    echo "> ".$style."</option>\n";
-}
-echo "                  </select>\n";
-echo "                </form>\n";
-#**/
-?>
-              </td>
-            </tr>
-          </table>
+        <td colspan="2" id="footer">
+              TSM Monitor 2 v<?php echo $config["tsm_monitor_version"]?> &copy; 2008 - <?php echo date('Y'); ?> TSM Monitor Development Team (<a class='nav' href="http://www.tsm-monitor.org">www.tsm-monitor.org</a>)
         </td>
       </tr>
 <!-- End: footer.php -->

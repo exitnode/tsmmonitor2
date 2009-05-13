@@ -68,23 +68,28 @@ background-repeat:repeat-x;
 }
 
 #tnleft {
+height: 35px;
+width: 180px;
 padding: 0px;
 font-size: 11px;
 background-repeat:repeat-x;
 }
 
 #tnright {
-padding-top: 5px;
+height: 35px;
+padding: 0px;
 font-size: 11px;
 background-repeat:repeat-x;
 }
 
 #tnbox1 {
 float:left;
+padding: 0 5px 0 5px;
 }
 
 #tnbox2 {
 float:right;
+padding: 0 5px 0 5px;
 }
 
 #printpreviewheader {
@@ -151,8 +156,15 @@ padding: 3px;
 text-align: center;
 }
 
-td { font-family: Tahoma, Geneva, Arial, helvetica, sans-serif; font-size: 10pt }
-th { font-family: Tahoma, Geneva, Arial, helvetica, sans-serif; font-size: 10pt }
+td { 
+font-family: Tahoma, Geneva, Arial, helvetica, sans-serif; 
+font-size: 10pt 
+}
+
+th { 
+font-family: Tahoma, Geneva, Arial, helvetica, sans-serif; 
+font-size: 10pt;
+}
 
 
 table.zebra   		{ border-spacing: 1px;margin-left: auto; margin-right: auto; width: 100%;}          
@@ -175,5 +187,11 @@ table.login th 		{ text-align: center; }
 table.login td		{ padding: 4px;}
 table.login tr		{ text-align: center; }
 
-.button			{ }
-.textfield		{ }
+.button	{ 
+position: relative;
+top: 5px;
+}
+.textfield {
+position: relative;
+top: 5px;
+}

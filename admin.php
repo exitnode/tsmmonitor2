@@ -46,8 +46,8 @@ if ($_POST["css"] != "") {
     <td colspan="2" id="head"><a class='navheader' href="admin.php"><img src="images/PollDTitleAdmin.gif" border=0></img></a></td>
 </tr>
 <tr>
-    <td id="tnleft" width="160"></td>
-    <td id="tnright"width="740" height="30" align="right">
+    <td id="tnleft"></td>
+    <td id="tnright">
 
 </td>
 <?php } ?>

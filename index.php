@@ -34,18 +34,14 @@
 include_once "includes/global.php";
 include_once "includes/page_head.php";
 
-if ($_POST["css"] != "") {
-	$_SESSION['stylesheet'] = $_POST["css"];
-}
-
 ?>
 <?php if ($_SESSION["logindata"]["loggedin"]) { ?>
 <tr>
     <td colspan="2" id="head"><a class='navheader' href="index.php"><img src="images/PollDTitle.gif" border=0></img></a></td>
 </tr>
 <tr>
-    <td id="tnleft" width="160"></td>
-    <td id="tnright"width="740" align="right">
+    <td id="tnleft"></td>
+    <td id="tnright">
 	<div id="tnbox1">
 
 	  <?php 
@@ -72,9 +68,35 @@ if ($_POST["css"] != "") {
 	<div class='menuelinks' id='datechooser'>
 		<?php echo $tsmmonitor->getTimemachine();  ?>
 	</div>
+	<!--
 	<br>
         <div class="menuelinks">
-		<?php echo $tsmmonitor->getInfo();  ?>
+		<?php //echo $tsmmonitor->getInfo();  ?>
+        </div>
+	-->
+	<br>
+        <div class="menuelinks">
+		<div class='sidebarinfo'>
+		<b>Stylesheet Switcher</b><br><br>
+		<?php
+			echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']."&s=".$tsmmonitor->GETVars['server']." method='post'>\n";
+			echo "<select name='css' size=1 onChange='submit();' class='button'>\n";
+			if ($handle = opendir('css')) {
+			    while (false !== ($file = readdir($handle))) {
+				if ($file != '.' && $file != '..' && substr($file, 0, 6) == 'style_') {
+				    $fileName = str_replace('.css', '', $file);
+				    $fileName = str_replace('style_', '', $fileName);
+				    echo '<option value="' . $file . '"';
+					if ($_SESSION['stylesheet'] == $file){ echo "SELECTED"; }
+					echo '>' . $fileName . '</option>';
+				}
+			    }
+			    closedir($handle);
+			}
+			echo "</select>\n";
+			echo "</form>\n";
+		?>
+		</div>
         </div>
         <img src="/images/trans.gif" alt="" width="150" height="1" border="0"><br>
     </td>

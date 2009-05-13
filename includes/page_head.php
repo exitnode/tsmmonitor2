@@ -27,6 +27,10 @@
  * @package tsmmonitor
  */
 
+if ($_POST["css"] != "") {
+        $_SESSION['stylesheet'] = $_POST["css"];
+}
+
 ?>
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
 <!-- Begin: page_head.php -->
@@ -36,6 +40,7 @@
   <meta http-equiv='content-type' content='text/html; charset=ISO-8859-1'>
   <link rel='shortcut icon' href='images/favicon.ico' type='image/x-icon'>
   <link rel='icon' href='images/favicon.ico' type='image/x-icon'>
+  <link rel='stylesheet' type='text/css' href='css/layout.css'>
   <link rel='stylesheet' type='text/css' href='css/<?php echo $_SESSION['stylesheet']; ?>'>
   <script type="text/javascript" src="extlib/datechooser.js"></script>
   <script type="text/javascript" src="includes/layout.js"></script>

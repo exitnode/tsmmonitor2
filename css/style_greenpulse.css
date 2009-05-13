@@ -11,7 +11,7 @@ color: #000000;
 /* - - - - - - - - - - - - - - - - - - - - */
 #inhalt {
 background: #ffffff;
-border: 1px solid #ff7f03;
+border: 1px solid #476802;
 }
 
 a.nav:link { color:#000000; }
@@ -66,24 +66,24 @@ color: #000000;
 }
 
 .menuelinks a {
-background: #fccd4e;
+background: #9ecb2d;
 color: #000000;
-border: 1px solid #ff7f03;
+border: 1px solid #476802;
 }
 .menuelinks a:hover {
-background: #fceabb;
+background: #bdd053;
 color: #000000;
 }
 
 .menuelinks .aktuell {
-background: #f8b602;
-border: 1px solid #336e9e;
+background: #76ad04;
+border: 1px solid #476802;
 }
 
 
 .menuelinks .sidebarinfo {
 background: #fafafa;
-border: 1px solid #ff7f03;
+border: 1px solid #476802;
 }
 
 #content {
@@ -108,16 +108,16 @@ background: #dadada;
 color: #ffffff;
 }
 
-table.zebra   		{background-color: #ff7f03; }          
-table.zebra th 		{ background-color: #fccd4e; }
-table.zebra td.footer	{ background-color: #fccd4e; }
+table.zebra   		{background-color: #476802; }          
+table.zebra th 		{ background-color: #9ecb2d; }
+table.zebra td.footer	{ background-color: #9ecb2d; }
 table.zebra td		{ }
 table.zebra tr.d0	{ background-color: #fff; }
 table.zebra tr.d1	{ background-color: #f2f2f2; }
 
-table.timetable   	{background-color: #ff7f03; }          
-table.timetable th 	{ background-color: #fccd4e; }
-table.timetable th.content 	{ background-color: #fccd4e; background-image:url(../images/tablebg.gif); }
+table.timetable   	{background-color: #476802; }          
+table.timetable th 	{ background-color: #9ecb2d; }
+table.timetable th.content 	{ background-color: #9ecb2d; background-image:url(../images/tablebg.gif); }
 table.timetable td	{ }
 table.timetable td.content	{ background-image:url(../images/tablebg.gif); }
 table.timetable tr.d0	{ background-color: #fff; color: #dddddd;}
@@ -128,5 +128,5 @@ table.login th 		{ background-color: #eaeaea; }
 table.login td		{ }
 table.login tr		{ background-color: #fff; }
 
-.button			{ background-color: #fccd4e; background-image:url(../images/bg-green-pulse-5x35.jpg); }
-.textfield		{ background-color: #fccd4e; background-image:url(../images/bg-green-pulse-5x35.jpg); }
+.button			{ background-color: #9ecb2d; background-image:url(../images/bg-green-pulse-5x35.jpg); }
+.textfield		{ background-color: #9ecb2d; background-image:url(../images/bg-green-pulse-5x35.jpg); }

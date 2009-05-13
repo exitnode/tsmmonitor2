@@ -11,7 +11,7 @@ color: #000000;
 /* - - - - - - - - - - - - - - - - - - - - */
 #inhalt {
 background: #ffffff;
-border: 1px solid #849e99;
+border: 1px solid #ff7f03;
 }
 
 a.nav:link { color:#000000; }
@@ -40,19 +40,19 @@ background: #ffffff;
 
 #head {
 color: #ffffff;
-background-image:url(../images/bg-grey-3d-5x75.jpg); 
+background-image:url(../images/bg-green-pulse-5x75.jpg); 
 }
 
 #tnleft {
 background: #ffffff;
 color: #000000;
-background-image:url(../images/bg-grey-3d-5x35.jpg); 
+background-image:url(../images/bg-green-pulse-5x35.jpg); 
 }
 
 #tnright {
 background: #ffffff;
 color: #000000;
-background-image:url(../images/bg-grey-3d-5x35.jpg); 
+background-image:url(../images/bg-green-pulse-5x35.jpg); 
 }
 
 #printpreviewheader {
@@ -66,25 +66,23 @@ color: #000000;
 }
 
 .menuelinks a {
-background: #bac9c5;
+background: #fccd4e;
 color: #000000;
-border: 1px solid #849e99;
+border: 1px solid #ff7f03;
 }
 .menuelinks a:hover {
-background: #d8e0de;
+background: #bdd053;
 color: #000000;
 }
 
 .menuelinks .aktuell {
-background: #343d3b;
-color: #dedede;
-border: 1px solid #010101;
+background: #76ad04;
+border: 1px solid #476802;
 }
-
 
 .menuelinks .sidebarinfo {
 background: #fafafa;
-border: 1px solid #849e99;
+border: 1px solid #ff7f03;
 }
 
 #content {
@@ -96,7 +94,7 @@ color: #000000;
 #footer {
 background: #eaeaea;
 color: #222222;
-background-image:url(../images/bg-grey-3d-5x35.jpg); 
+background-image:url(../images/bg-green-pulse-5x35.jpg); 
 }
 
 #sysinfo {
@@ -109,25 +107,25 @@ background: #dadada;
 color: #ffffff;
 }
 
-table.zebra   		{ background-color: #849e99; }          
-table.zebra th 		{ background-color: #bac9c5; }
-table.zebra td.footer	{ background-color: #bac9c5; }
+table.zebra   		{background-color: #ff7f03; }          
+table.zebra th 		{ background-color: #fccd4e; }
+table.zebra td.footer	{ background-color: #fccd4e; }
 table.zebra td		{ }
 table.zebra tr.d0	{ background-color: #fff; }
 table.zebra tr.d1	{ background-color: #f2f2f2; }
 
-table.timetable   	{ background-color: #849e99; }          
-table.timetable th 	{ background-color: #bac9c5; }
-table.timetable th.content 	{ background-color: #bac9c5; background-image:url(../images/tablebg.gif); }
+table.timetable   	{background-color: #ff7f03; }          
+table.timetable th 	{ background-color: #fccd4e; }
+table.timetable th.content 	{ background-color: #fccd4e; background-image:url(../images/tablebg.gif); }
 table.timetable td	{ }
 table.timetable td.content	{ background-image:url(../images/tablebg.gif); }
 table.timetable tr.d0	{ background-color: #fff; color: #dddddd;}
 table.timetable tr.d1	{ background-color: #f2f2f2; color: #ffffff;}
 
-table.login   		{ background-color: #eaeaea; }          
+table.login   		{background-color: #eaeaea; }          
 table.login th 		{ background-color: #eaeaea; }
 table.login td		{ }
 table.login tr		{ background-color: #fff; }
 
-.button			{ background-color: #bac9c5; background-image:url(../images/bg-grey-3d-5x35.jpg); }
-.textfield		{ background-color: #bac9c5; background-image:url(../images/bg-grey-3d-5x35.jpg); }
+.button			{ background-color: #fccd4e; background-image:url(../images/bg-green-pulse-5x35.jpg); }
+.textfield		{ background-color: #fccd4e; background-image:url(../images/bg-green-pulse-5x35.jpg); }
