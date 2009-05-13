@@ -132,8 +132,6 @@ class TSMMonitor {
 		if ($_POST["Poll"] == "Poll Now!") {
 			$timestamp = time();
 			$tmonpolld = new PollD($this->adodb);
-			//$tmonpolld->setDBParams($this->db_host, $this->db_name, $this->db_user, $this>db_password);
-			//$tmonpolld->initialize();
 			$tmonpolld->pollQuery($tmonpolld->queries[$this->GETVars['qq']], $tmonpolld->servers[$this->GETVars['server']], TRUE, $timestamp);
 			$_SESSION['timemachine']['date'] = $timestamp;
 			$_SESSION['timemachine']['time'] = $timestamp;

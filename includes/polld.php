@@ -129,7 +129,6 @@ class PollD {
 			$servers[$val["servername"]] = (array)$val;
 		}
 		return $servers;
-		//return $rows;
 	}
 
 
@@ -172,16 +171,23 @@ class PollD {
 				$stop = strstr($read, 'ANR2034E');
 				$stop = strstr($read, 'ANS1017E');
 				$stop = strstr($read, 'ANS8023E');
+				$blank = strstr($read, 'ANR2034E'); // dsmadmc runs correctly but result is empty (e.g. processes)
 				//$stop = strstr($read, 'ANS8023E');
 				if ($read != ' ' && $read != '' && !$stop) {
-					$read = preg_replace('/[\n]+/', '', $read);
-					if ($restable == "res_querysession_TSMSRV1") echo $read."\n";
-					$read = ereg_replace("\t","\",\"",$read);
-					if ($restable == "res_querysession_TSMSRV1") echo $read."\n";
-					if ($timestamp != '') {
-						$out[] = 'INSERT IGNORE INTO '.$restable.' values ("'.$timestamp.'", "'.$read.'")';
-					} else {
-						$out[] = 'INSERT INTO '.$restable.' (name, result) values ("'.$overviewname.'", "'.$read.'") ON DUPLICATE KEY update result="'.$read.'"';
+					if ($blank == "") {
+						$read = preg_replace('/[\n]+/', '', $read);
+						if ($restable == "res_querysession_TSMSRV1") echo $read."\n";
+						$read = ereg_replace("\t","\",\"",$read);
+						if ($restable == "res_querysession_TSMSRV1") echo $read."\n";
+						if ($timestamp != '') {
+							$out[] = 'INSERT IGNORE INTO '.$restable.' values ("'.$timestamp.'", "'.$read.'")';
+						} else {
+							$out[] = 'INSERT INTO '.$restable.' (name, result) values ("'.$overviewname.'", "'.$read.'") ON DUPLICATE KEY update result="'.$read.'"';
+						}
+					} else { // result is empty and it's ok
+						$out[0] = 'INSERT IGNORE INTO '.$restable.' (timestamp) values ("'.$timestamp.'")';
+						$hashstring = "";
+						$stop = TRUE;
 					}
 					//$out[] = $read;
 				}
@@ -189,7 +195,7 @@ class PollD {
 		}
 		$return["sql"] = $out;
 		$return["md5"] = md5($hashstring);
-		if (!$stop){
+		if (!$stop || ($blank && $stop)){
 			return $return;
 		} else {
 			return "";
@@ -210,7 +216,6 @@ class PollD {
 
 		$sql = "select count(*) from log_hashes where TABLENAME='".$tablename."' and HASH='".$hash."'";
 		$countobj = $this->adodb->fetchArrayDB($sql);
-		//$countobj = $this->fireMySQLQuery($sql, TRUE);
 		$countarray = (array)$countobj[0];
 		$count = $countarray["count(*)"];
 		
@@ -219,10 +224,9 @@ class PollD {
 		} else {
 			$sql = 'INSERT INTO log_hashes VALUES ("'.$tablename.'", "'.$hash.'")';
 			$colarray = array();
-			$colarray[$tablename] = $hash;
-			//echo $sql;
+			$colarray["tablename"] = $tablename;
+			$colarray["hash"] = $hash;
 			$this->adodb->updateDB("log_hashes", $colarray, 'tablename');
-			//$this->fireMySQLQuery($sql, FALSE);
 			return FALSE;
 		}
 
@@ -242,7 +246,6 @@ class PollD {
 	function checkFreq($tablename, $pollfreq, $timestamp) {
 
 		$sql = "select MAX(TimeStamp) from ".$tablename;
-		//$res = $this->fireMySQLQuery($sql, TRUE);
 		$res = $this->adodb->fetchArrayDB($sql);
 		$resarray = $res[0];
 		$lastinsert = $resarray["MAX(TimeStamp)"];
@@ -266,13 +269,11 @@ class PollD {
 
 		$sql = "select MIN(pollfreq) from cfg_queries";
 		$res = $this->adodb->fetchArrayDB($sql);
-		//$res = $this->fireMySQLQuery($sql, TRUE);
 		$resarray = (array)$res[0];
 		$minqueries = $resarray["MIN(pollfreq)"];
 
 		$sql = "select MIN(pollfreq) from cfg_overviewqueries";
 		$res = $this->adodb->fetchArrayDB($sql);
-		//$res = $this->fireMySQLQuery($sql, TRUE);
 		$resarray = (array)$res[0];
 		$minoverview = $resarray["MIN(pollfreq)"];
 
@@ -297,17 +298,14 @@ class PollD {
 		if (!$ignorePollFreq) echo "---------".$queryname.": ";
 		// create table if not exists
 		$showsql = "SHOW TABLES LIKE '".$tablename."'";
-		//$res = $this->fireMySQLQuery($showsql, TRUE);
 		$res = $this->adodb->fetchArrayDB($showsql);
 		if (!isset($res[0])) {
 			$fieldsql = "select fields from cfg_queries where name='".$queryname."'";
-			//$fields = $this->fireMySQLQuery($fieldsql, TRUE);
 			$fields = $this->adodb->fetchArrayDB($fieldsql);
 			var_dump($fields);
 			$ctsql = "CREATE TABLE `".$tablename."` (".$fields[0]['fields'].") DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 			if (!$ignorePollFreq) echo "created table ".$tablename." and ";
 			//$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." LIKE smp_".$query["name"];
-			//$this->fireMySQLQuery($ctsql, FALSE);
 			$this->adodb->execDB($ctsql);
 		}
 		// execute query and store result in mysql db
@@ -317,13 +315,11 @@ class PollD {
 				if (!$this->checkHash($tablename, $result["md5"])) {
 					if ($query["polltype"]=="update") {
 						$dropsql = "truncate table ".$tablename;
-						//$this->fireMySQLQuery($dropsql, FALSE);
 						$this->adodb->execDB($dropsql);
 						if (!$ignorePollFreq) echo " TRUNCATED TABLE and ";
 					}
 					foreach ($result["sql"] as $insertquery) {
 						if ($queryname == "querysession") echo "\n\n".$insertquery."\n\n";
-						//$this->fireMySQLQuery($insertquery, FALSE);
 						$this->adodb->execDB($insertquery);
 					}
 					if (!$ignorePollFreq) echo "inserted new rows into ".$tablename."\n";
@@ -358,11 +354,9 @@ class PollD {
 		//$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." LIKE smp_overview";
 		$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." ( `name` varchar(35) collate utf8_unicode_ci NOT NULL, `result` varchar(255) collate utf8_unicode_ci NOT NULL, UNIQUE KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 		$this->adodb->execDB($ctsql);
-		//$this->fireMySQLQuery($ctsql, FALSE);
 		$result = $this->execute($query["query"], $server["servername"], $tablename, '', $query["name"]);
 		if ($result != "") {
 			foreach ($result["sql"] as $insertquery) {
-				//$this->fireMySQLQuery($insertquery, FALSE);
 				$this->adodb->execDB($insertquery);
 				echo "inserted row\n";
 			}
@@ -384,9 +378,11 @@ class PollD {
 	 * @param string $hashonly do not drop table, just delete entry in log_hashes
 	 */
 
-	function cleanupDatabase($servername = "", $queryname = "", $overviewqueryname = "", $hashonly = "yes"){
+	function cleanupDatabase($servername = "", $queryname = "", $overviewqueryname = "", $months = "9999" ,$hashonly = "yes"){
 
 		if ($servername != "" && $queryname != "" && $overviewqueryname != "") {
+			$time = time()-($months*30*24*60*60);
+			$wc = " WHERE `timestamp`<'".$time."'";
 			foreach ($this->servers as $server) { 
 				if ($servername == "all" || $server["servername"] == $servername) {
 					foreach ($this->queries as $query) {
@@ -394,7 +390,6 @@ class PollD {
 							$tablename = "res_".$query["name"]."_".$server["servername"];
 							if ($hashonly != "yes") {
 								$dropsql = "drop table ".$tablename;
-								//$this->fireMySQLQuery($dropsql, FALSE);
 								$this->adodb->execDB($dropsql);
 							}
 							$delsql = "DELETE FROM log_hashes where `tablename` = '".$tablename."'";
@@ -406,7 +401,6 @@ class PollD {
 						if (($overviewqueryname == "all" || $query["name"] == $overviewqueryname) && $overviewqueryname != "none") {
 							$tablename = "res_overview_".$server["servername"];
 							$dropsql = "drop table ".$tablename;
-							//$this->fireMySQLQuery($dropsql, FALSE);
 							$this->adodb->execDB($dropsql);
 						}
 					}
@@ -433,7 +427,6 @@ class PollD {
 		if ($nextrun != "") $nextrun = ", `nextrun`='".$nextrun."'";
 		
 		$sql = "update log_polldstat set ".$status." ".$lastrun." ".$nextrun." WHERE `id`='1'";
-		//$this->fireMySQLQuery($sql, FALSE);
 		$this->adodb->execDB($sql);
 	}
 
@@ -448,7 +441,6 @@ class PollD {
 	function isEnabled() {
 
 		$sql = "select enabled from log_polldstat WHERE `id`='1'";
-		//$result = $this->fireMySQLQuery($sql, TRUE);
 		$result = $this->adodb->fetchArrayDB($sql);
 		
 		if ($result != "" && $result[0]["enabled"] == "1"){
@@ -475,13 +467,8 @@ class PollD {
 		} else {
 			return "";
 		}
-		//$colarray = array();
-		//$colarray["enabled"] = $val;
 		$sql = "update log_polldstat set `enabled` = '".$val."' WHERE `id`='1'";
-		//$this->fireMySQLQuery($sql, FALSE);
-		echo $sql;
 		$this->adodb->execDB($sql);
-		//$this->adodb->updateDB("log_polldstat", $colarray, 'id');
 
 	}
 
@@ -494,7 +481,6 @@ class PollD {
 	function getStatus() {
 
 		$sql = "select status from log_polldstat WHERE `id`='1'";
-		//$result = $this->fireMySQLQuery($sql, TRUE);
 		$result = $this->adodb->fetchArrayDB($sql);
 
 		return $result[0]["status"];
@@ -511,7 +497,7 @@ class PollD {
 
 	function poll(){
 
-		//$this->controlPollD("off");
+		$this->controlPollD("off");
 
 		$sleeptime = $this->getSleeptime();
 
@@ -548,7 +534,6 @@ class PollD {
 						$this->pollOverviewQuery($query, $server, $timestamp);
 					}
 					$sql = 'INSERT INTO log_polldlog VALUES ("'.$timestamp.'", "'.$server["servername"].'", "'.$log_updated.'", "'.$log_unchangedresult.'", "'.$log_pollfreqnoreached.'", "'.(time()-$log_timeneeded).'")';
-					//$this->fireMySQLQuery($sql, FALSE);
 					$this->adodb->execDB($sql);
 				}
 				$init = "no";
