@@ -1,0 +1,179 @@
+/* - - - - - - - - - - - - - - - - - - - - */
+/* BODY */
+/* - - - - - - - - - - - - - - - - - - - - */
+body, html {
+font-family: Verdana, Arial, sans-serif;
+font-size: 12px;
+margin: 0 0 5px 0;
+padding: 0;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - */
+/* OUTER CONTENTBOX */
+/* - - - - - - - - - - - - - - - - - - - - */
+#inhalt {
+margin:10px auto;
+text-align:left;
+width: 90%;
+padding: 2px;
+}
+
+.calendar * { margin: 0; padding: 0; border: 0; font-family: Tahoma, serif; font-weight: normal; color: #000; }
+.calendar .invalidday a, .calendar .invalidday a:hover { color: #ccc; background: #fff; cursor: default; }
+.calendar .selectedday { background: #ddd; }
+.calendar .today { font-weight: bold; color: #f00; }
+.calendar a { padding: 0 2px; color: #000; text-decoration: none; }
+.calendar a:hover { background: #bbb; }
+.calendar table { border-collapse: collapse; font-size: 90%; }
+.calendar tbody td { width: 20px; }
+.calendar td, .calendar th { padding: 1px; text-align: center; }
+.calendar thead td { border-bottom: 1px solid #aaa; }
+.calendar thead td { font-weight: bold; }
+.calendar thead th a { font-size: 95%; font-weight: bold; }
+.calendar thead th { padding: 2px 0; vertical-align: middle; background: #ddd; }
+.calendar { padding-bottom: 2px; border: 1px solid #aaa; font-size: small; background: #fff; }
+.calendaricon { cursor: pointer; }
+.calendarlink, .calendaricon { margin: 0 3px; }
+
+a.nav:link { text-decoration:underline; }
+a.nav:visited { text-decoration:underline; }
+a.nav:active { text-decoration:underline; }
+a.nav:hover { text-decoration:underline; }
+a.navhead:link { text-decoration:none; }
+a.navhead:visited { text-decoration:none; }
+a.navhead:active { text-decoration:none; }
+a.navhead:hover { text-decoration:none; }
+a.tablefooter:link { text-decoration:underline; }
+a.tablefooter:visited { text-decoration:underline; }
+a.tablefooter:active { text-decoration:none; }
+a.tablefooter:hover { text-decoration:underline; }
+a.navheader:link { text-decoration:none; }
+a.navheader:visited {text-decoration:none; }
+a.navheader:active { text-decoration:none; }
+a.navheader:hover { text-decoration:none; }
+
+/* - - - - - - - - - - - - - - - - - - - - */
+/* TABLE*/
+/* - - - - - - - - - - - - - - - - - - - - */
+#design {
+width: 100%;
+}
+
+#head {
+height: 75px;
+text-align: center;
+font-size: 24px;
+font-weight: bold;
+background-repeat:repeat-x;
+}
+
+#tnleft {
+padding: 0px;
+font-size: 11px;
+background-repeat:repeat-x;
+}
+
+#tnright {
+padding-top: 5px;
+font-size: 11px;
+background-repeat:repeat-x;
+}
+
+#tnbox1 {
+float:left;
+}
+
+#tnbox2 {
+float:right;
+}
+
+#printpreviewheader {
+padding: 3px;
+font-size: 16px;
+}
+
+#menue {
+padding: 0px;
+vertical-align: top;
+}
+
+.menuelinks a {
+display: block;
+width: auto;
+margin-bottom: 2px;
+padding: 3px 0px 3px 4px;
+font-size: 11px;
+font-weight: bold;
+text-decoration: none;
+}
+.menuelinks a:hover {
+text-decoration: none;
+}
+
+.menuelinks .aktuell {
+display: block;
+width: auto;
+margin-bottom: 2px;
+padding: 3px 0px 3px 4px;
+font-size: 11px;
+font-weight: bold;
+}
+
+
+.menuelinks .sidebarinfo {
+display: block;
+width: auto;
+margin-bottom: 2px;
+padding: 3px 0px 3px 4px;
+font-size: 11px;
+text-decoration: none;
+}
+
+#content {
+padding: 0px;
+vertical-align: top;
+}
+
+
+#footer {
+padding: 3px;
+text-align: center;
+background-repeat:repeat-x;
+}
+
+#sysinfo {
+padding: 3px;
+text-align: center;
+}
+
+#table {
+padding: 3px;
+text-align: center;
+}
+
+td { font-family: Tahoma, Geneva, Arial, helvetica, sans-serif; font-size: 10pt }
+th { font-family: Tahoma, Geneva, Arial, helvetica, sans-serif; font-size: 10pt }
+
+
+table.zebra   		{ border-spacing: 1px;margin-left: auto; margin-right: auto; width: 100%;}          
+table.zebra th 		{ }
+table.zebra td.footer	{ }
+table.zebra td		{ padding: 4px;}
+table.zebra tr.d0	{ }
+table.zebra tr.d1	{ }
+
+table.timetable   	{ border-spacing: 1px;margin-left: 1px; margin-right: auto;}          
+table.timetable th 	{ }
+table.timetable th.content 	{ }
+table.timetable td	{ padding: 2px; font-size: 10px; }
+table.timetable td.content	{ padding: 2px; font-size: 10px; }
+table.timetable tr.d0	{ }
+table.timetable tr.d1	{ }
+
+table.login   		{ border-spacing: 1px;margin-left: auto; margin-right: auto;}          
+table.login th 		{ text-align: center; }
+table.login td		{ padding: 4px;}
+table.login tr		{ text-align: center; }
+
+.button			{ }
+.textfield		{ }
