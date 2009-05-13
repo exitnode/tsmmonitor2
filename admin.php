@@ -76,9 +76,7 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 		// do nothing
 	// show settings page
         } else if ($tsmmonitor->GETVars['qq'] == "settings") {
-		$tmonpolld = new PollD();
-		$tmonpolld->setDBParams($db_host, $db_name, $db_user, $db_password);
-		$tmonpolld->initialize();
+		$tmonpolld = new PollD($adodb);
 
 		// If start/stop button was pressed
 		if ($_POST["PollDControl"] != "") {

@@ -41,6 +41,7 @@ class ADOdb {
 
 
 	var $conn;
+	var $debug;
 
         /**
          * constructor - establishes a DB connection via ADODB
@@ -54,7 +55,10 @@ class ADOdb {
          * @param string $retr the number attempts for the DB connection before a failure is reported
          * @return 0
          */
-        function ADOdb($host, $port = "3306", $user, $pass, $db_name, $db_type, $retr = 20) {
+        function ADOdb($host, $port = "3306", $user, $pass, $db_name, $db_type, $retr = 20, $debug = FALSE) {
+
+	    $this->debug = $debug;
+
             $try = 0;
             $hostport = $host . ":" . $port;
             $this->conn = NewADOConnection($db_type);
@@ -70,6 +74,19 @@ class ADOdb {
             die("FATAL: Cannot connect to database server on '$host':'$port'. Please make sure you have specified a valid database name in 'includes/config.php'\n");
 	    return 0;
         }
+
+
+
+
+        /**
+         * setDebug - enables or disabled debug mode
+         *
+	 * @param boolean $debug
+         */
+        function setDebug($debug) {
+		$this->debug = $debug;
+        }
+
 
 
 	/**
@@ -91,7 +108,7 @@ class ADOdb {
 	 * @return ADORecordSet
 	 */
 	function execDB($sql) {
-	//    $this->conn->debug = true;
+	    $this->conn->debug = $this->debug;
 	    $sql = $this->sanitizeSQL($sql);
 
 	    $recordSet = &$this->conn->Execute($sql);
@@ -115,6 +132,7 @@ class ADOdb {
 	 */
 	function fetchCellDB($sql, $column_name) {
 	    //$this->conn->debug = true;
+	    $this->conn->debug = $this->debug;
 	    $sql = $this->sanitizeSQL($sql);
 
 	    if ($column_name != '') {
@@ -151,6 +169,7 @@ class ADOdb {
 	 */
 	function fetchRowDB($sql) {
 	    //$this->conn->debug = true;
+	    $this->conn->debug = $this->debug;
 	    $sql = $this->sanitizeSQL($sql);
 
 	    $this->conn->SetFetchMode(ADODB_FETCH_ASSOC);
@@ -179,6 +198,7 @@ class ADOdb {
 	 */
 	function fetchArrayDB($sql) {
 	    //$this->conn->debug = true;
+	    $this->conn->debug = $this->debug;
 	    $sql = $this->sanitizeSQL($sql);
 
 	    $recordArray = array();
@@ -213,6 +233,7 @@ class ADOdb {
 	 */
 	function updateDB($table, $cells, $keys, $autoquote = TRUE) {
 	    //$this->conn->debug = true;
+	    $this->conn->debug = $this->debug;
 	    $this->conn->Replace($table, $cells, $keys, $autoquote);
 
 	    return $this->conn->Insert_ID();

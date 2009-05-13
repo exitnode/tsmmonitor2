@@ -95,14 +95,11 @@ $adodb = new ADOdb($db_host, $db_port, $db_user, $db_password, $db_name, $db_typ
 $tsmmonitor = new TSMMonitor($adodb);
 
 // check to see if this is a new installation
-$version = $adodb->fetchCellDB("select confval from cfg_config where confkey='version'", '', $tsmmonitor->conn);
+$version = $adodb->fetchCellDB("select confval from cfg_config where confkey='version'", '');
 if ($version != $config["tsm_monitor_version"] && basename($_SERVER['REQUEST_URI']) != 'install.php') {
     header("Location: install.php");
     exit;
 }
-// ** Initialize PHP session ** //
-//initialize();
-//$tsmmonitor->initialize();
 
 // ** Include generic code and external libraries ** //
 // ... more includes here

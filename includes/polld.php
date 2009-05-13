@@ -46,10 +46,13 @@ class PollD {
 var $servers;
 var $queries;
 var $overviewqueries;
+/**
 var $db_host;
 var $db_name;
 var $db_user;
 var $db_password;
+**/
+var $adodb;
 
 var $log_timeneeded;
 var $log_unchangedresult;
@@ -58,38 +61,20 @@ var $log_updated;
 
 
 
-/**
- * setDBParams - helper function to set db parameter properties
- *
- * @param string $db_host
- * @param string $db_name
- * @param string $db_user
- * @param string $db_password
- */
-
-function setDBParams($db_host, $db_name, $db_user, $db_password){
-
-	$this->db_host = $db_host;
-	$this->db_name = $db_name;
-	$this->db_user = $db_user;
-	$this->db_password = $db_password;
-
-}
-
-
 
 /**
- * initialize - initializes this class
+ * constructor
  *
  */
 
-function initialize() {
+function PollD($adodb) {
+
+	$this->adodb = $adodb;
 	
-	$this->setDBParams("localhost", "tsmmonitor", "tsmmonitor", "tsmmonitor");
+	//$this->setDBParams("localhost", "tsmmonitor", "tsmmonitor", "tsmmonitor");
 	$this->servers = $this->getServers();
 	$this->queries = $this->getQueries();
 	$this->overviewqueries = $this->getOverviewQueries();
-
 }
 
 
@@ -102,7 +87,7 @@ function initialize() {
  * @param boolean $direct give back MySQLResultSet directly or Array of Objects
  * @return MySQLResultSet/Array
  */
-
+/**
 function fireMySQLQuery($sql, $getreturnval = TRUE){
 
 	$ret = array();
@@ -121,7 +106,7 @@ function fireMySQLQuery($sql, $getreturnval = TRUE){
 
 	return $ret;
 }
-
+**/
 
 
 /**
@@ -132,9 +117,9 @@ function fireMySQLQuery($sql, $getreturnval = TRUE){
 function getQueries() {
 	$queries = array();
 	$query = "select * from cfg_queries";
-	$querytablerows = $this->fireMySQLQuery($query);
+	$querytablerows = $this->adodb->fetchArrayDB($query);
 	while (list ($subkey, $queryrow) = each ($querytablerows)) {
-		$queries[$queryrow->name] = (array)$queryrow;
+		$queries[$queryrow["name"]] = (array)$queryrow;
 		$temparray=split(",", $queryrow->Fields);
 		$cols = array();
 		while (list ($subkey, $col) = each ($temparray)) {
@@ -142,7 +127,7 @@ function getQueries() {
 			$cols[$subkey]["label"] = $temp[0];
 			$cols[$subkey]["name"] = $temp[1];
 		}
-		$queries[$queryrow->name]["header"]["column"] = $cols;
+		if ($queryrow->name != "") $queries[$queryrow->name]["header"]["column"] = $cols;
 	}
 	return $queries;
 }
@@ -159,9 +144,9 @@ function getQueries() {
 function getOverviewQueries() {
         $queries = array();
         $query = "select * from cfg_overviewqueries";
-        $querytablerows = $this->fireMySQLQuery($query);
+	$querytablerows = $this->adodb->fetchArrayDB($query);
         while (list ($subkey, $queryrow) = each ($querytablerows)) {
-                $queries[$queryrow->name] = (array)$queryrow;
+                $queries[$queryrow["name"]] = (array)$queryrow;
         }
         return $queries;
 }
@@ -175,12 +160,13 @@ function getOverviewQueries() {
 
 function getServers() {
 	$query = "select * from cfg_servers";
-	$rows = $this->fireMySQLQuery($query);
+	$rows = $this->adodb->fetchArrayDB($query);
 	$servers = array();
 	while (list ($key, $val) = each ($rows)) {
-		$servers[$val->servername] = (array)$val;
+		$servers[$val["servername"]] = (array)$val;
 	}
 	return $servers;
+	//return $rows;
 }
 
 
@@ -260,7 +246,8 @@ function execute($query = '', $servername = '', $restable = '', $timestamp = '',
 function checkHash($tablename = '', $hash = ''){
 
 	$sql = "select count(*) from log_hashes where TABLENAME='".$tablename."' and HASH='".$hash."'";
-	$countobj = $this->fireMySQLQuery($sql, TRUE);
+	$countobj = $this->adodb->fetchArrayDB($sql);
+	//$countobj = $this->fireMySQLQuery($sql, TRUE);
 	$countarray = (array)$countobj[0];
 	$count = $countarray["count(*)"];
 	
@@ -268,8 +255,11 @@ function checkHash($tablename = '', $hash = ''){
 		return TRUE;
 	} else {
 		$sql = 'INSERT INTO log_hashes VALUES ("'.$tablename.'", "'.$hash.'")';
+		$colarray = array();
+		$colarray[$tablename] = $hash;
 		//echo $sql;
-		$this->fireMySQLQuery($sql, FALSE);
+		$this->adodb->updateDB("log_hashes", $colarray, 'tablename');
+		//$this->fireMySQLQuery($sql, FALSE);
 		return FALSE;
 	}
 
@@ -289,8 +279,9 @@ function checkHash($tablename = '', $hash = ''){
 function checkFreq($tablename, $pollfreq, $timestamp) {
 
         $sql = "select MAX(TimeStamp) from ".$tablename;
-        $res = $this->fireMySQLQuery($sql, TRUE);
-        $resarray = (array)$res[0];
+        //$res = $this->fireMySQLQuery($sql, TRUE);
+	$res = $this->adodb->fetchArrayDB($sql);
+        $resarray = $res[0];
 	$lastinsert = $resarray["MAX(TimeStamp)"];
 
 	if ($lastinsert!="" && ($lastinsert+($pollfreq*60))>=$timestamp) {
@@ -311,12 +302,14 @@ function checkFreq($tablename, $pollfreq, $timestamp) {
 function getSleeptime() {
 
         $sql = "select MIN(pollfreq) from cfg_queries";
-        $res = $this->fireMySQLQuery($sql, TRUE);
+	$res = $this->adodb->fetchArrayDB($sql);
+        //$res = $this->fireMySQLQuery($sql, TRUE);
         $resarray = (array)$res[0];
         $minqueries = $resarray["MIN(pollfreq)"];
 
         $sql = "select MIN(pollfreq) from cfg_overviewqueries";
-        $res = $this->fireMySQLQuery($sql, TRUE);
+	$res = $this->adodb->fetchArrayDB($sql);
+        //$res = $this->fireMySQLQuery($sql, TRUE);
         $resarray = (array)$res[0];
         $minoverview = $resarray["MIN(pollfreq)"];
 
@@ -336,18 +329,23 @@ function getSleeptime() {
 
 function pollQuery($query = "", $server = "", $ignorePollFreq = FALSE, $timestamp){
 
-	$tablename = "res_".$query["name"]."_".$server["servername"];
-	if (!$ignorePollFreq) echo "---------".$query["name"].": ";
+	$queryname = $query["name"];
+	$tablename = "res_".$queryname."_".$server["servername"];
+	if (!$ignorePollFreq) echo "---------".$queryname.": ";
 	// create table if not exists
 	$showsql = "SHOW TABLES LIKE '".$tablename."'";
-	$res = $this->fireMySQLQuery($showsql, TRUE);
+	//$res = $this->fireMySQLQuery($showsql, TRUE);
+	$res = $this->adodb->fetchArrayDB($showsql);
 	if (!isset($res[0])) {
-		$fieldsql = "select fields from cfg_queries where name='".$query["name"]."'";
-		$fields = $this->fireMySQLQuery($fieldsql, TRUE);
-		$ctsql = "CREATE TABLE `".$tablename."` (".$fields[0]->fields.") DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+		$fieldsql = "select fields from cfg_queries where name='".$queryname."'";
+		//$fields = $this->fireMySQLQuery($fieldsql, TRUE);
+		$fields = $this->adodb->fetchArrayDB($fieldsql);
+		var_dump($fields);
+		$ctsql = "CREATE TABLE `".$tablename."` (".$fields[0]['fields'].") DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 		if (!$ignorePollFreq) echo "created table ".$tablename." and ";
 		//$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." LIKE smp_".$query["name"];
-		$this->fireMySQLQuery($ctsql, FALSE);
+		//$this->fireMySQLQuery($ctsql, FALSE);
+		$this->adodb->execDB($ctsql);
 	}
 	// execute query and store result in mysql db
 	if ($ignorePollFreq || !$this->checkFreq($tablename, $query["pollfreq"], $timestamp)){
@@ -356,12 +354,14 @@ function pollQuery($query = "", $server = "", $ignorePollFreq = FALSE, $timestam
 			if (!$this->checkHash($tablename, $result["md5"])) {
 				if ($query["polltype"]=="update") {
 					$dropsql = "truncate table ".$tablename;
-					$this->fireMySQLQuery($dropsql, FALSE);
+					//$this->fireMySQLQuery($dropsql, FALSE);
+					$this->adodb->execDB($dropsql);
 					if (!$ignorePollFreq) echo " TRUNCATED TABLE and ";
 				}
 				foreach ($result["sql"] as $insertquery) {
-					if ($query["name"] == "querysession") echo "\n\n".$insertquery."\n\n";
-					$this->fireMySQLQuery($insertquery, FALSE);
+					if ($queryname == "querysession") echo "\n\n".$insertquery."\n\n";
+					//$this->fireMySQLQuery($insertquery, FALSE);
+					$this->adodb->execDB($insertquery);
 				}
 				if (!$ignorePollFreq) echo "inserted new rows into ".$tablename."\n";
 				$this->log_updated++;
@@ -394,11 +394,13 @@ function pollOverviewQuery($query = "", $server = "", $timestamp){
 	echo "---------".$query["name"].": ";
 	//$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." LIKE smp_overview";
 	$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." ( `name` varchar(35) collate utf8_unicode_ci NOT NULL, `result` varchar(255) collate utf8_unicode_ci NOT NULL, UNIQUE KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-	$this->fireMySQLQuery($ctsql, FALSE);
+	$this->adodb->execDB($ctsql);
+	//$this->fireMySQLQuery($ctsql, FALSE);
 	$result = $this->execute($query["query"], $server["servername"], $tablename, '', $query["name"]);
 	if ($result != "") {
 		foreach ($result["sql"] as $insertquery) {
-			$this->fireMySQLQuery($insertquery, FALSE);
+			//$this->fireMySQLQuery($insertquery, FALSE);
+			$this->adodb->execDB($insertquery);
 			echo "inserted row\n";
 		}
         } else {
@@ -429,17 +431,20 @@ function cleanupDatabase($servername = "", $queryname = "", $overviewqueryname =
 						$tablename = "res_".$query["name"]."_".$server["servername"];
 						if ($hashonly != "yes") {
 							$dropsql = "drop table ".$tablename;
-							$this->fireMySQLQuery($dropsql, FALSE);
+							//$this->fireMySQLQuery($dropsql, FALSE);
+							$this->adodb->execDB($dropsql);
 						}
 						$delsql = "DELETE FROM log_hashes where `tablename` = '".$tablename."'";
-						$this->fireMySQLQuery($delsql, FALSE);
+						//$this->fireMySQLQuery($delsql, FALSE);
+						$this->adodb->execDB($delsql);
 					}
 				}
 				foreach ($this->overviewqueries as $query) {
 					if (($overviewqueryname == "all" || $query["name"] == $overviewqueryname) && $overviewqueryname != "none") {
 						$tablename = "res_overview_".$server["servername"];
 						$dropsql = "drop table ".$tablename;
-						$this->fireMySQLQuery($dropsql, FALSE);
+						//$this->fireMySQLQuery($dropsql, FALSE);
+						$this->adodb->execDB($dropsql);
 					}
 				}
 			}
@@ -465,8 +470,8 @@ function setPollDStatus($status, $lastrun, $nextrun) {
 	if ($nextrun != "") $nextrun = ", `nextrun`='".$nextrun."'";
 	
 	$sql = "update log_polldstat set ".$status." ".$lastrun." ".$nextrun." WHERE `id`='1'";
-	$this->fireMySQLQuery($sql, FALSE);
-
+	//$this->fireMySQLQuery($sql, FALSE);
+	$this->adodb->execDB($sql);
 }
 
 
@@ -480,9 +485,10 @@ function setPollDStatus($status, $lastrun, $nextrun) {
 function isEnabled() {
 
         $sql = "select enabled from log_polldstat WHERE `id`='1'";
-        $result = $this->fireMySQLQuery($sql, TRUE);
+        //$result = $this->fireMySQLQuery($sql, TRUE);
+	$result = $this->adodb->fetchArrayDB($sql);
 	
-	if ($result != "" && $result[0]->enabled == "1"){
+	if ($result != "" && $result[0]["enabled"] == "1"){
 		return TRUE;
 	} else {
  		return FALSE;
@@ -506,9 +512,13 @@ function controlPollD($switch = "") {
 	} else {
 		return "";
 	}
-
+	//$colarray = array();
+	//$colarray["enabled"] = $val;
         $sql = "update log_polldstat set `enabled` = '".$val."' WHERE `id`='1'";
-        $this->fireMySQLQuery($sql, FALSE);
+        //$this->fireMySQLQuery($sql, FALSE);
+	echo $sql;
+	$this->adodb->execDB($sql);
+	//$this->adodb->updateDB("log_polldstat", $colarray, 'id');
 
 }
 
@@ -521,7 +531,8 @@ function controlPollD($switch = "") {
 function getStatus() {
 
         $sql = "select status from log_polldstat WHERE `id`='1'";
-        $result = $this->fireMySQLQuery($sql, TRUE);
+        //$result = $this->fireMySQLQuery($sql, TRUE);
+	$result = $this->adodb->fetchArrayDB($sql);
 
         return $result[0]->status;
 	
@@ -537,7 +548,7 @@ function getStatus() {
 
 function poll(){
 
-	$this->controlPollD("off");
+	//$this->controlPollD("off");
 
 	$sleeptime = $this->getSleeptime();
 
@@ -557,6 +568,7 @@ function poll(){
 			
 			$this->setPollDStatus("running", "", "");
 
+
 			foreach ($this->servers as $server) {
 				$this->log_timeneeded = time();
 				$this->log_unchangedresult = 0;
@@ -573,7 +585,8 @@ function poll(){
 					$this->pollOverviewQuery($query, $server, $timestamp);
 				}
 				$sql = 'INSERT INTO log_polldlog VALUES ("'.$timestamp.'", "'.$server["servername"].'", "'.$log_updated.'", "'.$log_unchangedresult.'", "'.$log_pollfreqnoreached.'", "'.(time()-$log_timeneeded).'")';
-				$this->fireMySQLQuery($sql, FALSE);
+				//$this->fireMySQLQuery($sql, FALSE);
+				$this->adodb->execDB($sql);
 			}
 			$init = "no";
 
@@ -592,7 +605,7 @@ function poll(){
 		} else {
 
 			echo "PollD is disabled. Sleeping for 5 minutes...\n";
-			sleep (300);
+			sleep (3);
 
 		}
 	}

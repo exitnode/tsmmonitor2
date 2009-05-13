@@ -32,15 +32,36 @@
  * @package tsmmonitor
  */
 
+// ** Default database settings ** //
+/**
+$db_type = 'mysql';
+$db_name = 'tsmmonitor';
+$db_user = 'tsmmonitor';
+$db_password = 'tsmmonitor';
+$db_host = 'localhost';
+$db_port = '3306';
+$db_charset = 'utf8';
+$db_collate = '';
+*/
+// ** Include user configureable definitions ** //
+//include(dirname(__FILE__) . "/../includes/config.php");
 
-require('../includes/config.php');
-require('../includes/polld.php');
+// ** Global configuration array ** //
+//$config = array();
 
+// ** Display ALL PHP errors ** //
+//error_reporting(E_ALL);
 
-	$tmonpolld = new PollD();
-	$tmonpolld->setDBParams($db_host, $db_name, $db_user, $db_password);
-	$tmonpolld->initialize();
-	$tmonpolld->poll();
+// ** Include generic code and external libraries ** //
+//include ("../extlib/adodb5/adodb.inc.php");
+//include_once("../includes/adodb.php");
+include_once("../includes/global.php");
+
+// ** Connect to the database ** //
+//$adodb = new ADOdb($db_host, $db_port, $db_user, $db_password, $db_name, $db_type, '' ,FALSE);
+
+$tmonpolld = new PollD($adodb);
+$tmonpolld->poll();
 
 
 ?>
