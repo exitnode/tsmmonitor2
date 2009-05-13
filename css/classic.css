@@ -6,25 +6,26 @@ background: #F5F6F8;
 color: #000000;
 }
 
+
 /* - - - - - - - - - - - - - - - - - - - - */
 /* OUTER CONTENTBOX */
 /* - - - - - - - - - - - - - - - - - - - - */
 #inhalt {
 background: #ffffff;
-border: 1px solid #1f304e;
+border: 1px solid #a4aed5;
 }
 
-a.nav:link { color:#eaeff4; }
-a.nav:visited { color:#eaeff4; }
+a.nav:link { color:#000000; }
+a.nav:visited { color:#000000; }
 a.nav:active { color:#cccccc; }
 a.nav:hover { color:#555555; }
-a.navhead:link { color:#eaeff4; }
-a.navhead:visited { color:#eaeff4; }
-a.navhead:active { color:#eaeff4; }
+a.navhead:link { color:#000000; }
+a.navhead:visited { color:#000000; }
+a.navhead:active { color:#000000; }
 a.navhead:hover { color:#555555; }
-a.tablefooter:link { color:#eaeff4; }
-a.tablefooter:visited { color:#eaeff4; }
-a.tablefooter:active { color:#eaeff4; }
+a.tablefooter:link { color:#000000; }
+a.tablefooter:visited { color:#000000; }
+a.tablefooter:active { color:#000000; }
 a.tablefooter:hover { color:#555555; }
 a.navheader:link { color:#FFFFFF; }
 a.navheader:visited { color:#FFFFFF; }
@@ -35,24 +36,22 @@ a.navheader:hover { color:#FFFFFF; }
 /* TABLE*/
 /* - - - - - - - - - - - - - - - - - - - - */
 #design {
+width: 100%;
 background: #ffffff;
 }
 
 #head {
+background: #999999;
 color: #ffffff;
-background-image:url(../images/bg-horizon-5x75.jpg); 
 }
 
 #tnleft {
-background: #ffffff;
+background: #cacaca;
 color: #000000;
-background-image:url(../images/bg-horizon-5x35.jpg); 
 }
-
 #tnright {
-background: #ffffff;
+background: #cacaca;
 color: #000000;
-background-image:url(../images/bg-horizon-5x35.jpg); 
 }
 
 #printpreviewheader {
@@ -66,25 +65,24 @@ color: #000000;
 }
 
 .menuelinks a {
-background: #3880af;
-color: #eaeff4;
-border: 1px solid #1f304e;
+background: #eaeaea;
+color: #000000;
+border: 1px solid #d3d3d3;
 }
 .menuelinks a:hover {
-background: #bdd6e6;
+background: #dadada;
 color: #000000;
 }
 
 .menuelinks .aktuell {
-background: #1f304e;
-color: #eaeff4;
-border: 1px solid #010101;
+background: #dadada;
+border: 1px solid #444444;
 }
 
 
 .menuelinks .sidebarinfo {
 background: #fafafa;
-border: 1px solid #1f304e;
+border: 1px solid #d3d3d3;
 }
 
 #content {
@@ -95,8 +93,7 @@ color: #000000;
 
 #footer {
 background: #eaeaea;
-color: #eaeff4;
-background-image:url(../images/bg-horizon-5x35.jpg); 
+color: #222222;
 }
 
 #sysinfo {
@@ -109,25 +106,21 @@ background: #dadada;
 color: #ffffff;
 }
 
-table.zebra   		{ background-color: #1f304e; }          
-table.zebra th 		{ background-color: #3880af; }
-table.zebra td.footer	{ background-color: #3880af; }
+table.zebra   		{ background-color: #eaeaea; }          
+table.zebra th 		{ background-color: #eaeaea; }
 table.zebra td		{ }
 table.zebra tr.d0	{ background-color: #fff; }
 table.zebra tr.d1	{ background-color: #f2f2f2; }
 
-table.timetable   	{ background-color: #1f304e; }          
-table.timetable th 	{ background-color: #3880af; }
-table.timetable th.content 	{ background-color: #3880af; background-image:url(../images/tablebg.gif); }
+table.timetable   	{ background-color: #eaeaea; }          
+table.timetable th 	{ background-color: #eaeaea; }
+table.timetable th.content 	{ background-color: #eaeaea; background-image:url(../images/tablebg.gif);}
 table.timetable td	{ }
 table.timetable td.content	{ background-image:url(../images/tablebg.gif); }
 table.timetable tr.d0	{ background-color: #fff; color: #dddddd;}
 table.timetable tr.d1	{ background-color: #f2f2f2; color: #ffffff;}
 
-table.login   		{background-color: #eaeaea; }          
+table.login   		{ background-color: #eaeaea; }          
 table.login th 		{ background-color: #eaeaea; }
 table.login td		{ }
 table.login tr		{ background-color: #fff; }
-
-.button			{ background-color: #3880af; color: #eaeff4; background-image:url(../images/bg-horizon-5x35.jpg); }
-.textfield		{ background-color: #3880af; color: #eaeff4; background-image:url(../images/bg-horizon-5x35.jpg); }
