@@ -108,7 +108,8 @@ class TSMMonitor {
 		if ($this->GETVars['server'] == "") { $this->GETVars['server']=$this->configarray["defaultserver"]; }
 		if ($this->GETVars['orderdir'] == "") { $this->GETVars['orderdir'] = "asc"; }
 
-		if ($_SESSION['timeshift'] == '' ||  !strstr($this->GETVars["qq"], 'dynamictimetable')) {
+		//if ($_SESSION['timeshift'] == '' ||  !strstr($this->GETVars["qq"], 'dynamictimetable')) {
+		if ($_SESSION['timeshift'] == '' ||  $this->configarray["queryarray"][$this->GETVars['qq']]["timetablefields"] == "") {
 			$_SESSION['timeshift'] = 0 ;
 		}
 
@@ -119,12 +120,13 @@ class TSMMonitor {
 
 		$_SESSION["GETVars"] = $this->GETVars;
 
-
-		// BEGIN Timemachine
+		//Cleanup
 		if ($_SESSION["from"] != $_GET['q']) {
 			$_SESSION['timemachine'] = "";	
+			$_SESSION['tabletype'] = "";	
 		}
 
+		// BEGIN Timemachine
 		if ($_POST['dateinput'] != "") $_SESSION['timemachine']['date'] = strtotime($_POST['dateinput']);
 		if ($_POST['timestamps'] != "") $_SESSION['timemachine']['time'] = $_POST['timestamps'];
 
@@ -438,6 +440,42 @@ class TSMMonitor {
 			$ret .= "</div>";
 			return $ret;
 		}
+	}
+
+
+
+
+        /**
+         * getStylesheetSwitcher - returns HTML Code for Stylesheetswitchdropdownbox ;)
+         *
+         * @return string
+         */
+
+        function getStylesheetSwitcher() {
+		
+		$ret = "";
+                $ret .= "<div class='sidebarinfo'>";
+                $ret .= "<b>Stylesheet Switcher</b><br><br>";
+                $ret .= "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']."&s=".$tsmmonitor->GETVars['server']." method='post'>\n";
+                $ret .= "<select name='css' size=1 onChange='submit();' class='button'>\n";
+                if ($handle = opendir('css')) {
+		    while (false !== ($file = readdir($handle))) {
+			if ($file != '.' && $file != '..' && substr($file, 0, 6) == 'style_') {
+			    $fileName = str_replace('.css', '', $file);
+			    $fileName = str_replace('style_', '', $fileName);
+			    $ret .=  '<option value="' . $file . '"';
+				if ($_SESSION['stylesheet'] == $file){ $ret .= "SELECTED"; }
+				$ret .=  '>' . $fileName . '</option>';
+			}
+		    }
+		    closedir($handle);
+		}
+		$ret .= "</select>\n";
+		$ret .= "</form>\n";
+                $ret .= "</div>";
+
+		return $ret;
+
 	}
 
 
@@ -781,7 +819,11 @@ class TSMMonitor {
 			$wc= " ";
 		}
 
-		$columnnames = $this->getTableFields("res_".$qtable."_".$server);
+		if ($type == "timetable") {
+			$columnnames = $this->configarray["queryarray"][$this->GETVars['qq']]["timetablefields"];
+		} else {
+			$columnnames = $this->getTableFields("res_".$qtable."_".$server);
+		}
 
 		if ($columnnames == "") $bContinue = FALSE;
 
@@ -837,11 +879,11 @@ class TSMMonitor {
 			}
 			else if ($type == "timetable") {
 				$sqlres = $this->adodb->fetchArrayDB($sql);
-				$outp = array();;
+				$outp = array();
 				foreach ($sqlres as $row) {
 					$rowarray2 = array();
 					while(list($keycell, $valcell) = each($row)) {
-						if ($keycell == "Start Time" || $keycell == "End Time") {
+						if ($keycell == "Start Time" || $keycell == "Actual Start" || $keycell == "End Time") {
 							$date = $row[$keycell];
 							$rowarray2[] = mktime(substr($date,11,2),substr($date,14,2),substr($date,17,2),substr($date,5,2),substr($date,8,2),substr($date,0,4));
 						} else {

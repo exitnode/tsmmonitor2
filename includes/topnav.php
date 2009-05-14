@@ -36,6 +36,20 @@
 //if ($tsmmonitor->GETVars['qq'] != "admin" && !$_POST["edit"] == "edit") {
 if ($tsmmonitor->GETVars['qq'] != "index" && $tsmmonitor->GETVars['qq'] != "overview" && $tsmmonitor->GETVars['qq'] != "serverlist") {  
 	echo "<input type='button' value='PDF' onclick='genPDF()' class='button'>";
+
+	if ($tsmmonitor->configarray["queryarray"][$tsmmonitor->GETVars['qq']]["timetablefields"] != "") {
+
+		echo "<select name='tabletype' size=1 onChange='submit();' class='button'>";
+		$types = array('normal view', 'timetable');
+		foreach ($types as $type) {
+			echo '<option value="'.$type.'"';
+			if ($_SESSION['tabletype'] == $type){echo "SELECTED";}
+			echo '> '.$type.'</option>';
+		}
+		echo "</select>";
+
+}
+
 }
 if ($tsmmonitor->GETVars['qq'] != "polldstat" && $tsmmonitor->GETVars['qq'] != "serverlist") {
 
