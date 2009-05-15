@@ -31,6 +31,7 @@ if ($_POST["css"] != "") $_SESSION['stylesheet'] = $_POST["css"];
 if ($_POST["tabletype"] != "") $_SESSION["tabletype"] = $_POST["tabletype"];
 if ($_POST["DebugMode"] != "") $_SESSION["debug"] = $_POST["DebugMode"];
 $adodb->setDebug($_SESSION["debug"]);
+//if ($_SESSION['stylesheet'] == "") $_SESSION['stylesheet'] = "style_classic.css";
 
 ?>
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
@@ -41,6 +42,7 @@ $adodb->setDebug($_SESSION["debug"]);
   <meta http-equiv='content-type' content='text/html; charset=ISO-8859-1'>
   <link rel='shortcut icon' href='images/favicon.ico' type='image/x-icon'>
   <link rel='icon' href='images/favicon.ico' type='image/x-icon'>
+  <link rel="stylesheet" type="text/css" href="css/print.css" media="print"> 
   <link rel='stylesheet' type='text/css' href='css/layout.css'>
   <link rel='stylesheet' type='text/css' href='css/<?php echo $_SESSION['stylesheet']; ?>'>
   <script type="text/javascript" src="extlib/datechooser.js"></script>

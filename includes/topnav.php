@@ -35,11 +35,11 @@
 <?php 
 //if ($tsmmonitor->GETVars['qq'] != "admin" && !$_POST["edit"] == "edit") {
 if ($tsmmonitor->GETVars['qq'] != "index" && $tsmmonitor->GETVars['qq'] != "overview" && $tsmmonitor->GETVars['qq'] != "serverlist") {  
-	echo "<input type='button' value='PDF' onclick='genPDF()' class='button'>";
+	echo "<input type='button' value='PDF' onclick='genPDF()' class='button topnavbutton'>";
 
 	if ($tsmmonitor->configarray["queryarray"][$tsmmonitor->GETVars['qq']]["timetablefields"] != "") {
 
-		echo "<select name='tabletype' size=1 onChange='submit();' class='button'>";
+		echo "<select name='tabletype' size=1 onChange='submit();' class='button topnavbutton'>";
 		$types = array('normal view', 'timetable');
 		foreach ($types as $type) {
 			echo '<option value="'.$type.'"';
@@ -53,7 +53,7 @@ if ($tsmmonitor->GETVars['qq'] != "index" && $tsmmonitor->GETVars['qq'] != "over
 }
 if ($tsmmonitor->GETVars['qq'] != "polldstat" && $tsmmonitor->GETVars['qq'] != "serverlist") {
 
-	echo "<select name='s' size=1 onChange='submit();' class='button'>";
+	echo "<select name='s' size=1 onChange='submit();' class='button topnavbutton'>";
 
 	while(list($servername,$serveritems) = each($tsmmonitor->configarray["serverlist"])) {
 		echo '<option value="'.$servername.'"';

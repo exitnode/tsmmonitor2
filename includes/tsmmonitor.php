@@ -158,7 +158,7 @@ class TSMMonitor {
 		if ($this->configarray['stylesheet'] != "") {
 			$_SESSION['stylesheet'] = $this->configarray['stylesheet'];
 		} else {
-			$_SESSION['stylesheet'] = "default.css";
+			$_SESSION['stylesheet'] = "style_classic.css";
 		}
 		}
 
@@ -927,7 +927,7 @@ class TSMMonitor {
 	    $fieldnames = $this->adodb->fetchArrayDB($sql);
 
 	    // Build Field Name Combobox
-	    $fieldbox = "<select name='wcfield' size=1 onChange='' class='button'>";
+	    $fieldbox = "<select name='wcfield' size=1 onChange='' class='button topnavbutton'>";
 	    foreach ($fieldnames as $field) {
 		if ($field['Field'] != "timestamp") {
 		    $fieldbox.= '<option value="'.$field['Field'].'"';
@@ -939,7 +939,7 @@ class TSMMonitor {
 	    
 	    // Build Operator Combobox
 	    if ($arrop=="") $arrop="=";
-	    $opbox = "<select name='wcop' size=1 onChange='' class='button'>";
+	    $opbox = "<select name='wcop' size=1 onChange='' class='button topnavbutton'>";
 		foreach ($operators as $op) {
 		$opbox.= '<option value="'.$op.'"';
 		if ($arrop == $op) {$opbox.= "SELECTED";}
@@ -951,9 +951,9 @@ class TSMMonitor {
 	    $ret .= "<form action=".$link." method='post'>";
 	    $ret .= $fieldbox;
 	    $ret .= $opbox;
-	    $ret .= "<input name='wcval' type='text' size='15' maxlength='60' class='textfield' value='".$arrval."'>  ";
-	    $ret .= "<input type='submit' name='Search' value='Search' onclick='submit();' class='button'>";
-	    $ret .= "<input type='submit' name='Clear' value='Clear' onclick='submit();' class='button'>";
+	    $ret .= "<input name='wcval' type='text' size='15' maxlength='60' class='button topnavtextfield' value='".$arrval."'>  ";
+	    $ret .= "<input type='submit' name='Search' value='Search' onclick='submit();' class='button topnavbutton'>";
+	    $ret .= "<input type='submit' name='Clear' value='Clear' onclick='submit();' class='button topnavbutton'>";
 	    $ret .= "</form>";
 
 	    return $ret;

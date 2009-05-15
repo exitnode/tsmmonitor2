@@ -1,0 +1,44 @@
+
+body, html, #design, #table, #inhalt, #content  {
+ background-color: #ffffff;
+ width: 100%;
+ text-align: center;
+ font-family: Verdana, Arial, sans-serif;
+ font-size: 10px;
+ padding: 0;
+ margin: 0;
+
+}
+
+#head, #tnleft, #tnright, #menue, #footer, .button, .textfield {
+ display:none;
+}
+
+a.navhead:link, a.navhead:visited, a.navhead:active, a.navhead:hover {
+ text-decoration:none; 
+}
+
+table.zebra, table.timetable 	{ 
+ font: 10pt "trebuchet ms",arial,helvetica,sans-serif;
+ padding: 0; border-spacing: 0; 
+ border-collapse: collapse; 
+}          
+
+table.zebra th table.timetable th {
+ background-color: #f0f3f9;
+ padding: 0.5mm 5mm 0.5mm 2mm;
+ border: 0.1mm solid #aab;
+ border-width: 0.2mm 0 0.5mm;
+}
+
+table.zebra tr.d0 table.timetable tr.d0  {
+ background-color: #f0f3f9 ;
+ font-size: 10px;
+ padding: 0.5mm 5mm 0.5mm 2mm;
+}
+
+table.zebra tr.d1 table.timetable tr.d1  {
+ background-color: #fcf6e4;
+ font-size: 10px;
+ padding: 0.5mm 5mm 0.5mm 2mm; 
+}

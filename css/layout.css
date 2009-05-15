@@ -189,9 +189,16 @@ table.login tr		{ text-align: center; }
 
 .button	{ 
 position: relative;
-top: 5px;
 }
 .textfield {
+position: relative;
+}
+
+.topnavbutton	{ 
+position: relative;
+top: 5px;
+}
+.topnavtextfield {
 position: relative;
 top: 5px;
 }
