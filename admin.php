@@ -77,6 +77,7 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 	// show settings page
         } else if ($tsmmonitor->GETVars['qq'] == "settings") {
 		$tmonpolld = new PollD($adodb);
+		$tmonpolld->adodb->setDebug($_SESSION["debug"]);
 
 		// If start/stop button was pressed
 		if ($_POST["PollDControl"] != "") {
@@ -89,55 +90,69 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 
 		if ($tmonpolld->isEnabled()=="1") {
 			$polldenabled = "enabled and ".$tmonpolld->getStatus();
-			$cellcolor = "green";
+			//$cellcolor = "green";
 		} else {
 			$polldenabled = "disabled";
-			$cellcolor = "red";
+			//$cellcolor = "red";
 		}
 
-		echo "<b>PollD Control</b><br>";
 		echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
 		echo "<table class='zebra'>";
-		echo "<tr><th>Start/Stop</th><th>Status</th></tr>";
-		echo "<tr class='d0'><td>";
-		echo "<input type='submit' class='button' name='PollDControl' value='Start' onclick='submit();'>";
-		echo "<input type='submit' class='button' name='PollDControl' value='Stop' onclick='submit();'>";
-		echo "</td></td><td bgcolor=".$cellcolor.">PollD is ".$polldenabled."</td></tr>";
+		echo "<tr><th>Configuration</th><th>Action</th><th>Status</th></tr>";
+		echo "<tr class='d0'>";
+		echo "	<td>PollD Control</td>";
+		echo "	<td>";
+		echo "		<input type='submit' class='button' name='PollDControl' value='Start' onclick='submit();'>";
+		echo "		<input type='submit' class='button' name='PollDControl' value='Stop' onclick='submit();'>";
+		echo "	</td>";
+		echo "	<td bgcolor=".$cellcolor.">PollD is ".$polldenabled."</td>";
+		echo "</tr>";
+		echo "<tr class='d1'>";
+		echo "  <td>Debug Mode</td>";
+		echo "	<td>";
+                echo "		<input type='submit' class='button' name='DebugMode' value='On' onclick='submit();'>";
+                echo "		<input type='submit' class='button' name='DebugMode' value='Off' onclick='submit();'>";
+                echo "	</td>";
+		echo "	<td>".$_SESSION["debug"]."</td>";
+		echo "</tr>";
+		echo "<tr class='d0'>";
+		echo "  <td>PollD Control</td>";
+                echo "  <td>";
+		echo "		<table border=0>";
+		echo "          	<tr><td>";
+		echo "				<select name='cleandbserver' size=1 class='button'>";
+		echo "				<option value='all'>- all servers -</options>";
+						while(list($servername,$serveritems) = each($tsmmonitor->configarray["serverlist"])) {
+							echo '<option value="'.$servername.'"> '.$servername.' ('.$serveritems["description"].')</option>';
+						}
+		echo "				</select>";
+		echo "			</td><td>";
+                echo "				<select name='cleandbquery' size=1 class='button'>";
+		echo '				<option value="all">- all queries -</options>';
+						while(list($queryname,$queryitems) = each($tsmmonitor->queryarray)) {
+							echo '<option value="'.$queryname.'"> '.$queryname.'</option>';
+						}
+                echo "				</select>";
+                echo "			</td><td>"; 
+		echo "				<select name='cleandbovqueires' size=1 class='button'>";
+		echo '				<option value="yes">yes</options>';
+		echo '				<option value="no">no</options>';
+                echo "				</select>";
+                echo "			</td><td>";
+                echo "				<select name='cleandbtime' size=1 class='button'>";
+						$times = array("1 month" => "30", "2 months" => "60", "3 months" => "90", "6 months" => "180", "1 year" => "360");
+						while(list($label,$value) = each($times)) {
+							echo '<option value="'.$value.'"> '.$label.'</option>';
+						}
+                echo "				</select>";
+		echo "			</td><td>";
+		echo "				<input type='submit' class='button' name='cleanaction' value='Clean Up' onclick='submit();'>";
+		echo "			</td></tr>";
+                echo "		</table>";
+                echo "	</td>";
+		echo "	<td></td>";
+		echo "</tr>";
 		echo "</table>";
-		echo "<br><br>";
-                echo "<b>Cleanup Database</b><br>";
-                echo "<table class='zebra'>";
-                echo "<tr><th>Server</th><th>Query</th><th>Overview Query</th><th>Keep</th><th></th></tr>";
-                echo "<tr class='d0'><td>";
-
-		echo "<select name='cleandbserver' size=1 class='button'>";
-		echo '<option value="all">- all servers -</options>';
-		while(list($servername,$serveritems) = each($tsmmonitor->configarray["serverlist"])) {
-			echo '<option value="'.$servername.'"> '.$servername.' ('.$serveritems["description"].')</option>';
-		}
-		echo "</select>";
-		echo "</td><td>";
-                echo "<select name='cleandbquery' size=1 class='button'>";
-		echo '<option value="all">- all queries -</options>';
-                while(list($queryname,$queryitems) = each($tsmmonitor->queryarray)) {
-                        echo '<option value="'.$queryname.'"> '.$queryname.'</option>';
-                }
-                echo "</select>";
-                echo "</td><td>"; 
-		echo "<select name='cleandbovqueires' size=1 class='button'>";
-		echo '<option value="yes">yes</options>';
-		echo '<option value="no">no</options>';
-                echo "</select>";
-                echo "</td><td>";
-                echo "<select name='cleandbtime' size=1 class='button'>";
-                $times = array("1 month" => "30", "2 months" => "60", "3 months" => "90", "6 months" => "180", "1 year" => "360");
-                while(list($label,$value) = each($times)) {
-                        echo '<option value="'.$value.'"> '.$label.'</option>';
-                }
-                echo "</select>";
-		echo "<td><input type='submit' class='button' name='cleanaction' value='Clean Up' onclick='submit();'></td></tr>";
-                echo "</table>";
-                echo "<br><br>";
 		echo "</form>";
 
         } else {

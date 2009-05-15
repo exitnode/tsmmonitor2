@@ -179,10 +179,10 @@ class PollD {
 						if ($restable == "res_querysession_TSMSRV1") echo $read."\n";
 						$read = ereg_replace("\t","\",\"",$read);
 						if ($restable == "res_querysession_TSMSRV1") echo $read."\n";
-						if ($timestamp != '') {
+						if ($overviewname == '') {
 							$out[] = 'INSERT IGNORE INTO '.$restable.' values ("'.$timestamp.'", "'.$read.'")';
 						} else {
-							$out[] = 'INSERT INTO '.$restable.' (name, result) values ("'.$overviewname.'", "'.$read.'") ON DUPLICATE KEY update result="'.$read.'"';
+							$out[] = 'INSERT INTO '.$restable.' (timestamp, name, result) values ("'.$timestamp.'", "'.$overviewname.'", "'.$read.'") ON DUPLICATE KEY update result="'.$read.'"';
 						}
 					} else { // result is empty and it's ok
 						$out[0] = 'INSERT IGNORE INTO '.$restable.' (timestamp) values ("'.$timestamp.'")';
@@ -352,9 +352,9 @@ class PollD {
 		$tablename = "res_overview_".$server["servername"];
 		echo "---------".$query["name"].": ";
 		//$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." LIKE smp_overview";
-		$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." ( `name` varchar(35) collate utf8_unicode_ci NOT NULL, `result` varchar(255) collate utf8_unicode_ci NOT NULL, UNIQUE KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+		$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." ( `timestamp` int(11) collate utf8_unicode_ci NOT NULL, `name` varchar(35) collate utf8_unicode_ci NOT NULL, `result` varchar(255) collate utf8_unicode_ci NOT NULL, UNIQUE KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 		$this->adodb->execDB($ctsql);
-		$result = $this->execute($query["query"], $server["servername"], $tablename, '', $query["name"]);
+		$result = $this->execute($query["query"], $server["servername"], $tablename, $timestamp, $query["name"]);
 		if ($result != "") {
 			foreach ($result["sql"] as $insertquery) {
 				$this->adodb->execDB($insertquery);

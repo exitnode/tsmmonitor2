@@ -81,10 +81,14 @@ class ADOdb {
         /**
          * setDebug - enables or disabled debug mode
          *
-	 * @param boolean $debug
+	 * @param string $debug On or Off
          */
         function setDebug($debug) {
-		$this->debug = $debug;
+		if ($debug == "On") {
+			$this->debug = TRUE;
+		} else {
+			$this->debug = FALSE;
+		}
         }
 
 
@@ -116,7 +120,8 @@ class ADOdb {
 		return($recordSet);
 	    } else {
 		echo "<p style='font-size: 16px; font-weight: bold; color: red;'>Database Error (".$this->conn->ErrorNo().")</p>\n<p>".$this->conn->ErrorMsg()."</p>";
-		exit;
+		//exit;
+		return "";
 	    }
 	}
 

@@ -24,8 +24,9 @@
  *
  * tmonpolld.php, TSM Monitor
  * 
- * This file is the TSM Monitor Polling Daemon. It executes queries against TSM
- * and inserts them into TMS Monitor's MySQL Database
+ * This file instantiates PollD and executes the polling process.
+ * Start it like this: 'nohup php tmonpolld.php &'
+ * 
  * 
  * @author Michael Clemens
  * @version 1.0

@@ -29,6 +29,8 @@
 
 if ($_POST["css"] != "") $_SESSION['stylesheet'] = $_POST["css"];
 if ($_POST["tabletype"] != "") $_SESSION["tabletype"] = $_POST["tabletype"];
+if ($_POST["DebugMode"] != "") $_SESSION["debug"] = $_POST["DebugMode"];
+$adodb->setDebug($_SESSION["debug"]);
 
 ?>
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">

@@ -64,6 +64,8 @@ class TSMMonitor {
 
 		$this->adodb = $adodb;
 
+		//$this->adodb->setDebug($_SESSION["debug"]);
+
 		session_name("tsmmonitordev");
 		session_start();
 
@@ -134,6 +136,7 @@ class TSMMonitor {
 		if ($_POST["Poll"] == "Poll Now!") {
 			$timestamp = time();
 			$tmonpolld = new PollD($this->adodb);
+			$tmonpolld->adodb->setDebug($_SESSION["debug"]);
 			$tmonpolld->pollQuery($tmonpolld->queries[$this->GETVars['qq']], $tmonpolld->servers[$this->GETVars['server']], TRUE, $timestamp);
 			$_SESSION['timemachine']['date'] = $timestamp;
 			$_SESSION['timemachine']['time'] = $timestamp;
@@ -315,10 +318,11 @@ class TSMMonitor {
 		$this->queryarray = $this->configarray["queryarray"];
 
 		$ret = "";
+		$qq = $this->GETVars['qq'];
 
-		if ($this->queryarray[$this->GETVars['qq']]["polltype"]=="snapshot") {
+		if ($this->queryarray[$qq]["polltype"]=="snapshot") {
 			$ret .= "<div class='sidebarinfo'><b>Time Machine</b><br><br><div id='datechooser'>";
-			$ret .= "<form name='calform' action='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server']."' method='post'>";
+			$ret .= "<form name='calform' action='".$_SERVER['PHP_SELF']."?q=".$qq."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server']."' method='post'>";
 			$ret .= "<input id='dateinput' class='textfield' name='dateinput' type='text' style='width: 100px' value='".strftime("%Y/%m/%d", $_SESSION['timemachine']['date'])."'>";
 			$ret .= "<br>";
 			$ret .=  "<select name='timestamps' class='button' size=1 style='width: 103px' onchange='submit()'>";
@@ -341,22 +345,19 @@ class TSMMonitor {
 			$ret .= "<input type='submit' name='Poll' value='Poll Now!' onclick='submit();' class='button'>";
 			$ret .= "</form> </div><br></DIV>";
 
-		} else if ($this->queryarray[$this->GETVars['qq']]["polltype"]=="update" || $this->queryarray[$this->GETVars['qq']]["polltype"]=="append") {
-			$LastTimestamp = $this->GetLastSnapshot();
-			if ($LastTimestamp!="") {
-				$ret .= "<div class='sidebarinfo'><b>Time Machine</b><br><br><div id='datechooser'>";
-				$ret .= "<br>";
-				$ret .= "Last updated: ".strftime('%H:%M:%S', $LastTimestamp);
-				$ret .= "<br>";
-				$ret .= "<br>";
-				$ret .= "<input type='submit' name='Poll' value='Poll Now!' onclick='submit();' class='button'>";
-				$ret .= "</form> </div><br></DIV>";
-			}
-
+		} else if ($this->queryarray[$qq]["polltype"]=="update" || $this->queryarray[$qq]["polltype"]=="append" || $qq == "index") {
+			$ret .= "<div class='sidebarinfo'><b>Time Machine</b><br><br><div id='datechooser'>";
+			$ret .= "<form name='calform' action='".$_SERVER['PHP_SELF']."?q=".$qq."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server']."' method='post'>";
+			$ret .= "<br>";
+			if ($qq == "index") $qq = "overview";
+			$LastTimestamp = $this->getLastSnapshot($qq);
+			if ($LastTimestamp!="") $ret .= "Last updated: ".strftime('%H:%M:%S', $LastTimestamp);
+			$ret .= "<br>";
+			$ret .= "<br>";
+			$ret .= "<input type='submit' name='Poll' value='Poll Now!' onclick='submit();' class='button'>";
+			$ret .= "</form> </div><br></DIV>";
 		}
-
 		return $ret;
-
 	}
 
 
@@ -456,7 +457,7 @@ class TSMMonitor {
 		$ret = "";
                 $ret .= "<div class='sidebarinfo'>";
                 $ret .= "<b>Stylesheet Switcher</b><br><br>";
-                $ret .= "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']."&s=".$tsmmonitor->GETVars['server']." method='post'>\n";
+                $ret .= "<form action=".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server']." method='post'>\n";
                 $ret .= "<select name='css' size=1 onChange='submit();' class='button'>\n";
                 if ($handle = opendir('css')) {
 		    while (false !== ($file = readdir($handle))) {
@@ -651,17 +652,18 @@ class TSMMonitor {
 	/**
 	 * getLastSnapshot - returns the last inserted timestamp of a query result
 	 *
+	 * @param string qq name of query
 	 * @return string
 	 */
 
-	function getLastSnapshot() {
+	function getLastSnapshot($qq) {
 
 	    $server = $this->GETVars['server'];
 	    $ret = array();
 
-	    $qtable = $this->configarray["queryarray"][$this->GETVars['qq']]["name"];
+	    //$qtable = $this->configarray["queryarray"][$this->GETVars['qq']]["name"];
 
-	    $sql = "SELECT MAX(TimeStamp) from res_".$qtable."_".$server;
+	    $sql = "SELECT MAX(TimeStamp) from res_".$qq."_".$server;
 	    $ret = $this->adodb->fetchArrayDB($sql);
 	    $ret = (array)$ret[0];
 
