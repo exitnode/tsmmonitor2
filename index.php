@@ -164,11 +164,12 @@ if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"
 					}
 				}
 				echo "<table class='zebra'>";
-				echo $tsmmonitor->getTableheader();
+				$thead = $tsmmonitor->getTableheader();
+				echo $thead;
 				echo $tsmmonitor->execute('table');
 				$nav = $tsmmonitor->showPageNavigation("40");
 				if ($nav!="") {
-					echo "<tr><td colspan='999' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
+					echo "<tr><td colspan='".substr_count($thead, "<th>")."' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
 				}
 				echo "</table>";
 			}

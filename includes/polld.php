@@ -310,7 +310,12 @@ class PollD {
 		}
 		// execute query and store result in mysql db
 		if ($ignorePollFreq || !$this->checkFreq($tablename, $query["pollfreq"], $timestamp)){
-			$result = $this->execute($query["tsmquery"], $server["servername"], $tablename, $timestamp);
+			try {
+				$result = $this->execute($query["tsmquery"], $server["servername"], $tablename, $timestamp);
+			} catch (exception $e) {
+				$result = "";
+			    print_r($e);
+			}
 			if ($result != "") {
 				if (!$this->checkHash($tablename, $result["md5"])) {
 					if ($query["polltype"]=="update") {

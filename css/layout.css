@@ -6,6 +6,7 @@ font-family: Verdana, Arial, sans-serif;
 font-size: 12px;
 margin: 0 0 5px 0;
 padding: 0;
+width: 100%;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - */
@@ -92,17 +93,14 @@ float:right;
 padding: 0 5px 0 5px;
 }
 
-#printpreviewheader {
-padding: 3px;
-font-size: 16px;
-}
-
 #menue {
+width: 180px;
 padding: 0px;
 vertical-align: top;
 }
 
 .menuelinks a {
+width: 180px;
 display: block;
 width: auto;
 margin-bottom: 2px;
@@ -167,7 +165,7 @@ font-size: 10pt;
 }
 
 
-table.zebra   		{ border-spacing: 1px;margin-left: auto; margin-right: auto; width: 100%;}          
+table.zebra   		{ border-spacing: 1px;margin-left: auto; margin-right: auto; width: 100%;}
 table.zebra th 		{ }
 table.zebra td.footer	{ }
 table.zebra td		{ padding: 4px;}

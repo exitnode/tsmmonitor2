@@ -520,9 +520,9 @@ class TSMMonitor {
 			if (($this->GETVars['ob'] == $name && $this->GETVars['ob']!="") || ($this->GETVars['ob']=="" && $orderby!="" && $orderby == $name)) {
 			    $link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&so=".$sonew."&s=".$this->GETVars['server']."'";
 			    if ($orderdir == "asc") {
-				$arrow = "&uArr;";
+				$arrow = "&uarr;";
 			    } else if ($orderdir == "desc") {
-				$arrow = "&dArr;";
+				$arrow = "&darr;";
 			    }
 			} else {
 			    $arrow = "";
