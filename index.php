@@ -110,14 +110,11 @@ include_once "includes/page_head.php";
 						echo "<tr><th>Key</th><th>Value</th></tr>";
 						foreach ($tablearray as $row) {
 							while(list($keycell, $valcell) = each($row)) {
-								if ($i == 0) {
-									echo "<tr class='d0'>";
-									$i = 1;
-								} else {
-									echo "<tr class='d1'>";
-									$i = 0;
-								}
-								echo "<td><b>".$keycell."</b></td><td>".$valcell."</td></tr>";
+								$vertrow = array();
+								$vertrow["key"] = $keycell;
+								$vertrow["value"] = $valcell;
+								echo $tsmmonitor->renderZebraTableRow($vertrow, $i%2, "", "", "");
+								$i++;
 							}
 						}
 

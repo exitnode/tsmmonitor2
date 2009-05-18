@@ -880,10 +880,12 @@ class TSMMonitor {
 	 */
 	function renderZebraTableRow ($row, $shade , $alarmcol, $color, $cellproperties) {
 
+		$isNotEmpty = FALSE;
 		$colorsarray = $this->configarray["colorsarray"];
-
 		$outp = $outp."<tr class='d".$shade."'>";
+
 		while(list($keycell, $valcell) = each($row)) {
+
 			if (isset($cellproperties) && $cellproperties[$keycell] != "") {
 				$cellproperty = " ".$cellproperties[$keycell]." ";
 			} else {
@@ -900,10 +902,15 @@ class TSMMonitor {
 			} else {
 				$outp = $outp."<td".$cellproperty.">".$valcell."</td>";
 			}
+			if ($valcell != "") $isNotEmpty = TRUE;
 		}
 		$outp = $outp."</tr>\n";
 
-		return $outp;
+		if ($isNotEmpty) {
+			return $outp;
+		} else {
+			return "";
+		}
 	}
 
 
