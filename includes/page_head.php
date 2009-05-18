@@ -46,7 +46,7 @@ $adodb->setDebug($_SESSION["debug"]);
   <link rel='stylesheet' type='text/css' href='css/layout.css'>
   <link rel='stylesheet' type='text/css' href='css/<?php echo $_SESSION['stylesheet']; ?>'>
   <script type="text/javascript" src="extlib/datechooser.js"></script>
-  <script type="text/javascript" src="includes/layout.js"></script>
+  <script type="text/javascript" src="includes/functions.js"></script>
   <script type="text/javascript">
     <!-- //
     	events.add(window, 'load', WindowLoad);
