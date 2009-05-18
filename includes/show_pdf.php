@@ -1,22 +1,22 @@
 <?php
 /*
-************************************************************************
-    This file is part of TSM Monitor.
+ ************************************************************************
+ This file is part of TSM Monitor.
 
-    TSM Monitor is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ TSM Monitor is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    TSM Monitor is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ TSM Monitor is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
-************************************************************************
-*/
+ You should have received a copy of the GNU General Public License
+ along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
+ ************************************************************************
+ */
 
 
 /**
@@ -40,9 +40,9 @@ $pdf->Open();
 $pdf->AddPage();
 //First table: put all columns automatically
 $prop=array('HeaderColor'=>array(180,180,180),
-	    'color1'=>array(255,255,255),
-	    'color2'=>array(230,230,230),
-	    'padding'=>2);
+		'color1'=>array(255,255,255),
+		'color2'=>array(230,230,230),
+		'padding'=>2);
 $res = $adodb->fetchArrayDB($_SESSION["lastsql"]);
 
 //build Page Title

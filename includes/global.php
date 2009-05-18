@@ -1,22 +1,22 @@
 <?php
 /*
-************************************************************************
-    This file is part of TSM Monitor.
+ ************************************************************************
+ This file is part of TSM Monitor.
 
-    TSM Monitor is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ TSM Monitor is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    TSM Monitor is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ TSM Monitor is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
-************************************************************************
-*/
+ You should have received a copy of the GNU General Public License
+ along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
+ ************************************************************************
+ */
 
 /**
  *
@@ -36,7 +36,7 @@
    The defaults in this file are not meant to be altered by users!
    See include/config.php for user configurable database settings.
 
-*/
+ */
 
 // ** Default database settings ** //
 $db_type = 'mysql';
@@ -62,9 +62,9 @@ $config["server_os"] = (strstr(PHP_OS, "WIN")) ? "win32" : "unix";
 
 // ** Search paths for external programs (dsmadmc, php, ...) ** //
 if ($config["server_os"] == "win32") {
-    $config["search_path"] = array('c:/php', 'c:/progra~1/php', 'd:/php', 'd:/progra~1/php', 'c:/progra~1/tivoli/tsm/baclient', 'd:/progra~1/tivoli/tsm/baclient');
+	$config["search_path"] = array('c:/php', 'c:/progra~1/php', 'd:/php', 'd:/progra~1/php', 'c:/progra~1/tivoli/tsm/baclient', 'd:/progra~1/tivoli/tsm/baclient');
 } elseif ($config["server_os"] == "unix") {
-    $config["search_path"] = array('/bin', '/sbin', '/usr/bin', '/usr/sbin', '/usr/local/bin', '/usr/local/sbin', '/usr/tivoli/tsm/client/admin/bin', '/opt/tivoli/tsm/client/ba/bin');
+	$config["search_path"] = array('/bin', '/sbin', '/usr/bin', '/usr/sbin', '/usr/local/bin', '/usr/local/sbin', '/usr/tivoli/tsm/client/admin/bin', '/opt/tivoli/tsm/client/ba/bin');
 }
 
 // ** Paths (libraries, includes, ...) ** //
@@ -97,8 +97,8 @@ $tsmmonitor = new TSMMonitor($adodb);
 // check to see if this is a new installation
 $version = $adodb->fetchCellDB("select confval from cfg_config where confkey='version'", '');
 if ($version != $config["tsm_monitor_version"] && basename($_SERVER['REQUEST_URI']) != 'install.php') {
-    header("Location: install.php");
-    exit;
+	header("Location: install.php");
+	exit;
 }
 
 // ** Include generic code and external libraries ** //

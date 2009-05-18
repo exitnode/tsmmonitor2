@@ -1,22 +1,22 @@
 <?php
 /*
-************************************************************************
-    This file is part of TSM Monitor.
+ ************************************************************************
+ This file is part of TSM Monitor.
 
-    TSM Monitor is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ TSM Monitor is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    TSM Monitor is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ TSM Monitor is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
-************************************************************************
-*/
+ You should have received a copy of the GNU General Public License
+ along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
+ ************************************************************************
+ */
 
 
 /**
@@ -57,7 +57,6 @@ class PDF extends FPDF
 	 * Header - generates page header
 	 *
 	 */
-
 	function Header()
 	{
 		//Print the table header if necessary
@@ -67,14 +66,14 @@ class PDF extends FPDF
 	}
 
 
-        /**
-         * PageHeader - writes page title on top of first page
-         * 
-         * @param string $pagetitle title of page
-         * @access public
-         * @return void
-         */
-        function PageHeader($pagetitle) {
+	/**
+	 * PageHeader - writes page title on top of first page
+	 * 
+	 * @param string $pagetitle title of page
+	 * @access public
+	 * @return void
+	 */
+	function PageHeader($pagetitle) {
 
 		//Title
 		$this->SetFont('Arial','',12);
@@ -88,7 +87,6 @@ class PDF extends FPDF
 	 * TableHeader
 	 *
 	 */
-
 	function TableHeader()
 	{
 		$this->SetFont('Arial','B',6);
@@ -107,7 +105,6 @@ class PDF extends FPDF
 	 *
 	 * @param unknown $date
 	 */
-
 	function Row($data)
 	{
 		$this->SetX($this->TableX);
@@ -129,7 +126,6 @@ class PDF extends FPDF
 	 * @param string $width
 	 * @param string $align
 	 */
-
 	function CalcWidths($width,$align)
 	{
 		//Compute the widths of the columns
@@ -162,7 +158,6 @@ class PDF extends FPDF
 	 * @param string $caption
 	 * @param string $align
 	 */
-
 	function AddCol($field=-1,$width=-1,$caption='',$align='L')
 	{
 		//Add a column to the table
@@ -178,7 +173,6 @@ class PDF extends FPDF
 	 * @param string $query
 	 * @param array $prop
 	 */
-
 	function Table($query,$prop=array(),$dbresult)
 	{
 		//Issue query
@@ -219,10 +213,10 @@ class PDF extends FPDF
 		$this->ColorIndex=0;
 		$this->ProcessingTable=true;
 		foreach($dbresult as $key => $row) {
-		$row_num = array_values($row);
-		$row_comb = array_merge($row, $row_num);
-		$this->Row($row_comb);
-	}
+			$row_num = array_values($row);
+			$row_comb = array_merge($row, $row_num);
+			$this->Row($row_comb);
+		}
 		$this->ProcessingTable=false;
 		$this->cMargin=$cMargin;
 		$this->aCols=array();

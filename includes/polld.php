@@ -1,23 +1,23 @@
 <?php
 
 /*
-************************************************************************
-    This file is part of TSM Monitor.
+ ************************************************************************
+ This file is part of TSM Monitor.
 
-    TSM Monitor is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ TSM Monitor is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    TSM Monitor is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ TSM Monitor is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
-************************************************************************
-*/
+ You should have received a copy of the GNU General Public License
+ along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
+ ************************************************************************
+ */
 
 
 /**
@@ -162,7 +162,7 @@ class PollD {
 
 		if ($handle) {
 
-			 while (!feof($handle) && !$stop) {
+			while (!feof($handle) && !$stop) {
 				$read = fgets($handle, 4096);
 				$hashstring .= $read;
 				$stop = strstr($read, 'ANR2034E');
@@ -214,7 +214,7 @@ class PollD {
 		$countobj = $this->adodb->fetchArrayDB($sql);
 		$countarray = (array)$countobj[0];
 		$count = $countarray["count(*)"];
-		
+
 		if ($count > 0) {
 			return TRUE;
 		} else {
@@ -307,7 +307,7 @@ class PollD {
 				$result = $this->execute($query["tsmquery"], $server["servername"], $tablename, $timestamp);
 			} catch (exception $e) {
 				$result = "";
-			    print_r($e);
+				print_r($e);
 			}
 			if ($result != "") {
 				if (!$this->checkHash($tablename, $result["md5"])) {
@@ -420,7 +420,7 @@ class PollD {
 		if ($status != "") $status = "`status`='".$status."'";
 		if ($lastrun != "") $lastrun = ", `lastrun`='".$lastrun."'";
 		if ($nextrun != "") $nextrun = ", `nextrun`='".$nextrun."'";
-		
+
 		$sql = "update log_polldstat set ".$status." ".$lastrun." ".$nextrun." WHERE `id`='1'";
 		$this->adodb->execDB($sql);
 	}
@@ -436,7 +436,7 @@ class PollD {
 
 		$sql = "select enabled from log_polldstat WHERE `id`='1'";
 		$result = $this->adodb->fetchArrayDB($sql);
-		
+
 		if ($result != "" && $result[0]["enabled"] == "1"){
 			return TRUE;
 		} else {
@@ -476,7 +476,7 @@ class PollD {
 		$result = $this->adodb->fetchArrayDB($sql);
 
 		return $result[0]["status"];
-		
+
 
 	}
 
@@ -494,18 +494,18 @@ class PollD {
 
 
 		echo "Sleeptime will be ".$sleeptime." seconds\n";
-		
+
 
 		// infinite loop
 		while(true) {
 
 			if ($this->isEnabled()) {	
-		
+
 				$timestamp = time();
 
 				echo "running!\n";
 				echo "timestamp for this run is ".$timestamp."\n";
-				
+
 				$this->setPollDStatus("running", "", "");
 
 
@@ -529,7 +529,7 @@ class PollD {
 				}
 				$init = "no";
 
-				
+
 				echo "needed ".(time()-$timestamp)." seconds for this run.\n";
 				//$tempsleeptime = $sleeptime-(time()-$timestamp);
 				$tempsleeptime = 900 -(time()-$timestamp);

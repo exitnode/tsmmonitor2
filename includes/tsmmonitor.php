@@ -1,24 +1,24 @@
 <?php
 
 /*
-************************************************************************
-    This file is part of TSM Monitor.
+ ************************************************************************
+ This file is part of TSM Monitor.
 
-    TSM Monitor is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ TSM Monitor is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    TSM Monitor is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ TSM Monitor is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with TSM Monitor.  If not, see <http://www.gnu.org/licenses/>.
 
-************************************************************************
-*/
+ ************************************************************************
+ */
 
 /**
  *
@@ -157,11 +157,11 @@ class TSMMonitor {
 
 		// Custom Stylesheet
 		if ($_SESSION['stylesheet'] == "") {
-		if ($this->configarray['stylesheet'] != "") {
-			$_SESSION['stylesheet'] = $this->configarray['stylesheet'];
-		} else {
-			$_SESSION['stylesheet'] = "style_classic.css";
-		}
+			if ($this->configarray['stylesheet'] != "") {
+				$_SESSION['stylesheet'] = $this->configarray['stylesheet'];
+			} else {
+				$_SESSION['stylesheet'] = "style_classic.css";
+			}
 		}
 
 	}
@@ -169,46 +169,46 @@ class TSMMonitor {
 
 
 
-        /**
-         * $this->fetchSplitArrayDB - execute a SQL query against the DB via ADODB
-         *                     and return results in an associative array.
-         *
-         * @param string $sql SQL statement to execute
-         * @param string $rows_per_page number of rows per page a result will have
-         * @return array All results in an associative array
-         */
-        function fetchSplitArrayDB($sql, $rows_per_page = '20') {
-        //    $this->conn->debug = true;
-            $this->page = intval($_GET['page']);
+	/**
+	 * $this->fetchSplitArrayDB - execute a SQL query against the DB via ADODB
+	 *                     and return results in an associative array.
+	 *
+	 * @param string $sql SQL statement to execute
+	 * @param string $rows_per_page number of rows per page a result will have
+	 * @return array All results in an associative array
+	 */
+	function fetchSplitArrayDB($sql, $rows_per_page = '20') {
+		//    $this->conn->debug = true;
+		$this->page = intval($_GET['page']);
 
-            $sql = $this->adodb->sanitizeSQL($sql);
+		$sql = $this->adodb->sanitizeSQL($sql);
 
-            $recordArray = array();
-            $this->adodb->conn->SetFetchMode(ADODB_FETCH_ASSOC);
-            $recordSet = $this->adodb->conn->Execute($sql);
+		$recordArray = array();
+		$this->adodb->conn->SetFetchMode(ADODB_FETCH_ASSOC);
+		$recordSet = $this->adodb->conn->Execute($sql);
 
-            if (($recordSet) || ($this->adodb->conn->ErrorNo() == 0)) {
-                    $total_rows = $recordSet->RecordCount($recordSet);
-		    $this->max_pages = ceil($total_rows/$rows_per_page);
+		if (($recordSet) || ($this->adodb->conn->ErrorNo() == 0)) {
+			$total_rows = $recordSet->RecordCount($recordSet);
+			$this->max_pages = ceil($total_rows/$rows_per_page);
 
-                    if($this->page > $this->max_pages || $this->page <= 0) {
-                        $this->page = 1;
-                    }
-                    $offset = $rows_per_page * ($this->page-1);
-                $endset = $offset + $rows_per_page;
-                $recordSet->Move($offset);
+			if($this->page > $this->max_pages || $this->page <= 0) {
+				$this->page = 1;
+			}
+			$offset = $rows_per_page * ($this->page-1);
+			$endset = $offset + $rows_per_page;
+			$recordSet->Move($offset);
 
-                while (($recordSet->CurrentRow() < $endset) && ($recordSet->CurrentRow() < $total_rows) && ($recordSet)) {
-                    $recordArray{sizeof($recordArray)} = $recordSet->fields;
-                    $recordSet->MoveNext();
-                }
-                $recordSet->close();
-                return($recordArray);
-            } else {
-                echo "<p style='font-size: 16px; font-weight: bold; color: red;'>Database Error (".$this->conn->ErrorNo().")</p>\n<p>".$this->conn->ErrorMsg()."</p>";
-                exit;
-            }
-        }
+			while (($recordSet->CurrentRow() < $endset) && ($recordSet->CurrentRow() < $total_rows) && ($recordSet)) {
+				$recordArray{sizeof($recordArray)} = $recordSet->fields;
+				$recordSet->MoveNext();
+			}
+			$recordSet->close();
+			return($recordArray);
+		} else {
+			echo "<p style='font-size: 16px; font-weight: bold; color: red;'>Database Error (".$this->conn->ErrorNo().")</p>\n<p>".$this->conn->ErrorMsg()."</p>";
+			exit;
+		}
+	}
 
 
 
@@ -282,7 +282,7 @@ class TSMMonitor {
 		} else {
 			return "";
 		}
-		
+
 	}
 
 
@@ -296,12 +296,12 @@ class TSMMonitor {
 	 * @return string
 	 */
 	function GetBetween($content,$start,$end) {
-	    $r = explode($start, $content);
-	    if (isset($r[1])) {
-		$r = explode($end, $r[1]);
-		return $r[0];
-	    }
-	    return '';
+		$r = explode($start, $content);
+		if (isset($r[1])) {
+			$r = explode($end, $r[1]);
+			return $r[0];
+		}
+		return '';
 	}
 
 
@@ -379,7 +379,7 @@ class TSMMonitor {
 			$q = $this->GetBetween($key,"q=","&m=");
 			if ($this->configarray["queryarray"][$q]["notforlibclient"] == 1 && $this->configarray["serverlist"][$this->GETVars['server']]["libraryclient"] == 1) {
 				$bCont = FALSE;
-				
+
 			}
 			$key = $_SERVER['PHP_SELF']."?".$key;
 
@@ -442,33 +442,33 @@ class TSMMonitor {
 
 
 
-        /**
-         * getStylesheetSwitcher - returns HTML Code for Stylesheetswitchdropdownbox ;)
-         *
-         * @return string
-         */
-        function getStylesheetSwitcher() {
-		
+	/**
+	 * getStylesheetSwitcher - returns HTML Code for Stylesheetswitchdropdownbox ;)
+	 *
+	 * @return string
+	 */
+	function getStylesheetSwitcher() {
+
 		$ret = "";
-                $ret .= "<div class='sidebarinfo'>";
-                $ret .= "<b>Stylesheet Switcher</b><br><br>";
-                $ret .= "<form action=".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server']." method='post'>\n";
-                $ret .= "<select name='css' size=1 onChange='submit();' class='button'>\n";
-                if ($handle = opendir('css')) {
-		    while (false !== ($file = readdir($handle))) {
-			if ($file != '.' && $file != '..' && substr($file, 0, 6) == 'style_') {
-			    $fileName = str_replace('.css', '', $file);
-			    $fileName = str_replace('style_', '', $fileName);
-			    $ret .=  '<option value="' . $file . '"';
-				if ($_SESSION['stylesheet'] == $file){ $ret .= "SELECTED"; }
-				$ret .=  '>' . $fileName . '</option>';
+		$ret .= "<div class='sidebarinfo'>";
+		$ret .= "<b>Stylesheet Switcher</b><br><br>";
+		$ret .= "<form action=".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server']." method='post'>\n";
+		$ret .= "<select name='css' size=1 onChange='submit();' class='button'>\n";
+		if ($handle = opendir('css')) {
+			while (false !== ($file = readdir($handle))) {
+				if ($file != '.' && $file != '..' && substr($file, 0, 6) == 'style_') {
+					$fileName = str_replace('.css', '', $file);
+					$fileName = str_replace('style_', '', $fileName);
+					$ret .=  '<option value="' . $file . '"';
+					if ($_SESSION['stylesheet'] == $file){ $ret .= "SELECTED"; }
+					$ret .=  '>' . $fileName . '</option>';
+				}
 			}
-		    }
-		    closedir($handle);
+			closedir($handle);
 		}
 		$ret .= "</select>\n";
 		$ret .= "</form>\n";
-                $ret .= "</div>";
+		$ret .= "</div>";
 
 		return $ret;
 
@@ -485,61 +485,61 @@ class TSMMonitor {
 	 */
 	function getTableheader() {
 
-	    $tableheader="<tr>";
-	    $orderby = $this->configarray["queryarray"][$this->GETVars['qq']]["orderby"];
-	    $orderdir = $this->GETVars['orderdir'];
-	    $this->page = $_GET['page'];
+		$tableheader="<tr>";
+		$orderby = $this->configarray["queryarray"][$this->GETVars['qq']]["orderby"];
+		$orderdir = $this->GETVars['orderdir'];
+		$this->page = $_GET['page'];
 
-	    if ($orderdir == "asc") {
-		$sonew="desc";
-	    } else if ($orderdir == "desc") {
-		$sonew="asc";
-	    }
-
-	    $isAdmin = strstr($_SERVER['PHP_SELF'], 'admin.php');
-
-	    if ($isAdmin) {
-		$sql = "SHOW COLUMNS FROM cfg_".$_GET['q'];
-	    } else {
-		$sql = "SHOW COLUMNS FROM res_".$this->configarray["queryarray"][$this->GETVars['qq']]["name"]."_".$this->GETVars['server'];
-	    }
-	    $fieldnames = $this->adodb->fetchArrayDB($sql);
-
-	    // If table has more than one column
-	    if (sizeof($fieldnames) > 1) {
-		foreach ($fieldnames as $col) {
-		    if ($col['Field'] != "timestamp" && $col['Field'] != "id") {
-			$name = $col['Field'];
-			$arrow = "";
-			if (($this->GETVars['ob'] == $name && $this->GETVars['ob']!="") || ($this->GETVars['ob']=="" && $orderby!="" && $orderby == $name)) {
-			    $link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&so=".$sonew."&s=".$this->GETVars['server']."'";
-			    if ($orderdir == "asc") {
-				$arrow = "&uarr;";
-			    } else if ($orderdir == "desc") {
-				$arrow = "&darr;";
-			    }
-			} else {
-			    $arrow = "";
-			    $link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&s=".$this->GETVars['server']."'";
-			}
-			$tableheader = $tableheader."<th><a class='navhead' ".$link.">".ucfirst($name)." ".$arrow."</a></th>";
-		    }
-		}
-	    } else {
 		if ($orderdir == "asc") {
-		    $arrow = "&uArr;";
+			$sonew="desc";
 		} else if ($orderdir == "desc") {
-		    $arrow = "&dArr;";
+			$sonew="asc";
 		}
-		$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&so=".$sonew."'";
-		$label = $fieldnames[0]['Field'];
-		$tableheader = $tableheader."<th><a class='navhead' ".$link.">".$label." ".$arrow."</a></th>";    
-	    }
-	    if ($isAdmin) {
-		$tableheader = $tableheader."<th colspan=2><a class='navhead'></a></th>";
-	    }
-	    $tableheader=$tableheader."</tr>";
-	    return $tableheader;
+
+		$isAdmin = strstr($_SERVER['PHP_SELF'], 'admin.php');
+
+		if ($isAdmin) {
+			$sql = "SHOW COLUMNS FROM cfg_".$_GET['q'];
+		} else {
+			$sql = "SHOW COLUMNS FROM res_".$this->configarray["queryarray"][$this->GETVars['qq']]["name"]."_".$this->GETVars['server'];
+		}
+		$fieldnames = $this->adodb->fetchArrayDB($sql);
+
+		// If table has more than one column
+		if (sizeof($fieldnames) > 1) {
+			foreach ($fieldnames as $col) {
+				if ($col['Field'] != "timestamp" && $col['Field'] != "id") {
+					$name = $col['Field'];
+					$arrow = "";
+					if (($this->GETVars['ob'] == $name && $this->GETVars['ob']!="") || ($this->GETVars['ob']=="" && $orderby!="" && $orderby == $name)) {
+						$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&so=".$sonew."&s=".$this->GETVars['server']."'";
+						if ($orderdir == "asc") {
+							$arrow = "&uarr;";
+						} else if ($orderdir == "desc") {
+							$arrow = "&darr;";
+						}
+					} else {
+						$arrow = "";
+						$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&s=".$this->GETVars['server']."'";
+					}
+					$tableheader = $tableheader."<th><a class='navhead' ".$link.">".ucfirst($name)." ".$arrow."</a></th>";
+				}
+			}
+		} else {
+			if ($orderdir == "asc") {
+				$arrow = "&uArr;";
+			} else if ($orderdir == "desc") {
+				$arrow = "&dArr;";
+			}
+			$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&so=".$sonew."'";
+			$label = $fieldnames[0]['Field'];
+			$tableheader = $tableheader."<th><a class='navhead' ".$link.">".$label." ".$arrow."</a></th>";    
+		}
+		if ($isAdmin) {
+			$tableheader = $tableheader."<th colspan=2><a class='navhead'></a></th>";
+		}
+		$tableheader=$tableheader."</tr>";
+		return $tableheader;
 	}
 
 
@@ -554,7 +554,7 @@ class TSMMonitor {
 		$wc = "";
 
 		$isAdmin = strstr($_SERVER['PHP_SELF'], 'admin.php');
-		
+
 		if ($user != "" && $pass != "") {
 			$sql = "SELECT password, role from cfg_users where username='".$user."'";
 			$ret = $this->adodb->fetchArrayDB($sql);
@@ -570,7 +570,7 @@ class TSMMonitor {
 		} else {
 			$_SESSION["logindata"]["loggedin"] = FALSE;
 		}
-		
+
 	}
 
 
@@ -586,7 +586,7 @@ class TSMMonitor {
 	function checkAlert($comperator = '', $alertval = '', $val = '') {
 
 		$error = false;
-		
+
 		if (substr($val, -1) == "*") {
 			$val = substr($val,0,-1);
 		}
@@ -648,16 +648,16 @@ class TSMMonitor {
 	 */
 	function getLastSnapshot($qq) {
 
-	    $server = $this->GETVars['server'];
-	    $ret = array();
+		$server = $this->GETVars['server'];
+		$ret = array();
 
-	    //$qtable = $this->configarray["queryarray"][$this->GETVars['qq']]["name"];
+		//$qtable = $this->configarray["queryarray"][$this->GETVars['qq']]["name"];
 
-	    $sql = "SELECT MAX(TimeStamp) from res_".$qq."_".$server;
-	    $ret = $this->adodb->fetchArrayDB($sql);
-	    $ret = (array)$ret[0];
+		$sql = "SELECT MAX(TimeStamp) from res_".$qq."_".$server;
+		$ret = $this->adodb->fetchArrayDB($sql);
+		$ret = (array)$ret[0];
 
-	    return $ret["MAX(TimeStamp)"];
+		return $ret["MAX(TimeStamp)"];
 
 	}
 
@@ -671,22 +671,22 @@ class TSMMonitor {
 	 */
 	function getTableFields($tablename="") {
 
-	    $sqlth = "SELECT * from ".$tablename." LIMIT 1";
+		$sqlth = "SELECT * from ".$tablename." LIMIT 1";
 
-	    $sqlresth = $this->adodb->fetchArrayDB($sqlth);
-	    $columnnames = "";
+		$sqlresth = $this->adodb->fetchArrayDB($sqlth);
+		$columnnames = "";
 
-	    // get all table fields to be selected
-	    foreach ($sqlresth as $row) {
-		foreach ($row as $colname => $colval) {
-		    if ($colname != "timestamp") {
-			$columnnames .= "`".$colname."`";
-			if ( $i < $numfields-1) $columnnames .= ", ";
-		    }
+		// get all table fields to be selected
+		foreach ($sqlresth as $row) {
+			foreach ($row as $colname => $colval) {
+				if ($colname != "timestamp") {
+					$columnnames .= "`".$colname."`";
+					if ( $i < $numfields-1) $columnnames .= ", ";
+				}
+			}
 		}
-	    }
-	    $columnnames = ereg_replace(", $", "", $columnnames);
-	    return $columnnames;
+		$columnnames = ereg_replace(", $", "", $columnnames);
+		return $columnnames;
 	}
 
 
@@ -698,53 +698,53 @@ class TSMMonitor {
 	 */
 	function getAdminTables($type="") {
 
-	    $columnnames = $this->getTableFields("cfg_".$this->GETVars['qq']);
+		$columnnames = $this->getTableFields("cfg_".$this->GETVars['qq']);
 
-	    if ($this->GETVars['ob'] != '' ) {
-		$sqlappend = " order by `".$this->GETVars['ob']."` ".$this->GETVars['orderdir'];
-	    } elseif ($this->configarray["queryarray"][$this->GETVars['qq']]["orderby"] != '') {
-		$sqlappend = " order by `".$this->configarray["queryarray"][$this->GETVars['qq']]["orderby"]."` ".$this->GETVars['orderdir'];
-	    }
-
-	    if ($type == "edit") {
-		$wc = " where `id`='".$_GET['id']."' ";
-	    }
-
-	    $sql = "SELECT ".$columnnames." from cfg_".$this->GETVars["qq"].$wc.$sqlappend;
-	    $_SESSION["lastsql"] = $sql;
-	    if ($sqlres) $this->message = $sql;
-
-	    $i = 1;
-	    $rs = $this->adodb->fetchArrayDB($sql);
-
-	    foreach ($rs as $row) {
-		if ($type=="list") {
-		    if ($i % 2 == 0) {
-			$outp .= "<tr class='d1'>";
-		    }else{
-			$outp .= "<tr class='d0'>";
-		    }
-		    $i++;
-
-		    while(list($keycell, $valcell) = each($row)) {
-			if ($keycell == "id") {
-			    $id = $valcell;
-			} else {
-			    $outp .= "<td>".$valcell."</td>";
-			}
-		    }
-		    
-		    $baseurl = $_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu'];
-		    $outp .= "<td width='20px'><a href='".$baseurl."&id=".$id."&action=edit' onclick=''><img src='images/edit.png' border=0></img></a></td>";
-		    $outp .= "<td width='20px'><a href='#' onclick='show_confirm(\"".$baseurl."\", $id, \"delete\")'><img src='images/delete.png' border=0 ></img></a></td>";
-
-		    $outp .= "</tr>\n";
-		} else {
-		    $outp = $this->adodb->fetchArrayDB($sql);
-		    var_dump($outp);
+		if ($this->GETVars['ob'] != '' ) {
+			$sqlappend = " order by `".$this->GETVars['ob']."` ".$this->GETVars['orderdir'];
+		} elseif ($this->configarray["queryarray"][$this->GETVars['qq']]["orderby"] != '') {
+			$sqlappend = " order by `".$this->configarray["queryarray"][$this->GETVars['qq']]["orderby"]."` ".$this->GETVars['orderdir'];
 		}
-	    }
-	    return $outp;
+
+		if ($type == "edit") {
+			$wc = " where `id`='".$_GET['id']."' ";
+		}
+
+		$sql = "SELECT ".$columnnames." from cfg_".$this->GETVars["qq"].$wc.$sqlappend;
+		$_SESSION["lastsql"] = $sql;
+		if ($sqlres) $this->message = $sql;
+
+		$i = 1;
+		$rs = $this->adodb->fetchArrayDB($sql);
+
+		foreach ($rs as $row) {
+			if ($type=="list") {
+				if ($i % 2 == 0) {
+					$outp .= "<tr class='d1'>";
+				}else{
+					$outp .= "<tr class='d0'>";
+				}
+				$i++;
+
+				while(list($keycell, $valcell) = each($row)) {
+					if ($keycell == "id") {
+						$id = $valcell;
+					} else {
+						$outp .= "<td>".$valcell."</td>";
+					}
+				}
+
+				$baseurl = $_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu'];
+				$outp .= "<td width='20px'><a href='".$baseurl."&id=".$id."&action=edit' onclick=''><img src='images/edit.png' border=0></img></a></td>";
+				$outp .= "<td width='20px'><a href='#' onclick='show_confirm(\"".$baseurl."\", $id, \"delete\")'><img src='images/delete.png' border=0 ></img></a></td>";
+
+				$outp .= "</tr>\n";
+			} else {
+				$outp = $this->adodb->fetchArrayDB($sql);
+				var_dump($outp);
+			}
+		}
+		return $outp;
 	}
 
 
@@ -846,10 +846,10 @@ class TSMMonitor {
 						$outp = $outp."<tr class='d0'>";
 					}
 					$i++;
-					
+
 					while(list($keycell, $valcell) = each($row)) {
 						if($color!="" && $col==$keycell) {
-							
+
 							if ($i % 2 == 0) {
 								$cellcol = $colorsarray[$color."_light"];
 							} else {
@@ -897,53 +897,53 @@ class TSMMonitor {
 	 */
 	function getSearchfield() {
 
-	    $ret = "";
-	    $arrfield = "";
-	    $arrval = "";
-	    $arrop = "";
+		$ret = "";
+		$arrfield = "";
+		$arrval = "";
+		$arrop = "";
 
-	    $operators = array ("<", "=", "<>", ">");
+		$operators = array ("<", "=", "<>", ">");
 
-	    $searcharr = $_SESSION["search"][$this->GETVars['qq']];
-	    if (isset($searcharr)) {
-		$arrfield = $searcharr["field"];    
-		$arrval = $searcharr["val"];    
-		$arrop = $searcharr["op"];    
-	    }
-	    $sql = "SHOW COLUMNS FROM res_".$this->configarray["queryarray"][$this->GETVars['qq']]["name"]."_".$this->GETVars['server'];
-	    $fieldnames = $this->adodb->fetchArrayDB($sql);
-
-	    // Build Field Name Combobox
-	    $fieldbox = "<select name='wcfield' size=1 onChange='' class='button topnavbutton'>";
-	    foreach ($fieldnames as $field) {
-		if ($field['Field'] != "timestamp") {
-		    $fieldbox.= '<option value="'.$field['Field'].'"';
-		    if ($arrfield == $field['Field']) {$fieldbox.= "SELECTED";}
-		    $fieldbox.=  '> '.$field['Field'].' </option>';
+		$searcharr = $_SESSION["search"][$this->GETVars['qq']];
+		if (isset($searcharr)) {
+			$arrfield = $searcharr["field"];    
+			$arrval = $searcharr["val"];    
+			$arrop = $searcharr["op"];    
 		}
-	    }
-	    $fieldbox.= "</select>";
-	    
-	    // Build Operator Combobox
-	    if ($arrop=="") $arrop="=";
-	    $opbox = "<select name='wcop' size=1 onChange='' class='button topnavbutton'>";
+		$sql = "SHOW COLUMNS FROM res_".$this->configarray["queryarray"][$this->GETVars['qq']]["name"]."_".$this->GETVars['server'];
+		$fieldnames = $this->adodb->fetchArrayDB($sql);
+
+		// Build Field Name Combobox
+		$fieldbox = "<select name='wcfield' size=1 onChange='' class='button topnavbutton'>";
+		foreach ($fieldnames as $field) {
+			if ($field['Field'] != "timestamp") {
+				$fieldbox.= '<option value="'.$field['Field'].'"';
+				if ($arrfield == $field['Field']) {$fieldbox.= "SELECTED";}
+				$fieldbox.=  '> '.$field['Field'].' </option>';
+			}
+		}
+		$fieldbox.= "</select>";
+
+		// Build Operator Combobox
+		if ($arrop=="") $arrop="=";
+		$opbox = "<select name='wcop' size=1 onChange='' class='button topnavbutton'>";
 		foreach ($operators as $op) {
-		$opbox.= '<option value="'.$op.'"';
-		if ($arrop == $op) {$opbox.= "SELECTED";}
-		$opbox.=  '> '.$op.' </option>';
+			$opbox.= '<option value="'.$op.'"';
+			if ($arrop == $op) {$opbox.= "SELECTED";}
+			$opbox.=  '> '.$op.' </option>';
 		}
 		$opbox.= "</select>";
 
-	    $link = $_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server'];
-	    $ret .= "<form action=".$link." method='post'>";
-	    $ret .= $fieldbox;
-	    $ret .= $opbox;
-	    $ret .= "<input name='wcval' type='text' size='15' maxlength='60' class='button topnavtextfield' value='".$arrval."'>  ";
-	    $ret .= "<input type='submit' name='Search' value='Search' onclick='submit();' class='button topnavbutton'>";
-	    $ret .= "<input type='submit' name='Clear' value='Clear' onclick='submit();' class='button topnavbutton'>";
-	    $ret .= "</form>";
+		$link = $_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server'];
+		$ret .= "<form action=".$link." method='post'>";
+		$ret .= $fieldbox;
+		$ret .= $opbox;
+		$ret .= "<input name='wcval' type='text' size='15' maxlength='60' class='button topnavtextfield' value='".$arrval."'>  ";
+		$ret .= "<input type='submit' name='Search' value='Search' onclick='submit();' class='button topnavbutton'>";
+		$ret .= "<input type='submit' name='Clear' value='Clear' onclick='submit();' class='button topnavbutton'>";
+		$ret .= "</form>";
 
-	    return $ret;
+		return $ret;
 
 	}
 
@@ -989,60 +989,60 @@ class TSMMonitor {
 	 */
 	function getPollDStat() {
 
-	    $i=1;
-	    $outp = "<table class='zebra'>";
-	    $outp .= "<tr><th>Status</th><th>Last Run</th><th>Next Run</th></tr>";
+		$i=1;
+		$outp = "<table class='zebra'>";
+		$outp .= "<tr><th>Status</th><th>Last Run</th><th>Next Run</th></tr>";
 
-	    $sql = "SELECT enabled, status, lastrun, nextrun from log_polldstat";
-	    $sqlres = $this->adodb->fetchArrayDB($sql);
-	    foreach ($sqlres as $row) {
-		if ($row['enabled'] == "1") {
-			if ($row['status'] == "running") {
-				$cellcolor = "green";
-			} else if ($row['status'] == "sleeping") {
-				$cellcolor = "yellow";
+		$sql = "SELECT enabled, status, lastrun, nextrun from log_polldstat";
+		$sqlres = $this->adodb->fetchArrayDB($sql);
+		foreach ($sqlres as $row) {
+			if ($row['enabled'] == "1") {
+				if ($row['status'] == "running") {
+					$cellcolor = "green";
+				} else if ($row['status'] == "sleeping") {
+					$cellcolor = "yellow";
+				} else {
+					$cellcolor = "red";
+				}
+				if ($row['nextrun'] != "") $nextrun = strftime("%Y/%m/%d %H:%M:%S", $row['nextrun']);
+				$status = $row['status'];
 			} else {
+				$status = "disabled";
 				$cellcolor = "red";
 			}
-			if ($row['nextrun'] != "") $nextrun = strftime("%Y/%m/%d %H:%M:%S", $row['nextrun']);
-			$status = $row['status'];
-		} else {
-			$status = "disabled";
-			$cellcolor = "red";
+			if ($row['lastrun'] != "") $lastrun = strftime("%Y/%m/%d %H:%M:%S", $row['lastrun']);
+			$outp .= "<tr class='d1'><td bgcolor='".$cellcolor."'>".$status."</td><td>".$lastrun."</td><td>".$nextrun."</td></tr>";
 		}
-		if ($row['lastrun'] != "") $lastrun = strftime("%Y/%m/%d %H:%M:%S", $row['lastrun']);
-		$outp .= "<tr class='d1'><td bgcolor='".$cellcolor."'>".$status."</td><td>".$lastrun."</td><td>".$nextrun."</td></tr>";
-	    }
-	    $outp .= "</table><br><br>";
+		$outp .= "</table><br><br>";
 
-	    $outp .= "<table class='zebra'>";
-	    $outp .= "<tr><th>Time</th><th>Servername</th><th>Updated</th><th>Unchanged</th><th>Pollfreq not reached</th><th>Time needed (s)</th></tr>";
+		$outp .= "<table class='zebra'>";
+		$outp .= "<tr><th>Time</th><th>Servername</th><th>Updated</th><th>Unchanged</th><th>Pollfreq not reached</th><th>Time needed (s)</th></tr>";
 
-	    $sql = "SELECT * from log_polldlog where timestamp > '".(time()-86400)."' order by timestamp desc";
-	    $_SESSION["lastsql"] = $sql;
-	    $rs = $this->fetchSplitArrayDB($sql,20);
-	    foreach ($rs as $row) {
-		if ($i % 2 == 0) {
-		    $outp = $outp."<tr class='d1'>";
-		} else {
-		    $outp = $outp."<tr class='d0'>";
+		$sql = "SELECT * from log_polldlog where timestamp > '".(time()-86400)."' order by timestamp desc";
+		$_SESSION["lastsql"] = $sql;
+		$rs = $this->fetchSplitArrayDB($sql,20);
+		foreach ($rs as $row) {
+			if ($i % 2 == 0) {
+				$outp = $outp."<tr class='d1'>";
+			} else {
+				$outp = $outp."<tr class='d0'>";
+			}
+			$i++;
+
+			while(list($keycell, $valcell) = each($row)) {
+				if ($keycell == "timestamp") {
+					$valcell = strftime("%Y/%m/%d %T", $valcell);
+				}
+				$outp = $outp."<td>".$valcell."</td>";
+			}
+			$outp = $outp."</tr>\n";
 		}
-		$i++;
-
-		while(list($keycell, $valcell) = each($row)) {
-		    if ($keycell == "timestamp") {
-			$valcell = strftime("%Y/%m/%d %T", $valcell);
-		    }
-		    $outp = $outp."<td>".$valcell."</td>";
+		$nav = $this->showPageNavigation("20");
+		if ($nav!="") {
+			$outp = $outp."<tr><td colspan='6' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
 		}
-		$outp = $outp."</tr>\n";
-	    }
-	    $nav = $this->showPageNavigation("20");
-	    if ($nav!="") {
-		$outp = $outp."<tr><td colspan='6' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
-	    }
-	    
-	    return $outp."</table>";
+
+		return $outp."</table>";
 	}
 
 
@@ -1054,58 +1054,58 @@ class TSMMonitor {
 	 */
 	function getOverviewRows($subindexqueryarray = '') {
 
-	    $out="";
-	    $i=0;
+		$out="";
+		$i=0;
 
-	    while(list($key, $val) = each($subindexqueryarray)) {
+		while(list($key, $val) = each($subindexqueryarray)) {
 
-		$bgcol="";
-		$comperator = "";
-		$alertval = "";
-		$alertcol = "";
-		$cellcolors = $this->configarray["colorsarray"];
+			$bgcol="";
+			$comperator = "";
+			$alertval = "";
+			$alertcol = "";
+			$cellcolors = $this->configarray["colorsarray"];
 
-		$cache = $subindexqueryarray[$key]["cache"];
-		if ($this->configarray["serverlist"][$this->GETVars['server']]["libraryclient"] == 1 && $subindexqueryarray[$key]["notforlibclient"] == 1) {
-		    $res = "-§§§-";
-		} else {
-		    $res = '';
-		    $sql = "SELECT name, result from res_overview_".$this->GETVars['server']." where name='".$subindexqueryarray[$key]["name"]."'";
-		    $sqlres = $this->adodb->fetchArrayDB($sql);
-		    foreach ($sqlres as $row) {
-			$res .= $row['name']."§§§".$row['result'];
-		    }
-		}
-		
-		if ($i == 1) {
-		    $out = $out."<tr class='d1'><td width='50%'>";
-		    $i=0;
-		} else {
-		    $out = $out."<tr class='d0'><td width='50%'>";
-		    $i=1;
-		}
-		$res = split("§§§", $res);
-		//$out .= $subindexqueryarray[$key]["header"];
-		$out .= $res[0];
-		$comperator = $subindexqueryarray[$key]["alert_comp"];
-		$alertval = $subindexqueryarray[$key]["alert_val"];
-		$alertcol = $subindexqueryarray[$key]["alert_col"];
-		$unit = $subindexqueryarray[$key]["unit"];
-		$error = $this->checkAlert($comperator, $alertval, $res[1]);
-		if ($i==1) {
-		    $shade="light";
-		} else {
-		    $shade="dark";
-		}
-		if ($error && $res != "" && $res[1] != "-") {
-		    $bgcol="bgcolor='".$cellcolors[$alertcol."_".$shade]."'";
-		} else {
-		    $bgcol="bgcolor='".$cellcolors["ok_".$shade]."'";
-		}
-		$out .= "</td><td align='center' $bgcol>".$res[1]." ".$unit."</td></tr>\n";
-	    }
+			$cache = $subindexqueryarray[$key]["cache"];
+			if ($this->configarray["serverlist"][$this->GETVars['server']]["libraryclient"] == 1 && $subindexqueryarray[$key]["notforlibclient"] == 1) {
+				$res = "-§§§-";
+			} else {
+				$res = '';
+				$sql = "SELECT name, result from res_overview_".$this->GETVars['server']." where name='".$subindexqueryarray[$key]["name"]."'";
+				$sqlres = $this->adodb->fetchArrayDB($sql);
+				foreach ($sqlres as $row) {
+					$res .= $row['name']."§§§".$row['result'];
+				}
+			}
 
-	    return $out;
+			if ($i == 1) {
+				$out = $out."<tr class='d1'><td width='50%'>";
+				$i=0;
+			} else {
+				$out = $out."<tr class='d0'><td width='50%'>";
+				$i=1;
+			}
+			$res = split("§§§", $res);
+			//$out .= $subindexqueryarray[$key]["header"];
+			$out .= $res[0];
+			$comperator = $subindexqueryarray[$key]["alert_comp"];
+			$alertval = $subindexqueryarray[$key]["alert_val"];
+			$alertcol = $subindexqueryarray[$key]["alert_col"];
+			$unit = $subindexqueryarray[$key]["unit"];
+			$error = $this->checkAlert($comperator, $alertval, $res[1]);
+			if ($i==1) {
+				$shade="light";
+			} else {
+				$shade="dark";
+			}
+			if ($error && $res != "" && $res[1] != "-") {
+				$bgcol="bgcolor='".$cellcolors[$alertcol."_".$shade]."'";
+			} else {
+				$bgcol="bgcolor='".$cellcolors["ok_".$shade]."'";
+			}
+			$out .= "</td><td align='center' $bgcol>".$res[1]." ".$unit."</td></tr>\n";
+		}
+
+		return $out;
 
 	}
 
@@ -1120,7 +1120,7 @@ class TSMMonitor {
 	 * @return string
 	 */
 	function generateTimetableHeader($startpunkt = '', $FirstCol = '') {
-		
+
 		$header = $FirstCol["label"];
 		$out= "<tr align='left'><th>".$header."</th><th>";
 		for ($count = 0; $count <= 24; $count++) {
@@ -1130,7 +1130,7 @@ class TSMMonitor {
 
 		$out .= "</th></tr>";
 
-	return $out;
+		return $out;
 
 	}
 
@@ -1165,9 +1165,9 @@ class TSMMonitor {
 		$out .= "</select>";
 		$out .= "<input type='submit' class='button' name='forward' value='->' onclick='submit();'>";
 		$out .= "</th></tr>";
-	       $out .= "</form>";
+		$out .= "</form>";
 
-	       return $out;
+		return $out;
 	}
 
 
@@ -1244,7 +1244,7 @@ class TSMMonitor {
 					$barcol = $shade."grey";
 					$statusmsg = "";
 				}
-				
+
 				if($ii == 1) {
 					$out .= "<tr class='d0' width=".$lastpoint.">";
 				} else {
@@ -1279,20 +1279,20 @@ class TSMMonitor {
 
 
 
-        /**
-         * findPath - find a external program in the search path
-         *
-         * @param string $binary the external program to search for
-         * @param string $search_path the search path in which to look for the external program
-         * @return string the full path to the external program or empty string if not found
-         */
-        function findPath($binary, $search_path) {
-            foreach ($search_path as $path) {
-                if ((file_exists($path . "/" . $binary)) && (is_readable($path . "/" . $binary))) {
-                    return($path . "/" . $binary);
-                }
-            }
-        }
+	/**
+	 * findPath - find a external program in the search path
+	 *
+	 * @param string $binary the external program to search for
+	 * @param string $search_path the search path in which to look for the external program
+	 * @return string the full path to the external program or empty string if not found
+	 */
+	function findPath($binary, $search_path) {
+		foreach ($search_path as $path) {
+			if ((file_exists($path . "/" . $binary)) && (is_readable($path . "/" . $binary))) {
+				return($path . "/" . $binary);
+			}
+		}
+	}
 
 
 
@@ -1304,142 +1304,142 @@ class TSMMonitor {
 	 */
 	function getConfigArray() {
 
-	    $retArray = array();
+		$retArray = array();
 
-	    // Navigation
-	    $query = "SELECT * from cfg_mainmenu";
-	    $mainmenutablerows = $this->adodb->fetchArrayDB($query);
+		// Navigation
+		$query = "SELECT * from cfg_mainmenu";
+		$mainmenutablerows = $this->adodb->fetchArrayDB($query);
 
-	    $ret = array();
+		$ret = array();
 
-	    $menuarray = array();
-	    $mainmenuarray = array();
+		$menuarray = array();
+		$mainmenuarray = array();
 
-	    while (list ($key, $val) = each ($mainmenutablerows)) {
-		$menuname = $val['name'];
-		$menulabel = $val['label'];
-		$url = "q=overview&m=".$menuname;
-		$mainmenuarray[$url] = $menulabel;
-	    }
+		while (list ($key, $val) = each ($mainmenutablerows)) {
+			$menuname = $val['name'];
+			$menulabel = $val['label'];
+			$url = "q=overview&m=".$menuname;
+			$mainmenuarray[$url] = $menulabel;
+		}
 
-	    $menuarrayxml = $queryconfigarray["navigation"]["mainmenuitem"];
-	    $mainmenuarrayxml = $menuarrayxml;
-	    $mainmenuarray["trennlinie"] = "trennlinie";
-	    $mainmenuarray["q=polldstat&m=main"] = "Polling Daemon Log";
-	    $mainmenuarray["q=serverlist&m=main"] = "Change Server";
-	    if ($_SESSION["logindata"]["role"] == "admin") $mainmenuarray["admin"] = "Admin";
-	    $mainmenuarray["q=logout"] = "Logout";
-	    $menuarray["main"] = $mainmenuarray;
+		$menuarrayxml = $queryconfigarray["navigation"]["mainmenuitem"];
+		$mainmenuarrayxml = $menuarrayxml;
+		$mainmenuarray["trennlinie"] = "trennlinie";
+		$mainmenuarray["q=polldstat&m=main"] = "Polling Daemon Log";
+		$mainmenuarray["q=serverlist&m=main"] = "Change Server";
+		if ($_SESSION["logindata"]["role"] == "admin") $mainmenuarray["admin"] = "Admin";
+		$mainmenuarray["q=logout"] = "Logout";
+		$menuarray["main"] = $mainmenuarray;
 
-	    $query = "SELECT * from cfg_mainmenu";
-	    $mainmenutablerows = $this->adodb->fetchArrayDB($query);
-	    $query = "SELECT * from cfg_queries";
-	    $querytablerows = $this->adodb->fetchArrayDB($query);
-
-
-	    while (list ($key, $val) = each ($mainmenutablerows)) {
-		$menuname = $val['name'];
-		$menulabel = $val['label'];
-		$submenuarray = array();
-		$submenuarray[""] = "<---";
-		$query = "SELECT * from cfg_queries where parent='".$menuname."'";
+		$query = "SELECT * from cfg_mainmenu";
+		$mainmenutablerows = $this->adodb->fetchArrayDB($query);
+		$query = "SELECT * from cfg_queries";
 		$querytablerows = $this->adodb->fetchArrayDB($query);
-		while (list ($subkey, $submenuitem) = each ($querytablerows)) {
-		    $submenuitem_name = $submenuitem['name'];
-		    $submenuitem_label = $submenuitem['label'];
-		    $url = "q=".$submenuitem_name."&m=".$menuname;
-		    $submenuarray[$url] = $submenuitem_label;
+
+
+		while (list ($key, $val) = each ($mainmenutablerows)) {
+			$menuname = $val['name'];
+			$menulabel = $val['label'];
+			$submenuarray = array();
+			$submenuarray[""] = "<---";
+			$query = "SELECT * from cfg_queries where parent='".$menuname."'";
+			$querytablerows = $this->adodb->fetchArrayDB($query);
+			while (list ($subkey, $submenuitem) = each ($querytablerows)) {
+				$submenuitem_name = $submenuitem['name'];
+				$submenuitem_label = $submenuitem['label'];
+				$url = "q=".$submenuitem_name."&m=".$menuname;
+				$submenuarray[$url] = $submenuitem_label;
+			}
+			$submenuarray["trennlinie"] = "trennlinie";
+			$submenuarray["q=polldstat&m=".$submenu['name']] = "Polling Daemon Log";
+			$submenuarray["q=serverlist&m=".$submenu['name']] = "Change Server";
+			if ($_SESSION["logindata"]["role"] == "admin") $submenuarray["admin"] = "Admin";
+			$submenuarray["q=logout"] = "Logout";
+			$menuarray[$menuname] = $submenuarray;
 		}
-		$submenuarray["trennlinie"] = "trennlinie";
-		$submenuarray["q=polldstat&m=".$submenu['name']] = "Polling Daemon Log";
-		$submenuarray["q=serverlist&m=".$submenu['name']] = "Change Server";
-		if ($_SESSION["logindata"]["role"] == "admin") $submenuarray["admin"] = "Admin";
-		$submenuarray["q=logout"] = "Logout";
-		$menuarray[$menuname] = $submenuarray;
-	    }
 
-	    $retArray["menuarray"] = $menuarray;
+		$retArray["menuarray"] = $menuarray;
 
-	    // Admin Backend Menu
-	    $adminmenuarray = array();
-	    $adminmenuarray["q=config&m=main"] = "General";
-	    $adminmenuarray["q=users&m=main"] = "Users";
-	    $adminmenuarray["q=groups&m=main"] = "Groups";
-	    $adminmenuarray["q=servers&m=main"] = "Servers";
-	    $adminmenuarray["q=mainmenu&m=main"] = "Mainmenu";
-	    $adminmenuarray["q=queries&m=main"] = "Queries";
-	    $adminmenuarray["trennlinie"] = "trennlinie";
-	    $adminmenuarray["q=settings&m=main"] = "Settings";
-	    $adminmenuarray["trennlinie2"] = "trennlinie";
-	    $adminmenuarray["tsmmonitor"] = "TSM Monitor";
-	    $adminmenuarray["q=logout"] = "Logout";
-	    $retArray["adminmenuarray"] = $adminmenuarray;
+		// Admin Backend Menu
+		$adminmenuarray = array();
+		$adminmenuarray["q=config&m=main"] = "General";
+		$adminmenuarray["q=users&m=main"] = "Users";
+		$adminmenuarray["q=groups&m=main"] = "Groups";
+		$adminmenuarray["q=servers&m=main"] = "Servers";
+		$adminmenuarray["q=mainmenu&m=main"] = "Mainmenu";
+		$adminmenuarray["q=queries&m=main"] = "Queries";
+		$adminmenuarray["trennlinie"] = "trennlinie";
+		$adminmenuarray["q=settings&m=main"] = "Settings";
+		$adminmenuarray["trennlinie2"] = "trennlinie";
+		$adminmenuarray["tsmmonitor"] = "TSM Monitor";
+		$adminmenuarray["q=logout"] = "Logout";
+		$retArray["adminmenuarray"] = $adminmenuarray;
 
-	    // Overview Boxes
-	    $ret = array();
-	    
-	    $query = "SELECT * from cfg_overviewboxes order by sortorder asc";
-	    $queryoverviewboxes = $this->adodb->fetchArrayDB($query);
-	    while (list ($subkey, $box) = each ($queryoverviewboxes)) {
-		$query = "SELECT * from cfg_overviewqueries where parent='".$box['name']."' order by sortorder asc";
-		$queryoverview = $this->adodb->fetchArrayDB($query);
-		$temp = array ();
-		//print_r($queryoverview);
-		while (list ($subkey, $ovquery) = each ($queryoverview)) {
-		    $ovquery['header'] = $queryoverview['name'];
-		    $temp[] = (array)$ovquery;
+		// Overview Boxes
+		$ret = array();
+
+		$query = "SELECT * from cfg_overviewboxes order by sortorder asc";
+		$queryoverviewboxes = $this->adodb->fetchArrayDB($query);
+		while (list ($subkey, $box) = each ($queryoverviewboxes)) {
+			$query = "SELECT * from cfg_overviewqueries where parent='".$box['name']."' order by sortorder asc";
+			$queryoverview = $this->adodb->fetchArrayDB($query);
+			$temp = array ();
+			//print_r($queryoverview);
+			while (list ($subkey, $ovquery) = each ($queryoverview)) {
+				$ovquery['header'] = $queryoverview['name'];
+				$temp[] = (array)$ovquery;
+			}
+			$ret[$box['name']] = $temp;
 		}
-		$ret[$box['name']] = $temp;
-	    }
-	    $retArray["infoboxarray"] = $ret;
+		$retArray["infoboxarray"] = $ret;
 
-	    // Queries
-	    $dbret = array();
-	    $query = "SELECT * from cfg_queries";
-	    $querytablerows = $this->adodb->fetchArrayDB($query);
-	    while (list ($subkey, $queryrow) = each ($querytablerows)) {
-		$dbret[$queryrow['name']] = (array)$queryrow;
-	    }
-	    $retArray["queryarray"] = $dbret;
-	    
-	    // General settings
-	    $query = "SELECT * from cfg_config";
-	    $rows = $this->adodb->fetchArrayDB($query);
-	    $ret = array();
-	    foreach ($rows as $key => $val) {
-		$ret[$val['confkey']] = $val['confval'];
-	    }
-	    $retArray["settings"] = $ret;
-
-	    // Set Stylesheet
-	    $query = "SELECT stylesheet from cfg_users where username='".$_SESSION["logindata"]["user"]."'";
-	    $row = $this->adodb->fetchArrayDB($query);
-	    $retArray["stylesheet"] = $row[0]['stylesheet'];
-
-	    // Colors
-	    $query = "SELECT * from cfg_colors";
-	    $rows = $this->adodb->fetchArrayDB($query);
-
-	    $ret = array();
-	    while (list ($key, $val) = each ($rows)) {
-		$ret[$val['name']] = $val['value'];
-	    }
-	    $retArray["colorsarray"] = $ret;
-
-	    // Servers
-	    $query = "SELECT * from cfg_servers";
-	    $rows = $this->adodb->fetchArrayDB($query);
-
-	    $ret = array();
-	    while (list ($key, $val) = each ($rows)) {
-		$ret[$val['servername']] = (array)$val;
-		if ($val['default'] == 1) {
-		    $retArray["defaultserver"] = $val['servername'];
+		// Queries
+		$dbret = array();
+		$query = "SELECT * from cfg_queries";
+		$querytablerows = $this->adodb->fetchArrayDB($query);
+		while (list ($subkey, $queryrow) = each ($querytablerows)) {
+			$dbret[$queryrow['name']] = (array)$queryrow;
 		}
-	    }
+		$retArray["queryarray"] = $dbret;
 
-	    $retArray["serverlist"] = $ret;
-	    return $retArray;
+		// General settings
+		$query = "SELECT * from cfg_config";
+		$rows = $this->adodb->fetchArrayDB($query);
+		$ret = array();
+		foreach ($rows as $key => $val) {
+			$ret[$val['confkey']] = $val['confval'];
+		}
+		$retArray["settings"] = $ret;
+
+		// Set Stylesheet
+		$query = "SELECT stylesheet from cfg_users where username='".$_SESSION["logindata"]["user"]."'";
+		$row = $this->adodb->fetchArrayDB($query);
+		$retArray["stylesheet"] = $row[0]['stylesheet'];
+
+		// Colors
+		$query = "SELECT * from cfg_colors";
+		$rows = $this->adodb->fetchArrayDB($query);
+
+		$ret = array();
+		while (list ($key, $val) = each ($rows)) {
+			$ret[$val['name']] = $val['value'];
+		}
+		$retArray["colorsarray"] = $ret;
+
+		// Servers
+		$query = "SELECT * from cfg_servers";
+		$rows = $this->adodb->fetchArrayDB($query);
+
+		$ret = array();
+		while (list ($key, $val) = each ($rows)) {
+			$ret[$val['servername']] = (array)$val;
+			if ($val['default'] == 1) {
+				$retArray["defaultserver"] = $val['servername'];
+			}
+		}
+
+		$retArray["serverlist"] = $ret;
+		return $retArray;
 	}
 
 }
