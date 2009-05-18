@@ -1,7 +1,3 @@
-function genPDF() {
-    window.open( "includes/show_pdf.php", "myWindow", "status = 1, fullscreen=yes,scrollbars=yes" )
-}
-
 function show_confirm($url, $id, $action)
 {
     var r=confirm("Are you sure?");

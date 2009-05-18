@@ -56,10 +56,12 @@ class TSMMonitor {
 
 
 	/**
-	 * TSMMonitor - constructor
-	 *
+	 * TSMMonitor 
+	 * 
+	 * @param mixed $adodb 
+	 * @access public
+	 * @return void
 	 */
-
 	function TSMMonitor($adodb) {
 
 		$this->adodb = $adodb;
@@ -217,7 +219,6 @@ class TSMMonitor {
 	 * @param string links_per_page number of links that will be displayed per page
 	 * @return string
 	 */
-
 	function showPageNavigation($links_per_page = "1") {
 
 		$this->page = intval($_GET['page']);
@@ -294,7 +295,6 @@ class TSMMonitor {
 	 * @param string $end second string
 	 * @return string
 	 */
-
 	function GetBetween($content,$start,$end) {
 	    $r = explode($start, $content);
 	    if (isset($r[1])) {
@@ -312,7 +312,6 @@ class TSMMonitor {
 	 *
 	 * @return string
 	 */
-
 	function GetTimemachine() {
 
 		$this->queryarray = $this->configarray["queryarray"];
@@ -351,7 +350,7 @@ class TSMMonitor {
 			$ret .= "<br>";
 			if ($qq == "index") $qq = "overview";
 			$LastTimestamp = $this->getLastSnapshot($qq);
-			if ($LastTimestamp!="") $ret .= "Last updated: ".strftime('%H:%M:%S', $LastTimestamp);
+			if ($LastTimestamp!="") $ret .= "Last updated: ".strftime('%Y-%m-%d %H:%M:%S', $LastTimestamp);
 			$ret .= "<br>";
 			$ret .= "<br>";
 			$ret .= "<input type='submit' name='Poll' value='Poll Now!' onclick='submit();' class='button'>";
@@ -371,7 +370,6 @@ class TSMMonitor {
 	 * @param string $type index or admin
 	 * @return string
 	 */
-
 	function getMenu($menu = '', $activelink = '', $type) {
 
 		if (!isset($menu)) { return ""; };
@@ -416,7 +414,6 @@ class TSMMonitor {
 	 *
 	 * @return string
 	 */
-
 	function getMessage() {
 
 		return "<div class='sidebarinfo'><b>System Message:</b><br><br>".$this->message."</div>";
@@ -430,7 +427,6 @@ class TSMMonitor {
 	 *
 	 * @return string
 	 */
-
 	function getInfo() {
 
 		$label = $this->configarray["queryarray"][$this->GETVars['qq']]["label"];
@@ -451,7 +447,6 @@ class TSMMonitor {
          *
          * @return string
          */
-
         function getStylesheetSwitcher() {
 		
 		$ret = "";
@@ -488,7 +483,6 @@ class TSMMonitor {
 	 *
 	 * @return string
 	 */
-
 	function getTableheader() {
 
 	    $tableheader="<tr>";
@@ -553,7 +547,6 @@ class TSMMonitor {
 	 * checkLogin - processes login procedure and sets loggedin property in SESSION 
 	 *
 	 */
-
 	function checkLogin() {
 
 		$user = $_SESSION["logindata"]["user"];
@@ -590,7 +583,6 @@ class TSMMonitor {
 	 * @param string $val the value that will be checked 
 	 * @return boolean
 	 */
-
 	function checkAlert($comperator = '', $alertval = '', $val = '') {
 
 		$error = false;
@@ -628,7 +620,6 @@ class TSMMonitor {
 	 * @param string $timestamp a timestamp that s needed to get the current day
 	 * @return string
 	 */
-
 	function getTimestampsOfADay($timestamp = "") {
 
 		$server = $this->GETVars['server'];
@@ -655,7 +646,6 @@ class TSMMonitor {
 	 * @param string qq name of query
 	 * @return string
 	 */
-
 	function getLastSnapshot($qq) {
 
 	    $server = $this->GETVars['server'];
@@ -673,12 +663,12 @@ class TSMMonitor {
 
 
 	/**
-	 * $this->getTableFields
-	 *
-	 * @param string tablename
-	 * @return string
+	 * getTableFields 
+	 * 
+	 * @param string $tablename 
+	 * @access public
+	 * @return void
 	 */
-
 	function getTableFields($tablename="") {
 
 	    $sqlth = "SELECT * from ".$tablename." LIMIT 1";
@@ -706,7 +696,6 @@ class TSMMonitor {
 	 * @param string $type (list, edit, add)
 	 * @return string
 	 */
-
 	function getAdminTables($type="") {
 
 	    $columnnames = $this->getTableFields("cfg_".$this->GETVars['qq']);
@@ -765,7 +754,6 @@ class TSMMonitor {
 	 * @param string $type sets the table type (vertical, standard and graphical time table)
 	 * @return string
 	 */
-
 	function execute($type = 'table') {
 
 		$colorsarray = $this->configarray["colorsarray"];
@@ -907,7 +895,6 @@ class TSMMonitor {
 	 *
 	 * @return string
 	 */
-
 	function getSearchfield() {
 
 	    $ret = "";
@@ -967,7 +954,6 @@ class TSMMonitor {
 	 *
 	 * @return string
 	 */
-
 	function getServerlist() {
 
 		$ret = "";
@@ -1001,7 +987,6 @@ class TSMMonitor {
 	 *
 	 * @return string
 	 */
-
 	function getPollDStat() {
 
 	    $i=1;
@@ -1067,7 +1052,6 @@ class TSMMonitor {
 	 * @param array $subindexqueryarray array of query objects
 	 * @return string
 	 */
-
 	function getOverviewRows($subindexqueryarray = '') {
 
 	    $out="";
@@ -1135,7 +1119,6 @@ class TSMMonitor {
 	 * @param string $FirstCol first field of result table
 	 * @return string
 	 */
-
 	function generateTimetableHeader($startpunkt = '', $FirstCol = '') {
 		
 		$header = $FirstCol["label"];
@@ -1159,7 +1142,6 @@ class TSMMonitor {
 	 *
 	 * @return string
 	 */
-
 	function generateTimetableNavigation() {
 
 
@@ -1199,7 +1181,6 @@ class TSMMonitor {
 	 * @param string $FirstCol first field of result table
 	 * @return string
 	 */
-
 	function generateTimetable($tablearray = '', $FirstCol = '') {
 
 		$now = time();
@@ -1321,7 +1302,6 @@ class TSMMonitor {
 	 *
 	 * @return array
 	 */
-
 	function getConfigArray() {
 
 	    $retArray = array();

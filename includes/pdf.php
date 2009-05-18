@@ -54,7 +54,7 @@ class PDF extends FPDF
 
 
 	/**
-	 * Header - class header
+	 * Header - generates page header
 	 *
 	 */
 
@@ -62,23 +62,26 @@ class PDF extends FPDF
 	{
 		//Print the table header if necessary
 		if($this->ProcessingTable) $this->TableHeader();
-		$configarray = $_SESSION["configarray"];
-		$queryarray = $configarray["queryarray"];
-		$qq = $_SESSION["GETVars"]["qq"];
-		$server = $_SESSION["GETVars"]["server"];
-		$label = $queryarray[$qq]["label"];
-		$snapshotdate = $_SESSION['timemachine']['time'];
-		if ($snapshotdate != "") {
-		$snapshotdate = " (".strftime("%Y/%m/%d %H:%m", $snapshotdate).")";
-		}
-		//Title
-		$this->SetFont('Arial','',12);
-		$this->Cell(0,6,$server.": ".$label.$snapshotdate,0,1,'C');
-		$this->Ln(10);
 		//Ensure table header is output
 		parent::Header();
 	}
 
+
+        /**
+         * PageHeader - writes page title on top of first page
+         * 
+         * @param string $pagetitle title of page
+         * @access public
+         * @return void
+         */
+        function PageHeader($pagetitle) {
+
+		//Title
+		$this->SetFont('Arial','',12);
+		$this->Cell(0,6,$pagetitle,0,1,'C');
+		$this->Ln(10);
+
+	}
 
 	/**
 	 *

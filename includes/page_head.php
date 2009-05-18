@@ -72,6 +72,11 @@ $adodb->setDebug($_SESSION["debug"]);
     
     		return true;
     	}
+
+	function genPDF() {
+	    window.open( "includes/show_pdf.php?q=<?php echo $_SESSION['GETVars']['qq'] ?>&s=<?php echo $_SESSION['GETVars']['server'] ?>", "myWindow", "status = 1, fullscreen=yes,scrollbars=yes" )
+	}
+
     
     // -->
     </script>

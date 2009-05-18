@@ -43,8 +43,19 @@ $prop=array('HeaderColor'=>array(180,180,180),
 	    'color1'=>array(255,255,255),
 	    'color2'=>array(230,230,230),
 	    'padding'=>2);
-
 $res = $adodb->fetchArrayDB($_SESSION["lastsql"]);
+
+//build Page Title
+$configarray = $_SESSION["configarray"];
+$queryarray = $configarray["queryarray"];
+$qq = $_GET["q"];
+$server = $_GET["s"];
+$label = $queryarray[$qq]["label"];
+$snapshotdate = $_SESSION['timemachine']['time'];
+if ($snapshotdate != "") $snapshotdate = " (".strftime("%Y/%m/%d %H:%m", $snapshotdate).")";
+$pageheader = $server.": ".$label." ".$snapshotdate;
+
+$pdf->PageHeader($pageheader);
 $pdf->Table($_SESSION["lastsql"],$prop,$res);
 $pdf->Output();
 

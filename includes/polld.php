@@ -40,7 +40,6 @@
  * Class PollD
  *
  */
-
 class PollD {
 
 	var $servers;
@@ -57,10 +56,12 @@ class PollD {
 
 
 	/**
-	 * constructor
-	 *
+	 * PollD 
+	 * 
+	 * @param mixed $adodb 
+	 * @access public
+	 * @return void
 	 */
-
 	function PollD($adodb) {
 
 		$this->adodb = $adodb;
@@ -76,7 +77,6 @@ class PollD {
 	 * getQueries - returns an array filled with all configured TSM queries
 	 *
 	 */
-
 	function getQueries() {
 		$queries = array();
 		$query = "select * from cfg_queries";
@@ -103,7 +103,6 @@ class PollD {
 	 *
 	 * @return array
 	 */
-
 	function getOverviewQueries() {
 		$queries = array();
 		$query = "select * from cfg_overviewqueries";
@@ -120,7 +119,6 @@ class PollD {
 	 *
 	 * @return array
 	 */
-
 	function getServers() {
 		$query = "select * from cfg_servers";
 		$rows = $this->adodb->fetchArrayDB($query);
@@ -145,7 +143,6 @@ class PollD {
 	 * @param string $overviewname
 	 * @return array
 	 */
-
 	function execute($query = '', $servername = '', $restable = '', $timestamp = '', $overviewname = '') {
 
 		$server = $this->servers[$servername];
@@ -182,7 +179,7 @@ class PollD {
 						if ($overviewname == '') {
 							$out[] = 'INSERT IGNORE INTO '.$restable.' values ("'.$timestamp.'", "'.$read.'")';
 						} else {
-							$out[] = 'INSERT INTO '.$restable.' (timestamp, name, result) values ("'.$timestamp.'", "'.$overviewname.'", "'.$read.'") ON DUPLICATE KEY update result="'.$read.'"';
+							$out[] = 'INSERT INTO '.$restable.' (timestamp, name, result) values ("'.$timestamp.'", "'.$overviewname.'", "'.$read.'") ON DUPLICATE KEY update result="'.$read.'", timestamp="'.$timestamp.'"';
 						}
 					} else { // result is empty and it's ok
 						$out[0] = 'INSERT IGNORE INTO '.$restable.' (timestamp) values ("'.$timestamp.'")';
@@ -211,7 +208,6 @@ class PollD {
 	 * @param string $hash md5 hash checksum of current resultSet
 	 * @return boolean
 	 */
-
 	function checkHash($tablename = '', $hash = ''){
 
 		$sql = "select count(*) from log_hashes where TABLENAME='".$tablename."' and HASH='".$hash."'";
@@ -242,7 +238,6 @@ class PollD {
 	 * @param string $timestamp timestamp
 	 * @return boolean
 	 */
-
 	function checkFreq($tablename, $pollfreq, $timestamp) {
 
 		$sql = "select MAX(TimeStamp) from ".$tablename;
@@ -264,7 +259,6 @@ class PollD {
 	 *
 	 * @return string
 	 */
-
 	function getSleeptime() {
 
 		$sql = "select MIN(pollfreq) from cfg_queries";
@@ -290,7 +284,6 @@ class PollD {
 	 * @param boolean $ignorePollFreq
 	 * @param string $timestamp
 	 */
-
 	function pollQuery($query = "", $server = "", $ignorePollFreq = FALSE, $timestamp){
 
 		$queryname = $query["name"];
@@ -351,7 +344,6 @@ class PollD {
 	 * @param boolean $ignorePollFreq
 	 * @param string $timestamp
 	 */
-
 	function pollOverviewQuery($query = "", $server = "", $timestamp){
 
 		$tablename = "res_overview_".$server["servername"];
@@ -382,7 +374,6 @@ class PollD {
 	 * @param string $overviewqueryname
 	 * @param string $hashonly do not drop table, just delete entry in log_hashes
 	 */
-
 	function cleanupDatabase($servername = "", $queryname = "", $overviewqueryname = "", $months = "9999" ,$hashonly = "yes"){
 
 		if ($servername != "" && $queryname != "" && $overviewqueryname != "") {
@@ -424,7 +415,6 @@ class PollD {
 	 * @param string $lastrun
 	 * @param string $nextrun
 	 */
-
 	function setPollDStatus($status, $lastrun, $nextrun) {
 
 		if ($status != "") $status = "`status`='".$status."'";
@@ -442,7 +432,6 @@ class PollD {
 	 *
 	 * @returns boolean
 	 */
-
 	function isEnabled() {
 
 		$sql = "select enabled from log_polldstat WHERE `id`='1'";
@@ -462,7 +451,6 @@ class PollD {
 	 *
 	 * @param string switch on or off
 	 */
-
 	function controlPollD($switch = "") {
 
 		if ($switch == "on") {
@@ -482,7 +470,6 @@ class PollD {
 	 *
 	 * @returns string
 	 */
-
 	function getStatus() {
 
 		$sql = "select status from log_polldstat WHERE `id`='1'";
@@ -499,7 +486,6 @@ class PollD {
 	 *
 	 * @return boolean
 	 */
-
 	function poll(){
 
 		$this->controlPollD("off");
