@@ -177,16 +177,16 @@ include_once "includes/page_head.php";
 					}
 				}
 			} else {
-			if (isset($_SESSION["logindata"])){
-				$errormsg = "Login failed!";
-			}else{
-				$errormsg = "Login";
-			}
+				if (isset($_SESSION["logindata"])){
+					$errormsg = "Login failed!";
+				}else{
+					$errormsg = "Login";
+				}
 
-			session_unset();
-			$_SESSION=array();
+				session_unset();
+				$_SESSION=array();
 
-			include_once "includes/login.php";
+				include_once "includes/login.php";
 
 			}
 			$_SESSION['from'] = $tsmmonitor->GETVars['qq'];

@@ -719,26 +719,25 @@ class TSMMonitor {
 
 		foreach ($rs as $row) {
 			if ($type=="list") {
-				if ($i % 2 == 0) {
-					$outp .= "<tr class='d1'>";
-				}else{
-					$outp .= "<tr class='d0'>";
-				}
-				$i++;
-
+				$modrow = array();
+				$widths = array();
 				while(list($keycell, $valcell) = each($row)) {
 					if ($keycell == "id") {
 						$id = $valcell;
 					} else {
-						$outp .= "<td>".$valcell."</td>";
+						$modrow[$keycell] = $valcell;
 					}
+					$widths[$keycell] = "";
 				}
 
 				$baseurl = $_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu'];
-				$outp .= "<td width='20px'><a href='".$baseurl."&id=".$id."&action=edit' onclick=''><img src='images/edit.png' border=0></img></a></td>";
-				$outp .= "<td width='20px'><a href='#' onclick='show_confirm(\"".$baseurl."\", $id, \"delete\")'><img src='images/delete.png' border=0 ></img></a></td>";
+				$modrow["edit"] = "<a href='".$baseurl."&id=".$id."&action=edit' onclick=''><img src='images/edit.png' border=0></img></a>";
+				$widths["edit"] = " width='20px' ";
+				$modrow["del"] = "<a href='#' onclick='show_confirm(\"".$baseurl."\", $id, \"delete\")'><img src='images/delete.png' border=0 ></img></a>";
+				$widths["del"] = " width='20px' ";
 
-				$outp .= "</tr>\n";
+				$outp .= $this->renderZebraTableRow($modrow, $i%2, "", "", $widths);
+				$i++;
 			} else {
 				$outp = $this->adodb->fetchArrayDB($sql);
 				var_dump($outp);
@@ -825,7 +824,7 @@ class TSMMonitor {
 
 		if ($bContinue) {
 			if ($type == "table") {
-				$i = 1;
+				$i = 0;
 				$rs = $this->fetchSplitArrayDB($sql,20);
 
 				foreach ($rs as $row) {
@@ -838,30 +837,9 @@ class TSMMonitor {
 						} else {
 							$color = "ok";
 						}
-						$colorzebra = $colorsarray[$color][$i];
 					}
-					if ($i % 2 == 0) {
-						$outp = $outp."<tr class='d1'>";
-					}else{
-						$outp = $outp."<tr class='d0'>";
-					}
+					$outp .= $this->renderZebraTableRow($row, $i%2, $col, $color, "");
 					$i++;
-
-					while(list($keycell, $valcell) = each($row)) {
-						if($color!="" && $col==$keycell) {
-
-							if ($i % 2 == 0) {
-								$cellcol = $colorsarray[$color."_light"];
-							} else {
-								$cellcol = $colorsarray[$color."_dark"];
-							}
-							$outp = $outp."<td bgcolor='".$cellcol."'>".$valcell."</td>";
-						} else {
-							$outp = $outp."<td>".$valcell."</td>";
-						}
-
-					}
-					$outp = $outp."</tr>\n";
 				}
 			}
 			else if ($type == "verticaltable") {
@@ -884,6 +862,46 @@ class TSMMonitor {
 				}
 			}
 		}
+
+		return $outp;
+	}
+	
+
+	/**
+	 * renderZebraTableRow - returns HTML code for one zebra tabel row
+	 * 
+	 * @param mixed $row array of fields
+	 * @param mixed $shade 1 or 0
+	 * @param mixed $alarmcol column which should be colored in alarm color
+	 * @param mixed $color alarm color
+	 * @param mixed $cellproperties array of cell properties (optional)
+	 * @access public
+	 * @return void
+	 */
+	function renderZebraTableRow ($row, $shade , $alarmcol, $color, $cellproperties) {
+
+		$colorsarray = $this->configarray["colorsarray"];
+
+		$outp = $outp."<tr class='d".$shade."'>";
+		while(list($keycell, $valcell) = each($row)) {
+			if (isset($cellproperties) && $cellproperties[$keycell] != "") {
+				$cellproperty = " ".$cellproperties[$keycell]." ";
+			} else {
+				$cellproperty = "";
+			}
+			if($color!="" && $alarmcol==$keycell) {
+
+				if ($shade == 0) {
+					$cellcol = $colorsarray[$color."_light"];
+				} else {
+					$cellcol = $colorsarray[$color."_dark"];
+				}
+				$outp = $outp."<td ".$cellproperty."bgcolor='".$cellcol."'>".$valcell."</td>";
+			} else {
+				$outp = $outp."<td".$cellproperty.">".$valcell."</td>";
+			}
+		}
+		$outp = $outp."</tr>\n";
 
 		return $outp;
 	}
@@ -966,18 +984,13 @@ class TSMMonitor {
 			$listip = $serveritems["ip"];
 			$listdescription = $serveritems["description"];
 			$listport = $serveritems["port"];
-			if ($i == 0) {
-				$ret .= "<tr class='d0'>";
-				$i = 1;
-			} else {
-				$ret .= "<tr class='d1'>";
-				$i = 0;
-			}
 			$listlink = $_SERVER['PHP_SELF']."?q=".$_SESSION["from"]."&m=".$this->GETVars['menu']."&s=".$servername;
-			$ret .= "<td><a class='nav' href='".$listlink."'>".$servername."</a></td><td>".$listdescription."</td><td>".$listip."</td><td>".$listport."</td></tr>";
+			$row = array("<a class='nav' href='".$listlink."'>".$servername."</a>", $listdescription, $listip, $listport);
+			$ret .= $this->renderZebraTableRow($row, $i%2, "", "", "");
+			$i++;
 		}
-
 		return $ret."</table>";
+
 
 	}
 
@@ -1022,21 +1035,17 @@ class TSMMonitor {
 		$_SESSION["lastsql"] = $sql;
 		$rs = $this->fetchSplitArrayDB($sql,20);
 		foreach ($rs as $row) {
-			if ($i % 2 == 0) {
-				$outp = $outp."<tr class='d1'>";
-			} else {
-				$outp = $outp."<tr class='d0'>";
-			}
-			$i++;
-
+			$modrow = array();
 			while(list($keycell, $valcell) = each($row)) {
 				if ($keycell == "timestamp") {
 					$valcell = strftime("%Y/%m/%d %T", $valcell);
 				}
-				$outp = $outp."<td>".$valcell."</td>";
+				$modrow[$keycell] = $valcell;
 			}
-			$outp = $outp."</tr>\n";
+			$outp .= $this->renderZebraTableRow($modrow, $i%2, "", "", "");
+			$i++;
 		}
+
 		$nav = $this->showPageNavigation("20");
 		if ($nav!="") {
 			$outp = $outp."<tr><td colspan='6' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
@@ -1059,50 +1068,41 @@ class TSMMonitor {
 
 		while(list($key, $val) = each($subindexqueryarray)) {
 
-			$bgcol="";
 			$comperator = "";
 			$alertval = "";
 			$alertcol = "";
-			$cellcolors = $this->configarray["colorsarray"];
 
-			$cache = $subindexqueryarray[$key]["cache"];
 			if ($this->configarray["serverlist"][$this->GETVars['server']]["libraryclient"] == 1 && $subindexqueryarray[$key]["notforlibclient"] == 1) {
-				$res = "-§§§-";
+				$sqlres = array();
+				$sqlres[0]["name"] = "-";
+				$sqlres[0]["result"] = "-";
+				$error = FALSE;
 			} else {
-				$res = '';
 				$sql = "SELECT name, result from res_overview_".$this->GETVars['server']." where name='".$subindexqueryarray[$key]["name"]."'";
 				$sqlres = $this->adodb->fetchArrayDB($sql);
-				foreach ($sqlres as $row) {
-					$res .= $row['name']."§§§".$row['result'];
-				}
+				$comperator = $subindexqueryarray[$key]["alert_comp"];
+				$alertval = $subindexqueryarray[$key]["alert_val"];
+				$alertcol = $subindexqueryarray[$key]["alert_col"];
+				$unit = $subindexqueryarray[$key]["unit"];
+				$error = $this->checkAlert($comperator, $alertval, $sqlres[0]["result"]);
 			}
 
-			if ($i == 1) {
-				$out = $out."<tr class='d1'><td width='50%'>";
-				$i=0;
+			if ($error) {
+				$errorcolor = $alertcol;
 			} else {
-				$out = $out."<tr class='d0'><td width='50%'>";
-				$i=1;
+				$errorcolor = "ok";
 			}
-			$res = split("§§§", $res);
-			//$out .= $subindexqueryarray[$key]["header"];
-			$out .= $res[0];
-			$comperator = $subindexqueryarray[$key]["alert_comp"];
-			$alertval = $subindexqueryarray[$key]["alert_val"];
-			$alertcol = $subindexqueryarray[$key]["alert_col"];
-			$unit = $subindexqueryarray[$key]["unit"];
-			$error = $this->checkAlert($comperator, $alertval, $res[1]);
-			if ($i==1) {
-				$shade="light";
-			} else {
-				$shade="dark";
-			}
-			if ($error && $res != "" && $res[1] != "-") {
-				$bgcol="bgcolor='".$cellcolors[$alertcol."_".$shade]."'";
-			} else {
-				$bgcol="bgcolor='".$cellcolors["ok_".$shade]."'";
-			}
-			$out .= "</td><td align='center' $bgcol>".$res[1]." ".$unit."</td></tr>\n";
+			
+			$cellprop = array();
+			$cellprop["name"] = "width='50%'";
+			$cellprop["result"] = "align='center'";
+
+			$res = array();
+			$res["name"] = $sqlres[0]["name"];
+			$res["result"] = $sqlres[0]["result"]." ".$unit;
+
+			$out .= $this->renderZebraTableRow($res, $i%2, "result", $errorcolor, $cellprop, "" );
+			$i++;
 		}
 
 		return $out;
