@@ -46,13 +46,12 @@ class PollD {
 	var $queries;
 	var $overviewqueries;
 	var $adodb;
+	var $debuglevel; // VERBOSE=4, INFO=3, WARN=2, ERROR=1, OFF=0
 
 	var $log_timeneeded;
 	var $log_unchangedresult;
 	var $log_pollfreqnoreached;
 	var $log_updated;
-
-
 
 
 	/**
@@ -64,13 +63,78 @@ class PollD {
 	 */
 	function PollD($adodb) {
 
+		$this->setDebuglevel("INFO");
 		$this->adodb = $adodb;
 		$this->servers = $this->getServers();
 		$this->queries = $this->getQueries();
 		$this->overviewqueries = $this->getOverviewQueries();
+		//$this->controlPollD("off");
 	}
 
 
+    /**
+     * writeMSG 
+     * 
+     * @param mixed $msg 
+     * @param mixed $level VERBOSE, INFO, WARN, ERROR, OFF
+     * @access public
+     * @return void
+     */
+    function writeMSG($msg, $level) {
+
+		switch ($level) {
+			case ("OFF"):
+				$ilevel = 0;
+				break;
+			case ("ERROR"):
+				$ilevel = 1;
+				break;
+			case ("WARN"):
+				$ilevel = 2;
+				break;
+			case ("INFO"):
+				$ilevel = 3;
+				break;
+			case ("VERBOSE"):
+				$ilevel = 4;
+				break;
+		}
+
+		if ($this->debuglevel >= $ilevel) {
+			echo $level.": ".$msg;
+		}
+	}
+
+
+
+
+	/**
+	 * setDebuglevel 
+	 * 
+	 * @param mixed $debuglevel VERBOSE, INFO, WARN, ERROR, OFF
+	 * @access public
+	 * @return void
+	 */
+	function setDebuglevel($debuglevel) {
+
+		switch ($debuglevel) {
+			case ("OFF"):
+				$this->debuglevel = 0;
+				break;
+			case ("ERROR"):
+				$this->debuglevel = 1;
+				break;
+			case ("WARN"):
+				$this->debuglevel = 2;
+				break;
+			case ("INFO"):
+				$this->debuglevel = 3;
+				break;
+			case ("VERBOSE"):
+				$this->debuglevel = 4;
+				break;
+		}
+	}
 
 
 	/**
@@ -173,9 +237,7 @@ class PollD {
 				if ($read != ' ' && $read != '' && !$stop) {
 					if ($blank == "") {
 						$read = preg_replace('/[\n]+/', '', $read);
-						if ($restable == "res_querysession_TSMSRV1") echo $read."\n";
 						$read = ereg_replace("\t","\",\"",$read);
-						if ($restable == "res_querysession_TSMSRV1") echo $read."\n";
 						if ($overviewname == '') {
 							$out[] = 'INSERT IGNORE INTO '.$restable.' values ("'.$timestamp.'", "'.$read.'")';
 						} else {
@@ -284,21 +346,23 @@ class PollD {
 	 * @param boolean $ignorePollFreq
 	 * @param string $timestamp
 	 */
-	function pollQuery($query = "", $server = "", $ignorePollFreq = FALSE, $timestamp){
+	function pollQuery($query = "", $server = "", $ignorePollFreq = TRUE, $timestamp){
 
 		$queryname = $query["name"];
 		$tablename = "res_".$queryname."_".$server["servername"];
-		if (!$ignorePollFreq) echo "---------".$queryname.": ";
+		if (!$ignorePollFreq) {
+			$this->writeMSG("---------".$queryname.": ", "INFO");
+		}
 		// create table if not exists
 		$showsql = "SHOW TABLES LIKE '".$tablename."'";
 		$res = $this->adodb->fetchArrayDB($showsql);
 		if (!isset($res[0])) {
 			$fieldsql = "select fields from cfg_queries where name='".$queryname."'";
 			$fields = $this->adodb->fetchArrayDB($fieldsql);
-			var_dump($fields);
 			$ctsql = "CREATE TABLE `".$tablename."` (".$fields[0]['fields'].") DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-			if (!$ignorePollFreq) echo "created table ".$tablename." and ";
-			//$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." LIKE smp_".$query["name"];
+			if (!$ignorePollFreq) {
+				$this->writeMSG("created table ".$tablename." and ", "INFO");
+			}
 			$this->adodb->execDB($ctsql);
 		}
 		// execute query and store result in mysql db
@@ -306,31 +370,38 @@ class PollD {
 			try {
 				$result = $this->execute($query["tsmquery"], $server["servername"], $tablename, $timestamp);
 			} catch (exception $e) {
-				$result = "";
-				print_r($e);
+				$this->writeMSG("Problem while querying from TSM Server!", "ERROR");
 			}
 			if ($result != "") {
 				if (!$this->checkHash($tablename, $result["md5"])) {
 					if ($query["polltype"]=="update") {
 						$dropsql = "truncate table ".$tablename;
-						$this->adodb->execDB($dropsql);
-						if (!$ignorePollFreq) echo " TRUNCATED TABLE and ";
+						try {
+							$this->adodb->execDB($dropsql);
+						} catch (exception $e) {
+							$this->writeMSG("Error while truncating table (".$dropsql.")", "ERROR");
+						}
+						$this->writeMSG(" TRUNCATED TABLE and ", "INFO");
 					}
 					foreach ($result["sql"] as $insertquery) {
-						if ($queryname == "querysession") echo "\n\n".$insertquery."\n\n";
-						$this->adodb->execDB($insertquery);
+						try {
+							$this->adodb->execDB($insertquery);
+							//echo $insertquery;
+						} catch (exception $e) {
+							$this->writeMSG("Error while inserting into table (".$insertquery.")", "ERROR");
+						}
 					}
-					if (!$ignorePollFreq) echo "inserted new rows into ".$tablename."\n";
+					$this->writeMSG("inserted new rows into ".$tablename."\n", "INFO");
 					$this->log_updated++;
 				} else {
-					if (!$ignorePollFreq) echo "no need to update result -> result is the same as last time\n";
+					$this->writeMSG("no need to update result -> result is the same as last time\n", "INFO");
 					$this->log_unchangedresult++;
 				}
 			} else {
-				echo "There was a problem querying the TSM Server ".$server["servername"]."!\n";
+				$this->writeMSG("There was a problem querying the TSM Server ".$server["servername"]."!\n", "ERROR");
 			} 
 		} else {
-			if (!$ignorePollFreq) echo "no need to update result -> pollfreq not reached!\n";
+			$this->writeMSG("no need to update result -> pollfreq not reached!\n", "INFO");
 			$this->log_pollfreqnoreached++;
 		}
 	}
@@ -347,7 +418,7 @@ class PollD {
 	function pollOverviewQuery($query = "", $server = "", $timestamp){
 
 		$tablename = "res_overview_".$server["servername"];
-		echo "---------".$query["name"].": ";
+		$this->writeMSG("---------".$query["name"].": ", "INFO");
 		//$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." LIKE smp_overview";
 		$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." ( `timestamp` int(11) collate utf8_unicode_ci NOT NULL, `name` varchar(35) collate utf8_unicode_ci NOT NULL, `result` varchar(255) collate utf8_unicode_ci NOT NULL, UNIQUE KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 		$this->adodb->execDB($ctsql);
@@ -355,10 +426,10 @@ class PollD {
 		if ($result != "") {
 			foreach ($result["sql"] as $insertquery) {
 				$this->adodb->execDB($insertquery);
-				echo "inserted row\n";
+				$this->writeMSG("inserted row\n", "INFO");
 			}
 		} else {
-			echo "There was a problem querying the TSM Server ".$server["servername"]."!\n";
+			$this->writeMSG("There was a problem querying the TSM Server ".$server["servername"]."!\n", "ERROR");
 		}
 
 	}
@@ -488,12 +559,11 @@ class PollD {
 	 */
 	function poll(){
 
-		$this->controlPollD("off");
 
 		$sleeptime = $this->getSleeptime();
 
 
-		echo "Sleeptime will be ".$sleeptime." seconds\n";
+		$this->writeMSG("Sleeptime will be ".$sleeptime." seconds\n", "WARN");
 
 
 		// infinite loop
@@ -503,8 +573,7 @@ class PollD {
 
 				$timestamp = time();
 
-				echo "running!\n";
-				echo "timestamp for this run is ".$timestamp."\n";
+				$this->writeMSG("running!\ntimestamp for this run is ".$timestamp."\n", "WARN");
 
 				$this->setPollDStatus("running", "", "");
 
@@ -515,12 +584,12 @@ class PollD {
 					$this->log_pollfreqnoreached = 0;
 					$this->log_updated = 0;
 					// go through all queries defined in xml file
-					echo "---querying server ".$server["servername"]."\n";
-					echo "------querying normal queries\n";
+					$this->writeMSG("---querying server ".$server["servername"]."\n", "WARN");
+					$this->writeMSG("------querying normal queries\n", "WARN");
 					foreach ($this->queries as $query) {
 						$this->pollQuery($query, $server, FALSE, $timestamp);
 					}
-					echo "------querying overview queries\n";
+					$this->writeMSG("------querying overview queries\n", "WARN");
 					foreach ($this->overviewqueries as $query) {
 						$this->pollOverviewQuery($query, $server, $timestamp);
 					}
@@ -530,11 +599,11 @@ class PollD {
 				$init = "no";
 
 
-				echo "needed ".(time()-$timestamp)." seconds for this run.\n";
+				$this->writeMSG("needed ".(time()-$timestamp)." seconds for this run.\n", "INFO");
 				//$tempsleeptime = $sleeptime-(time()-$timestamp);
 				$tempsleeptime = 900 -(time()-$timestamp);
-				echo "sleeping for ".$tempsleeptime." seconds...\n";
-				echo "next run will be at ".strftime("%H:%M:%S", (time()+$tempsleeptime))."\n\n";
+				$this->writeMSG("sleeping for ".$tempsleeptime." seconds...\n", "WARN");
+				$this->writeMSG("next run will be at ".strftime("%H:%M:%S", (time()+$tempsleeptime))."\n\n", "WARN");
 
 				$this->setPollDStatus("sleeping", $timestamp, (time()+$tempsleeptime));
 
@@ -543,7 +612,7 @@ class PollD {
 
 			} else {
 
-				echo "PollD is disabled. Sleeping for 5 minutes...\n";
+				$this->writeMSG("PollD is disabled. Sleeping for 5 minutes...\n", "ERROR");
 				sleep (3);
 
 			}

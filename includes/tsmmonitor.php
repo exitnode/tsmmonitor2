@@ -102,8 +102,12 @@ class TSMMonitor {
 		$this->configarray = $_SESSION['configarray'];
 
 		// timeout
-		if( !ini_get('safe_mode') && ini_get('max_execution_time') != $this->configarray["settings"]["timeout"]) {
-			ini_set('max_execution_time', $this->configarray["settings"]["timeout"]);
+		if( !ini_get('safe_mode')) {
+			if (ini_get('max_execution_time') != $this->configarray["settings"]["timeout"]) {
+				ini_set('max_execution_time', $this->configarray["settings"]["timeout"]);
+			}
+			//ini_set('session.gc_maxlifetime', 10);
+			//ini_set('session.gc_divisor', 1);
 		}
 
 		// set defaults if vars are empty
