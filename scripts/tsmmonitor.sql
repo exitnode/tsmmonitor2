@@ -1,28 +1,22 @@
 -- phpMyAdmin SQL Dump
--- version 2.11.9.2
+-- version 2.11.8.1deb5
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Erstellungszeit: 14. Mai 2009 um 12:25
--- Server Version: 5.0.45
--- PHP-Version: 5.2.3-1ubuntu6.5
+-- Generation Time: May 21, 2009 at 01:12 PM
+-- Server version: 5.0.51
+-- PHP Version: 5.2.6-1+lenny3
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
 --
--- Datenbank: `tsmmonitor`
+-- Database: `tsmmonitor`
 --
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `cfg_colors`
+-- Table structure for table `cfg_colors`
 --
 
 CREATE TABLE IF NOT EXISTS `cfg_colors` (
@@ -31,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `cfg_colors` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Daten für Tabelle `cfg_colors`
+-- Dumping data for table `cfg_colors`
 --
 
 INSERT INTO `cfg_colors` (`name`, `value`) VALUES
@@ -45,29 +39,31 @@ INSERT INTO `cfg_colors` (`name`, `value`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `cfg_config`
+-- Table structure for table `cfg_config`
 --
 
 CREATE TABLE IF NOT EXISTS `cfg_config` (
   `id` int(11) NOT NULL auto_increment,
   `confkey` varchar(35) collate utf8_unicode_ci NOT NULL,
-  `confval` varchar(35) collate utf8_unicode_ci NOT NULL,
+  `confval` varchar(255) collate utf8_unicode_ci NOT NULL,
   `description` varchar(255) collate utf8_unicode_ci NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=5 ;
 
 --
--- Daten für Tabelle `cfg_config`
+-- Dumping data for table `cfg_config`
 --
 
 INSERT INTO `cfg_config` (`id`, `confkey`, `confval`, `description`) VALUES
 (1, 'timeout', '200', 'change this value to your desired php timeout'),
-(2, 'version', '0.1.0', '');
+(2, 'version', '0.1.0', 'TSM Monitor version'),
+(3, 'path_tmlog', '', 'TSM Monitor Logfile Path'),
+(4, 'path_polldlog', '', 'PollD Logfile Path');
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `cfg_groups`
+-- Table structure for table `cfg_groups`
 --
 
 CREATE TABLE IF NOT EXISTS `cfg_groups` (
@@ -77,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `cfg_groups` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
 --
--- Daten für Tabelle `cfg_groups`
+-- Dumping data for table `cfg_groups`
 --
 
 INSERT INTO `cfg_groups` (`id`, `group`) VALUES
@@ -86,7 +82,7 @@ INSERT INTO `cfg_groups` (`id`, `group`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `cfg_mainmenu`
+-- Table structure for table `cfg_mainmenu`
 --
 
 CREATE TABLE IF NOT EXISTS `cfg_mainmenu` (
@@ -98,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `cfg_mainmenu` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8 ;
 
 --
--- Daten für Tabelle `cfg_mainmenu`
+-- Dumping data for table `cfg_mainmenu`
 --
 
 INSERT INTO `cfg_mainmenu` (`id`, `name`, `label`, `sortorder`) VALUES
@@ -113,7 +109,7 @@ INSERT INTO `cfg_mainmenu` (`id`, `name`, `label`, `sortorder`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `cfg_overviewboxes`
+-- Table structure for table `cfg_overviewboxes`
 --
 
 CREATE TABLE IF NOT EXISTS `cfg_overviewboxes` (
@@ -125,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `cfg_overviewboxes` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=5 ;
 
 --
--- Daten für Tabelle `cfg_overviewboxes`
+-- Dumping data for table `cfg_overviewboxes`
 --
 
 INSERT INTO `cfg_overviewboxes` (`id`, `name`, `label`, `sortorder`) VALUES
@@ -137,7 +133,7 @@ INSERT INTO `cfg_overviewboxes` (`id`, `name`, `label`, `sortorder`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `cfg_overviewqueries`
+-- Table structure for table `cfg_overviewqueries`
 --
 
 CREATE TABLE IF NOT EXISTS `cfg_overviewqueries` (
@@ -156,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `cfg_overviewqueries` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=20 ;
 
 --
--- Daten für Tabelle `cfg_overviewqueries`
+-- Dumping data for table `cfg_overviewqueries`
 --
 
 INSERT INTO `cfg_overviewqueries` (`id`, `name`, `query`, `unit`, `alert_comp`, `alert_val`, `alert_col`, `notforlibclient`, `pollfreq`, `parent`, `sortorder`) VALUES
@@ -183,7 +179,7 @@ INSERT INTO `cfg_overviewqueries` (`id`, `name`, `query`, `unit`, `alert_comp`, 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `cfg_queries`
+-- Table structure for table `cfg_queries`
 --
 
 CREATE TABLE IF NOT EXISTS `cfg_queries` (
@@ -209,7 +205,7 @@ CREATE TABLE IF NOT EXISTS `cfg_queries` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=52 ;
 
 --
--- Daten für Tabelle `cfg_queries`
+-- Dumping data for table `cfg_queries`
 --
 
 INSERT INTO `cfg_queries` (`id`, `name`, `label`, `tsmquery`, `fields`, `timetablefields`, `info`, `orderby`, `alert_comp`, `alert_val`, `alert_field`, `alert_col`, `notforlibclient`, `polltype`, `pollfreq`, `parent`, `sortorder`) VALUES
@@ -236,7 +232,7 @@ INSERT INTO `cfg_queries` (`id`, `name`, `label`, `tsmquery`, `fields`, `timetab
 (21, 'backups_24h', 'Backup Times / 24h', 'SELECT entity AS "Node_name", CAST(sum(bytes/1024/1024/1024) AS decimal(8,3)) AS "GB_xfer", start_time, end_time, END_TIME-START_TIME as duration, comm_wait, Affected, Failed, Successful FROM summary WHERE activity=''BACKUP'' AND start_time>=current_timestamp - 24 hours group by start_time, end_time, Successful,Examined,Affected,Failed,entity,comm_wait', '`timestamp` int(11), `Node Name` varchar(64), `TX/GB` varchar(30), `Start Time` varchar(26), `End Time` varchar(26), `Duration` varchar(30), `Comm Wait` int(11), `Files` int(11), `Failed` int(11), `OK?` varchar(3) ', '`Node Name`, `Start Time`, `End Time`, `OK?`', 'This query gives you an overview over all backups performed during the last 24 hours.', 'Start Time', 'equal', 'NO', 'Successful', 'alarm', 0, 'update', 15, 'backup', 30),
 (23, 'archivestatus_24h', 'Archive Status / 24h', 'select Entity, Successful, cast(float(sum(bytes))/1024/1024/1024 as dec(8,3)) as GB, Examined, Affected, Failed from summary where activity=''ARCHIVE'' and cast((current_timestamp-start_time)hours as decimal(8,0)) LESS 24 group by Entity,Successful,Examined,AFFECTED,Failed', '`timestamp` int(11), `Entity` varchar(64), `Successful` varchar(3), `GB` varchar(30), `Examined` int(11), `Affected` int(11), `Failed` int(11), UNIQUE KEY `Entity` (`Entity`,`GB`,`Examined`,`Affected`,`Failed`) ', NULL, 'A list of all archives that have been started during the last 24 hours', 'Successful', 'equal', 'NO', 'Successful', 'alarm', 0, 'update', 15, 'backup', 60),
 (24, 'archives_all', 'Archive Times', 'SELECT entity AS "Node_name", CAST(sum(bytes/1024/1024/1024) AS decimal(8,3)) AS "GB_xfer", start_time, end_time, END_TIME-START_TIME as duration, comm_wait, Affected, Failed, Successful FROM summary WHERE activity=''ARCHIVE'' group by start_time, end_time, Successful,Examined,Affected,Failed,entity,comm_wait', '`timestamp` int(11), `Node Name` varchar(64), `TX/GB` varchar(30), `Start Time` varchar(26), `End Time` varchar(26), `Duration` varchar(30), `Comm Wait` int(11), `Files` int(11), `Failed` int(11), `OK?` varchar(3), UNIQUE KEY `Node Name` (`Node Name`,`Start Time`,`End Time`,`Comm Wait`) ', '`Node Name`, `Start Time`, `End Time`, `OK?`', 'Search for a node name and get a list of all archives performed on this node', 'Start Time', 'equal', 'NO', 'Successful', 'alarm', 0, 'append', 15, 'backup', 70),
-(25, 'archives_24', 'Archive Times / 24h', 'SELECT entity AS "Node_name", CAST(sum(bytes/1024/1024/1024) AS decimal(8,3)) AS "GB_xfer", start_time, end_time, END_TIME-START_TIME as duration, comm_wait, Affected, Failed, Successful FROM summary WHERE activity=''ARCHIVE'' AND start_time>=current_timestamp - 24 hours group by start_time, end_time, Successful,Examined,Affected,Failed,entity,comm_wait', '`timestamp` int(11), `Node Name` varchar(64), `TX/GB` varchar(30), `Start Time` varchar(26), `End Time` varchar(26), `Duration` varchar(30), `Comm Wait` int(11), `Files` int(11), `Failed` int(11), `OK?` varchar(3), UNIQUE KEY `Node Name` (`Node Name`,`Start Time`,`End Time`,`Comm Wait`) ', '`Node Name`, `Start Time`, `End Time`, `OK?`', 'This query gives you an overview over all archives performed during the last 24 hours.', 'Start Time', 'equal', 'NO', 'Successful', 'alarm', 0, 'append', 15, 'backup', 80),
+(25, 'archives_24h', 'Archive Times / 24h', 'SELECT entity AS "Node_name", CAST(sum(bytes/1024/1024/1024) AS decimal(8,3)) AS "GB_xfer", start_time, end_time, END_TIME-START_TIME as duration, comm_wait, Affected, Failed, Successful FROM summary WHERE activity=''ARCHIVE'' AND start_time>=current_timestamp - 24 hours group by start_time, end_time, Successful,Examined,Affected,Failed,entity,comm_wait', '`timestamp` int(11), `Node Name` varchar(64), `TX/GB` varchar(30), `Start Time` varchar(26), `End Time` varchar(26), `Duration` varchar(30), `Comm Wait` int(11), `Files` int(11), `Failed` int(11), `OK?` varchar(3), UNIQUE KEY `Node Name` (`Node Name`,`Start Time`,`End Time`,`Comm Wait`) ', '`Node Name`, `Start Time`, `End Time`, `OK?`', 'This query gives you an overview over all archives performed during the last 24 hours.', 'Start Time', 'equal', 'NO', 'Successful', 'alarm', 0, 'append', 15, 'backup', 80),
 (27, 'clientscheddef', 'Client Schedules Definitions', 'select schedule_name, domain_name, description, action, priority, starttime, period, perunits, dayofweek, sched_style from client_schedules', '`timestamp` int(11), `Schedule Name` varchar(30), `Domain` varchar(30), `Description` varchar(255), `Action` varchar(30), `Prio` int(2), `Start` varchar(26), `Period` int(2), `Unit` varchar(30), `Day of Week` varchar(30), `Style` varchar(30) ', NULL, 'A list of all client schedules defined in the current tsm server.', 'Schedule Name', '', '', '', '', 0, 'snapshot', 15, 'schedules', 10),
 (28, 'clientschedules', 'Client Schedules Results', 'select node_name, schedule_name, scheduled_start, ACTUAL_START,COMPLETED, status, result, reason from events where scheduled_start >= current_timestamp - 24 hours and node_name != '''' and status != ''Future'' and status != ''Started''', '`timestamp` int(11), `Node Name` varchar(64), `Schedule Name` varchar(30), `Scheduled Start` varchar(26), `Actual Start` varchar(26), `End Time` varchar(26), `Status` varchar(30), `Result` int(11), `Reason` int(11), UNIQUE KEY `Node Name` (`Node Name`,`Schedule Name`,`Scheduled Start`,`Actual Start`,`End Time`)', '`Node Name`,`Actual Start`, `End Time`, `Status`', 'This query shows the start times and results of all client schedule that were scheduled during the last 24 hours.', 'Node Name', 'notequal', 'Completed', 'Status', 'alarm', 0, 'append', 15, 'schedules', 20),
 (30, 'adminscheddef', 'Admin Schedules Definitions', 'select schedule_name, command, description, active, priority, starttime, period, perunits, dayofweek, sched_style from admin_schedules', '`timestamp` int(11), `Schedule Name` varchar(30), `Command` varchar(255), `Description` varchar(255), `Active?` varchar(3), `Prio` int(2), `Start` varchar(26), `Period` int(30), `Unit` varchar(30), `Day of Week` varchar(30), `Style` varchar(30) ', NULL, 'A list of all administrative schedules defined in the current tsm server.', 'Schedule Name', '', '', '', '', 0, 'snapshot', 15, 'schedules', 40),
@@ -263,7 +259,7 @@ INSERT INTO `cfg_queries` (`id`, `name`, `label`, `tsmquery`, `fields`, `timetab
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `cfg_servers`
+-- Table structure for table `cfg_servers`
 --
 
 CREATE TABLE IF NOT EXISTS `cfg_servers` (
@@ -277,10 +273,10 @@ CREATE TABLE IF NOT EXISTS `cfg_servers` (
   `libraryclient` int(1) NOT NULL default '0',
   `default` int(1) NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
 
 --
--- Daten für Tabelle `cfg_servers`
+-- Dumping data for table `cfg_servers`
 --
 
 INSERT INTO `cfg_servers` (`id`, `servername`, `description`, `ip`, `port`, `username`, `password`, `libraryclient`, `default`) VALUES
@@ -291,7 +287,7 @@ INSERT INTO `cfg_servers` (`id`, `servername`, `description`, `ip`, `port`, `use
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `cfg_users`
+-- Table structure for table `cfg_users`
 --
 
 CREATE TABLE IF NOT EXISTS `cfg_users` (
@@ -301,10 +297,10 @@ CREATE TABLE IF NOT EXISTS `cfg_users` (
   `stylesheet` varchar(35) collate utf8_unicode_ci NOT NULL default 'default.css',
   `role` varchar(35) collate utf8_unicode_ci NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=16 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
 --
--- Daten für Tabelle `cfg_users`
+-- Dumping data for table `cfg_users`
 --
 
 INSERT INTO `cfg_users` (`id`, `username`, `password`, `stylesheet`, `role`) VALUES
@@ -313,7 +309,7 @@ INSERT INTO `cfg_users` (`id`, `username`, `password`, `stylesheet`, `role`) VAL
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `log_hashes`
+-- Table structure for table `log_hashes`
 --
 
 CREATE TABLE IF NOT EXISTS `log_hashes` (
@@ -323,11 +319,15 @@ CREATE TABLE IF NOT EXISTS `log_hashes` (
   UNIQUE KEY `tablename` (`tablename`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+--
+-- Dumping data for table `log_hashes`
+--
+
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `log_polldlog`
+-- Table structure for table `log_polldlog`
 --
 
 CREATE TABLE IF NOT EXISTS `log_polldlog` (
@@ -339,11 +339,15 @@ CREATE TABLE IF NOT EXISTS `log_polldlog` (
   `timeneeded` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+--
+-- Dumping data for table `log_polldlog`
+--
+
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `log_polldstat`
+-- Table structure for table `log_polldstat`
 --
 
 CREATE TABLE IF NOT EXISTS `log_polldstat` (
@@ -355,7 +359,7 @@ CREATE TABLE IF NOT EXISTS `log_polldstat` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Daten für Tabelle `log_polldstat`
+-- Dumping data for table `log_polldstat`
 --
 
 INSERT INTO `log_polldstat` (`id`, `enabled`, `status`, `lastrun`, `nextrun`) VALUES
