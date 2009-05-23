@@ -47,6 +47,7 @@ class PollD {
 	var $overviewqueries;
 	var $adodb;
 	var $debuglevel; // VERBOSE=4, INFO=3, WARN=2, ERROR=1, OFF=0
+    var $loghandle;
 
 	var $log_timeneeded;
 	var $log_unchangedresult;
@@ -65,6 +66,15 @@ class PollD {
 
 		$this->setDebuglevel("INFO");
 		$this->adodb = $adodb;
+        $sql = "select confval from cfg_config WHERE `confkey`='loglevel_polld'";
+        $loglevel = $this->adodb->fetchArrayDB($sql);
+        $loglevel = strtoupper($loglevel[0][confval]);
+        $this->setDebuglevel("$loglevel");
+        $sql = "select confval from cfg_config WHERE `confkey`='path_polldlog'";
+        $logfile = $this->adodb->fetchArrayDB($sql);
+        if ($logfile[0][confval] != "") {
+            $this->loghandle = fopen($logfile[0][confval], 'at');
+        }
 		$this->servers = $this->getServers();
 		$this->queries = $this->getQueries();
 		$this->overviewqueries = $this->getOverviewQueries();
@@ -101,7 +111,12 @@ class PollD {
 		}
 
 		if ($this->debuglevel >= $ilevel) {
-			echo $level.": ".$msg;
+            if ($this->loghandle) {
+                fwrite($this->loghandle, $level.": ".$msg);
+            }
+            else {
+                echo $level.": ".$msg;
+            }
 		}
 	}
 
@@ -347,6 +362,8 @@ class PollD {
 	 * @param string $timestamp
 	 */
 	function pollQuery($query = "", $server = "", $ignorePollFreq = TRUE, $timestamp){
+        $starttquery = time();
+        $querytime = 0;
 
 		$queryname = $query["name"];
 		$tablename = "res_".$queryname."_".$server["servername"];
@@ -391,10 +408,12 @@ class PollD {
 							$this->writeMSG("Error while inserting into table (".$insertquery.")", "ERROR");
 						}
 					}
-					$this->writeMSG("inserted new rows into ".$tablename."\n", "INFO");
+                    $querytime = time() - $starttquery;
+					$this->writeMSG("inserted new rows into ".$tablename." ($querytime sec)\n", "INFO");
 					$this->log_updated++;
 				} else {
-					$this->writeMSG("no need to update result -> result is the same as last time\n", "INFO");
+                    $querytime = time() - $starttquery;
+					$this->writeMSG("no need to update result -> result is the same as last time ($querytime sec)\n", "INFO");
 					$this->log_unchangedresult++;
 				}
 			} else {
@@ -416,6 +435,8 @@ class PollD {
 	 * @param string $timestamp
 	 */
 	function pollOverviewQuery($query = "", $server = "", $timestamp){
+        $starttquery = time();
+        $querytime = 0;
 
 		$tablename = "res_overview_".$server["servername"];
 		$this->writeMSG("---------".$query["name"].": ", "INFO");
@@ -426,7 +447,8 @@ class PollD {
 		if ($result != "") {
 			foreach ($result["sql"] as $insertquery) {
 				$this->adodb->execDB($insertquery);
-				$this->writeMSG("inserted row\n", "INFO");
+                $querytime = time() - $starttquery;
+				$this->writeMSG("inserted row ($querytime sec)\n", "INFO");
 			}
 		} else {
 			$this->writeMSG("There was a problem querying the TSM Server ".$server["servername"]."!\n", "ERROR");
@@ -602,11 +624,13 @@ class PollD {
 				$this->writeMSG("needed ".(time()-$timestamp)." seconds for this run.\n", "INFO");
 				//$tempsleeptime = $sleeptime-(time()-$timestamp);
 				$tempsleeptime = 900 -(time()-$timestamp);
+                if ($tempsleeptime < 0) {
+                    $tempsleeptime = 0;
+                }
 				$this->writeMSG("sleeping for ".$tempsleeptime." seconds...\n", "WARN");
 				$this->writeMSG("next run will be at ".strftime("%H:%M:%S", (time()+$tempsleeptime))."\n\n", "WARN");
 
 				$this->setPollDStatus("sleeping", $timestamp, (time()+$tempsleeptime));
-
 
 				sleep ($tempsleeptime);
 
