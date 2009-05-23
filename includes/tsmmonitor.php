@@ -728,6 +728,8 @@ class TSMMonitor {
 				while(list($keycell, $valcell) = each($row)) {
 					if ($keycell == "id") {
 						$id = $valcell;
+                    } else if ($valcell == "version") {
+                        continue 2;
 					} else {
 						$modrow[$keycell] = $valcell;
 					}
