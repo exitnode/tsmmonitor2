@@ -249,7 +249,7 @@ if ($_POST["css"] != "") {
 											} else {
 												$val = $_POST["txt".$col['Field']];
 											}
-											if ($val != "") {
+//											if ($val != "") {
 												if ($_POST['AddSave'] == "Save") {
 													$colarray["`".$col['Field']."`"] = $val;
 													$sqlcols .= $col['Field'];
@@ -261,7 +261,7 @@ if ($_POST["css"] != "") {
 													$set .= $col['Field']."='".$val."'";
 													$set .= ", ";
 												}
-											}
+//											}
 										}
 									}
 									$sqlcols = ereg_replace(", $", "", $sqlcols);

@@ -74,6 +74,9 @@ class PollD {
         $logfile = $this->adodb->fetchArrayDB($sql);
         if ($logfile[0][confval] != "") {
             $this->loghandle = fopen($logfile[0][confval], 'at');
+            if (!$this->loghandle) {
+                echo "ERROR: Cannot open logfile: '".$logfile[0][confval]."' for writing. Falling back to STDOUT.\n";
+            }
         }
 		$this->servers = $this->getServers();
 		$this->queries = $this->getQueries();
@@ -253,6 +256,7 @@ class PollD {
 					if ($blank == "") {
 						$read = preg_replace('/[\n]+/', '', $read);
 						$read = ereg_replace("\t","\",\"",$read);
+						$read = ereg_replace("\\\\",'\\\\',$read);
 						if ($overviewname == '') {
 							$out[] = 'INSERT IGNORE INTO '.$restable.' values ("'.$timestamp.'", "'.$read.'")';
 						} else {

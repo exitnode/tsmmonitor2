@@ -746,7 +746,7 @@ class TSMMonitor {
 				$i++;
 			} else {
 				$outp = $this->adodb->fetchArrayDB($sql);
-				var_dump($outp);
+				//var_dump($outp);
 			}
 		}
 		return $outp;
