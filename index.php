@@ -24,9 +24,9 @@
 /**
  *
  * index.php, TSM Monitor
- * 
+ *
  * main php file
- * 
+ *
  * @author Michael Clemens
  * @package tsmmonitor
  */
@@ -44,9 +44,9 @@ include_once "includes/page_head.php";
 		<td id="tnright">
 		<div id="tnbox1">
 
-			<?php 
+			<?php
 			if ( $_SESSION["logindata"]["loggedin"] && !in_array($tsmmonitor->GETVars['qq'], array("admin", "serverlist", "custom", "polldstat", "index", "overview", "")) && !strstr($tsmmonitor->GETVars['qq'], 'table') ) {
-				echo $tsmmonitor->getSearchfield();  
+				echo $tsmmonitor->getSearchfield();
 			}
 			?>
 
@@ -153,11 +153,14 @@ include_once "includes/page_head.php";
 						} else {
 
 							$whereclause = array();
-							$whereclause["field"] = $_POST["wcfield"];
+    						$whereclause["field"] = $_POST["wcfield"];
 							$whereclause["val"] = $_POST["wcval"];
 							$whereclause["op"] = $_POST["wcop"];
-							//}
-							if ($whereclause["field"]!="" && $whereclause["val"]!="") {
+                            if ($whereclause["op"] == 'LIKE') {
+                                $whereclause["val"] = ereg_replace("\*","%",$whereclause["val"]);
+                                $_POST["wcval"] = $whereclause["val"];
+                            }
+							if ($whereclause["field"] != "" && $whereclause["val"] != "") {
 								if ($_POST["Clear"] == "Clear") {
 									$_SESSION["search"][$tsmmonitor->GETVars['qq']] = "";
 								} else {
@@ -207,7 +210,7 @@ include_once "includes/page_head.php";
 
 			}
 			$_SESSION['from'] = $tsmmonitor->GETVars['qq'];
-			session_write_close(void); 
+			session_write_close(void);
 	?>
 
 		</td>

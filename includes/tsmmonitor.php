@@ -23,9 +23,9 @@
 /**
  *
  * tsmmonitor.php, TSM Monitor
- * 
+ *
  * TSM Monitor main class
- * 
+ *
  * @author Michael Clemens
  * @package tsmmonitor
  */
@@ -57,9 +57,9 @@ class TSMMonitor {
 
 
 	/**
-	 * TSMMonitor 
-	 * 
-	 * @param mixed $adodb 
+	 * TSMMonitor
+	 *
+	 * @param mixed $adodb
 	 * @access public
 	 * @return void
 	 */
@@ -131,8 +131,8 @@ class TSMMonitor {
 
 		//Cleanup
 		if ($_SESSION["from"] != $_GET['q']) {
-			$_SESSION['timemachine'] = "";	
-			$_SESSION['tabletype'] = "";	
+			$_SESSION['timemachine'] = "";
+			$_SESSION['tabletype'] = "";
 		}
 
 		// BEGIN Timemachine
@@ -194,21 +194,23 @@ class TSMMonitor {
 
 		if (($recordSet) || ($this->adodb->conn->ErrorNo() == 0)) {
 			$total_rows = $recordSet->RecordCount($recordSet);
-			$this->max_pages = ceil($total_rows/$rows_per_page);
+            if ($total_rows > 0 ) {
+                $this->max_pages = ceil($total_rows/$rows_per_page);
 
-			if($this->page > $this->max_pages || $this->page <= 0) {
-				$this->page = 1;
-			}
-			$offset = $rows_per_page * ($this->page-1);
-			$endset = $offset + $rows_per_page;
-			$recordSet->Move($offset);
+                if($this->page > $this->max_pages || $this->page <= 0) {
+                	$this->page = 1;
+                }
+                $offset = $rows_per_page * ($this->page-1);
+                $endset = $offset + $rows_per_page;
+                $recordSet->Move($offset);
 
-			while (($recordSet->CurrentRow() < $endset) && ($recordSet->CurrentRow() < $total_rows) && ($recordSet)) {
-				$recordArray{sizeof($recordArray)} = $recordSet->fields;
-				$recordSet->MoveNext();
-			}
-			$recordSet->close();
-			return($recordArray);
+                while (($recordSet->CurrentRow() < $endset) && ($recordSet->CurrentRow() < $total_rows) && ($recordSet)) {
+                	$recordArray{sizeof($recordArray)} = $recordSet->fields;
+                	$recordSet->MoveNext();
+                }
+                $recordSet->close();
+            }
+            return($recordArray);
 		} else {
 			echo "<p style='font-size: 16px; font-weight: bold; color: red;'>Database Error (".$this->conn->ErrorNo().")</p>\n<p>".$this->conn->ErrorMsg()."</p>";
 			exit;
@@ -351,7 +353,7 @@ class TSMMonitor {
 			}
 			foreach ($this->getTimestampsOfADay($_SESSION['timemachine']['date']) as $ts) {
 				$ret .= "<option value='".$ts['timestamp']."'";
-				if ($_SESSION['timemachine']['time'] == $ts['timestamp'])	{ 
+				if ($_SESSION['timemachine']['time'] == $ts['timestamp']) {
 					$ret .= " SELECTED ";
 				}
 				$ret .= "> ".strftime('%H:%M:%S', $ts['timestamp'])."</option>";
@@ -416,7 +418,7 @@ class TSMMonitor {
 				$key = "admin.php";
 			}else if ($val['label'] == "TSM Monitor") {
 				$key = "index.php";
-			} 
+			}
 
 			if ($val['label'] == "trennlinie") {
 				$links .= "<br>\n";
@@ -562,7 +564,7 @@ class TSMMonitor {
 			}
 			$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&so=".$sonew."'";
 			$label = $fieldnames[0]['Field'];
-			$tableheader = $tableheader."<th><a class='navhead' ".$link.">".$label." ".$arrow."</a></th>";    
+			$tableheader = $tableheader."<th><a class='navhead' ".$link.">".$label." ".$arrow."</a></th>";
 		}
 		if ($isAdmin) {
 			$tableheader = $tableheader."<th colspan=2><a class='navhead'></a></th>";
@@ -573,7 +575,7 @@ class TSMMonitor {
 
 
 	/**
-	 * checkLogin - processes login procedure and sets loggedin property in SESSION 
+	 * checkLogin - processes login procedure and sets loggedin property in SESSION
 	 *
 	 */
 	function checkLogin() {
@@ -590,7 +592,7 @@ class TSMMonitor {
 
 			if ($ret[0] != "" && $ret[0]['password'] == md5($pass)) {
 				$_SESSION["logindata"]["role"] = $ret[0]['role'];
-				if (!$isAdmin || ($isAdmin && $ret[0]['role'] == "admin")) { 
+				if (!$isAdmin || ($isAdmin && $ret[0]['role'] == "admin")) {
 					$_SESSION["logindata"]["loggedin"] = TRUE;
 				}
 			} else {
@@ -609,7 +611,7 @@ class TSMMonitor {
 	 *
 	 * @param string $comperator
 	 * @param string $alertval the value which will trigger an alert
-	 * @param string $val the value that will be checked 
+	 * @param string $val the value that will be checked
 	 * @return boolean
 	 */
 	function checkAlert($comperator = '', $alertval = '', $val = '') {
@@ -692,9 +694,9 @@ class TSMMonitor {
 
 
 	/**
-	 * getTableFields 
-	 * 
-	 * @param string $tablename 
+	 * getTableFields
+	 *
+	 * @param string $tablename
 	 * @access public
 	 * @return void
 	 */
@@ -798,7 +800,7 @@ class TSMMonitor {
 		$outp = '';
 		$outp_cache = '';
 		$stop=FALSE;
-		$tablearray = array(); 
+		$tablearray = array();
 		$bContinue = TRUE;
 
 		if ($this->GETVars['ob'] != '' ) {
@@ -858,7 +860,7 @@ class TSMMonitor {
         } else {
             $lpp = 20;
         }
-            
+
 		if ($bContinue) {
 			if ($type == "table") {
 				$i = 0;
@@ -902,11 +904,11 @@ class TSMMonitor {
 
 		return $outp;
 	}
-	
+
 
 	/**
 	 * renderZebraTableRow - returns HTML code for one zebra tabel row
-	 * 
+	 *
 	 * @param mixed $row array of fields
 	 * @param mixed $shade 1 or 0
 	 * @param mixed $alarmcol column which should be colored in alarm color
@@ -964,14 +966,23 @@ class TSMMonitor {
 		$arrval = "";
 		$arrop = "";
 
-		$operators = array ("<", "=", "<>", ">");
-
-		$searcharr = $_SESSION["search"][$this->GETVars['qq']];
-		if (isset($searcharr)) {
-			$arrfield = $searcharr["field"];    
-			$arrval = $searcharr["val"];    
-			$arrop = $searcharr["op"];    
-		}
+		$operators = array ("<", "=", "<>", ">", "LIKE");
+        $searcharr = $_SESSION["search"][$this->GETVars['qq']];
+        if ($_POST["wcfield"] != "") {
+            $arrfield = $_POST["wcfield"];
+        } else if (isset($searcharr)){
+            $arrfield = $searcharr["field"];
+        }
+        if ($_POST["wcval"] != "") {
+            $arrval = $_POST["wcval"];
+        } else if (isset($searcharr)){
+            $arrval = $searcharr["val"];
+        }
+        if ($_POST["wcop"] != "") {
+            $arrop = $_POST["wcop"];
+        } else if (isset($searcharr)){
+            $arrop = $searcharr["op"];
+        }
 		$sql = "SHOW COLUMNS FROM res_".$this->configarray["queryarray"][$this->GETVars['qq']]["name"]."_".$this->GETVars['server'];
 		$fieldnames = $this->adodb->fetchArrayDB($sql);
 
@@ -987,7 +998,7 @@ class TSMMonitor {
 		$fieldbox.= "</select>";
 
 		// Build Operator Combobox
-		if ($arrop=="") $arrop="=";
+		if ($arrop == "") $arrop="=";
 		$opbox = "<select name='wcop' size=1 onChange='' class='button topnavbutton'>";
 		foreach ($operators as $op) {
 			$opbox.= '<option value="'.$op.'"';
@@ -1142,7 +1153,7 @@ class TSMMonitor {
 			} else {
 				$errorcolor = "ok";
 			}
-			
+
 			$cellprop = array();
 			$cellprop["name"] = "width='50%'";
 			$cellprop["result"] = "align='center'";
@@ -1273,7 +1284,7 @@ class TSMMonitor {
 				$end = ($valrow[2]-$startpunkt)/$faktor;
 				$duration = $end - $start;
 				// fake a longer time for better visibility
-				if ($duration < 2) {$duration=2;} 
+				if ($duration < 2) {$duration=2;}
 				// cut the bar at the right side to fit into table
 				if (($start+$duration)>$lastpoint) {
 					$duration = $lastpoint-$start;
