@@ -47,8 +47,9 @@ class TSMMonitor {
 	var $max_pages;
 	var $timetablestarttime;
 
-	var $submenu;
+	var $menu;
 	var $adminmenu;
+    var $menuindent = 0;
 	var $message;
 	var $adodb;
 
@@ -121,7 +122,7 @@ class TSMMonitor {
 			$_SESSION['timeshift'] = 0 ;
 		}
 
-		$this->submenu = $this->configarray["menuarray"][$this->GETVars['menu']];
+		$this->menu = $this->configarray["menuarray"];
 		$this->adminmenu = $this->configarray["adminmenuarray"];
 		//$query = $this->configarray["queryarray"][$this->GETVars['qq']]["tsmquery"];
 		$this->queryarray = $this->configarray["queryarray"];
@@ -301,10 +302,13 @@ class TSMMonitor {
 	 */
 	function GetBetween($content,$start,$end) {
 		$r = explode($start, $content);
-		if (isset($r[1])) {
+		if (isset($r[1]) && $end != "") {
 			$r = explode($end, $r[1]);
 			return $r[0];
 		}
+        else {
+            return $r[1];
+        }
 		return '';
 	}
 
@@ -377,10 +381,16 @@ class TSMMonitor {
 	function getMenu($menu = '', $activelink = '', $type) {
 
 		if (!isset($menu)) { return ""; };
+        $this->menuindent++;
+        for ($i=1;$i<$this->menuindent;$i++){
+            $indent .= "&nbsp;&nbsp;&nbsp;";
+        }
 		while(list($key, $val) = each($menu)) {
 
 			$bCont = TRUE;
 			$q = $this->GetBetween($key,"q=","&m=");
+			$m = $this->GetBetween($key,"&m=","");
+            $okey = $key;
 			if ($this->configarray["queryarray"][$q]["notforlibclient"] == 1 && $this->configarray["serverlist"][$this->GETVars['server']]["libraryclient"] == 1) {
 				$bCont = FALSE;
 
@@ -391,23 +401,27 @@ class TSMMonitor {
 				$key .= "&s=".$this->GETVars['server'];
 			}
 
-			if ($val == "Admin") {
+			if ($val['label'] == "Admin") {
 				$key = "admin.php";
-			}else if ($val == "TSM Monitor") {
+			}else if ($val['label'] == "TSM Monitor") {
 				$key = "index.php";
 			} 
 
-			if ($val == "trennlinie") {
+			if ($val['label'] == "trennlinie") {
 				$links .= "<br>\n";
 			} else if ($bCont) {
 
 				if (!stristr($key,$activelink)) {
-					$links .= "<a href=\"$key\">$val</a>\n";
+					$links .= "<a href=\"$key\">$indent".$val['label']."</a>\n";
 				} else {
-					$links .= "<div class=\"aktuell\">$val</div>\n";
+					$links .= "<div class=\"aktuell\">$indent".$val['label']."</div>\n";
 				}
 			}
+            if ($this->GETVars['menu'] == $m) {
+                $links .= $this->getMenu($menu[$okey]['sub'], $activelink, $type);
+            }
 		}
+        $this->menuindent--;
 		return $links;
 	}
 
@@ -1328,20 +1342,21 @@ class TSMMonitor {
 		$menuarray = array();
 		$mainmenuarray = array();
 
+		$mainmenuarray["q=index&m=main"]['label'] = "Overview";
 		while (list ($key, $val) = each ($mainmenutablerows)) {
 			$menuname = $val['name'];
 			$menulabel = $val['label'];
 			$url = "q=overview&m=".$menuname;
-			$mainmenuarray[$url] = $menulabel;
+			$mainmenuarray[$url]['label'] = $menulabel;
 		}
 
 		$menuarrayxml = $queryconfigarray["navigation"]["mainmenuitem"];
 		$mainmenuarrayxml = $menuarrayxml;
-		$mainmenuarray["trennlinie"] = "trennlinie";
-		$mainmenuarray["q=polldstat&m=main"] = "Polling Daemon Log";
-		$mainmenuarray["q=serverlist&m=main"] = "Change Server";
-		if ($_SESSION["logindata"]["role"] == "admin") $mainmenuarray["admin"] = "Admin";
-		$mainmenuarray["q=logout"] = "Logout";
+		$mainmenuarray["trennlinie"]['label'] = "trennlinie";
+		$mainmenuarray["q=polldstat&m=main"]['label'] = "Polling Daemon Log";
+		$mainmenuarray["q=serverlist&m=main"]['label'] = "Change Server";
+		if ($_SESSION["logindata"]["role"] == "admin") $mainmenuarray["admin"]['label'] = "Admin";
+		$mainmenuarray["q=logout"]['label'] = "Logout";
 		$menuarray["main"] = $mainmenuarray;
 
 		$query = "SELECT * from cfg_mainmenu";
@@ -1354,38 +1369,32 @@ class TSMMonitor {
 			$menuname = $val['name'];
 			$menulabel = $val['label'];
 			$submenuarray = array();
-			$submenuarray[""] = "<---";
 			$query = "SELECT * from cfg_queries where parent='".$menuname."'";
 			$querytablerows = $this->adodb->fetchArrayDB($query);
 			while (list ($subkey, $submenuitem) = each ($querytablerows)) {
 				$submenuitem_name = $submenuitem['name'];
 				$submenuitem_label = $submenuitem['label'];
 				$url = "q=".$submenuitem_name."&m=".$menuname;
-				$submenuarray[$url] = $submenuitem_label;
+				$submenuarray[$url]['label'] = $submenuitem_label;
 			}
-			$submenuarray["trennlinie"] = "trennlinie";
-			$submenuarray["q=polldstat&m=".$submenu['name']] = "Polling Daemon Log";
-			$submenuarray["q=serverlist&m=".$submenu['name']] = "Change Server";
-			if ($_SESSION["logindata"]["role"] == "admin") $submenuarray["admin"] = "Admin";
-			$submenuarray["q=logout"] = "Logout";
-			$menuarray[$menuname] = $submenuarray;
+			$menuarray['main']["q=overview&m=".$menuname]['sub'] = $submenuarray;
 		}
 
 		$retArray["menuarray"] = $menuarray;
 
 		// Admin Backend Menu
 		$adminmenuarray = array();
-		$adminmenuarray["q=config&m=main"] = "General";
-		$adminmenuarray["q=users&m=main"] = "Users";
-		$adminmenuarray["q=groups&m=main"] = "Groups";
-		$adminmenuarray["q=servers&m=main"] = "Servers";
-		$adminmenuarray["q=mainmenu&m=main"] = "Mainmenu";
-		$adminmenuarray["q=queries&m=main"] = "Queries";
-		$adminmenuarray["trennlinie"] = "trennlinie";
-		$adminmenuarray["q=settings&m=main"] = "Settings";
-		$adminmenuarray["trennlinie2"] = "trennlinie";
-		$adminmenuarray["tsmmonitor"] = "TSM Monitor";
-		$adminmenuarray["q=logout"] = "Logout";
+		$adminmenuarray["q=config&m=main"]['label'] = "General";
+		$adminmenuarray["q=users&m=main"]['label'] = "Users";
+		$adminmenuarray["q=groups&m=main"]['label'] = "Groups";
+		$adminmenuarray["q=servers&m=main"]['label'] = "Servers";
+		$adminmenuarray["q=mainmenu&m=main"]['label'] = "Mainmenu";
+		$adminmenuarray["q=queries&m=main"]['label'] = "Queries";
+		$adminmenuarray["trennlinie"]['label'] = "trennlinie";
+		$adminmenuarray["q=settings&m=main"]['label'] = "Settings";
+		$adminmenuarray["trennlinie2"]['label'] = "trennlinie";
+		$adminmenuarray["tsmmonitor"]['label'] = "TSM Monitor";
+		$adminmenuarray["q=logout"]['label'] = "Logout";
 		$retArray["adminmenuarray"] = $adminmenuarray;
 
 		// Overview Boxes

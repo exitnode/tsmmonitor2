@@ -62,7 +62,7 @@ include_once "includes/page_head.php";
 		<!-- Start left navigation menu -->
 		<td id="menue">
 			<div class="menuelinks">
-				<?php echo $tsmmonitor->getMenu( $tsmmonitor->submenu, "index.php?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']."&s=".$tsmmonitor->GETVars['server'], "index" );  ?>
+				<?php echo $tsmmonitor->getMenu( $tsmmonitor->menu['main'], "index.php?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']."&s=".$tsmmonitor->GETVars['server'], "index" );  ?>
 			</div>
 			<br>
 			<div class='menuelinks' id='datechooser'>
