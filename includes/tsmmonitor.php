@@ -241,7 +241,6 @@ class TSMMonitor {
 		$pp = '&lt;&lt;';
 
 		if($this->page != 1) {
-			//$fp =  '<a class="tablefooter" href="'.$self.'?'.$urlappend.'&page=1">'.$fp.'</a>';
 			$fp =  $navelement.'1">'.$fp.'</a>';
 		}
 
@@ -282,10 +281,23 @@ class TSMMonitor {
 				$numbers .= ' '.$navelement.$i.'">'.$i.'</a> ';
 			}
 		}
+
+		$lines = array ("20", "50", "100", "200", "500");
+		$linesel = $_SESSION["lines"][$this->GETVars['qq']];
+		if ($linesel == "") $linesel = "20";
+        $linebox = "<form action=".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server']." method='post'><select name='lpp' size=1 onChange='submit();' class='button topnavbutton'>";
+
+		foreach ($lines as $line) {
+			$linebox .= '<option value="'.$line.'"';
+			if ($linesel == $line) {$linebox.= "SELECTED";}
+			$linebox .=  '> '.$line.' </option>';
+        }
+        $linebox .= "</select></form>";
+
 		if ($end > 1) {
-			return $fp.'&nbsp;'.$pp.'&nbsp;'.$numbers.'&nbsp;'.$np.'&nbsp;'.$lp;
+			return '<div>'.$fp.'&nbsp;'.$pp.'&nbsp;'.$numbers.'&nbsp;'.$np.'&nbsp;'.$lp.'</div><div id="tnbox2">'.$linebox.'</div>';
 		} else {
-			return "";
+			return '<div id="tnbox2">'.$linebox.'</div>';
 		}
 
 	}
@@ -842,10 +854,16 @@ class TSMMonitor {
 		$_SESSION["lastsql"] = $sql;
 		if ($sqlres) $this->message = $sql;
 
+        if ($_SESSION["lines"][$this->GETVars['qq']] != "") {
+            $lpp = $_SESSION["lines"][$this->GETVars['qq']];
+        } else {
+            $lpp = 20;
+        }
+            
 		if ($bContinue) {
 			if ($type == "table") {
 				$i = 0;
-				$rs = $this->fetchSplitArrayDB($sql,20);
+				$rs = $this->fetchSplitArrayDB($sql,$lpp);
 
 				foreach ($rs as $row) {
 					$color = "";

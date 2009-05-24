@@ -160,12 +160,22 @@ include_once "includes/page_head.php";
 									}
 								}
 							}
+                            $lines = $_POST["lpp"];
+                            if ($lines != "") {
+                                if (!isset($_SESSION["lines"])){
+                                    $temp = array();
+                                    $temp[$tsmmonitor->GETVars['qq']] = $lines;
+                                    $_SESSION["lines"] = $temp;
+                                } else {
+                                    $_SESSION["lines"][$tsmmonitor->GETVars['qq']] = $lines;
+                                }
+                            }
 							echo "<table class='zebra'>";
 							$thead = $tsmmonitor->getTableheader();
 							echo $thead;
 							echo $tsmmonitor->execute('table');
 							$nav = $tsmmonitor->showPageNavigation("40");
-							if ($nav!="") {
+							if ($nav != "") {
 								echo "<tr><td colspan='".substr_count($thead, "<th>")."' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
 							}
 							echo "</table>";
