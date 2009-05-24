@@ -95,6 +95,16 @@ include_once "includes/page_head.php";
 
 						// show polld status
 					} else if ($tsmmonitor->GETVars['qq'] == "polldstat") {
+                        $lines = $_POST["lpp"];
+                        if ($lines != "") {
+                            if (!isset($_SESSION["lines"])){
+                                $temp = array();
+                                $temp[$tsmmonitor->GETVars['qq']] = $lines;
+                                $_SESSION["lines"] = $temp;
+                            } else {
+                                $_SESSION["lines"][$tsmmonitor->GETVars['qq']] = $lines;
+                            }
+                        }
 						echo $tsmmonitor->getPollDStat();
 
 						// show serverlist

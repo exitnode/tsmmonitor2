@@ -295,10 +295,9 @@ class TSMMonitor {
         $linebox .= "</select></form>";
 
 		if ($end > 1) {
-			return '<div>'.$fp.'&nbsp;'.$pp.'&nbsp;'.$numbers.'&nbsp;'.$np.'&nbsp;'.$lp.'</div><div id="tnbox2">'.$linebox.'</div>';
-		} else {
-			return '<div id="tnbox2">'.$linebox.'</div>';
+            $navline = $fp.'&nbsp;'.$pp.'&nbsp;'.$numbers.'&nbsp;'.$np.'&nbsp;'.$lp;
 		}
+        return '<table width="100%" align="center" cellpadding="1" cellspacing="0" border=0><tr><td width="10%" align="left"></td><td width="80%" align="center">'.$navline.'</td><td width="10%" align="right">'.$linebox.'</td></tr></table>';
 
 	}
 
@@ -1078,7 +1077,13 @@ class TSMMonitor {
 
 		$sql = "SELECT * from log_polldlog where timestamp > '".(time()-86400)."' order by timestamp desc";
 		$_SESSION["lastsql"] = $sql;
-		$rs = $this->fetchSplitArrayDB($sql,20);
+        if ($_SESSION["lines"][$this->GETVars['qq']] != "") {
+            $lpp = $_SESSION["lines"][$this->GETVars['qq']];
+        } else {
+            $lpp = 20;
+        }
+
+		$rs = $this->fetchSplitArrayDB($sql,$lpp);
 		foreach ($rs as $row) {
 			$modrow = array();
 			while(list($keycell, $valcell) = each($row)) {
