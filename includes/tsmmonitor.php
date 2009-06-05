@@ -849,7 +849,6 @@ class TSMMonitor {
 
 		//execute the constructed query
 		$sql = "SELECT ".$columnnames." from res_".$qtable."_".$server.$timestampquery.$wc.$sqlappend;
-echo "TEST 1: $sql<br>\n";
 
 		$_SESSION["lastsql"] = $sql;
 		if ($sqlres) $this->message = $sql;
