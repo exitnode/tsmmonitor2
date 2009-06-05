@@ -233,7 +233,7 @@ class TSMMonitor {
 		$so = $_GET['so'];
 		$sortcol = $_GET['sort'];
 
-		$getvars = 'q='.$_GET['q'].'&m='.$_GET['m'].'&s='.$this->GETVars['server'].'&sort='.$sortcol."&so=".$so;
+		$getvars = 'q='.$_GET['q'].'&m='.$_GET['m'].'&s='.$this->GETVars['server'].'&sort='.(urlencode($sortcol))."&so=".$so;
 		$self = htmlspecialchars($_SERVER['PHP_SELF']);
 		$navelement = '<a class="tablefooter" href="'.$self.'?'.$getvars.'&page=';
 
@@ -542,8 +542,8 @@ class TSMMonitor {
 				if ($col['Field'] != "timestamp" && $col['Field'] != "id") {
 					$name = $col['Field'];
 					$arrow = "";
-					if (($this->GETVars['ob'] == $name && $this->GETVars['ob']!="") || ($this->GETVars['ob']=="" && $orderby!="" && $orderby == $name)) {
-						$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&so=".$sonew."&s=".$this->GETVars['server']."'";
+					if (($this->GETVars['ob'] == $name && $this->GETVars['ob'] != "") || ($this->GETVars['ob'] == "" && $orderby != "" && $orderby == $name)) {
+						$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".(urlencode($name))."&page=".$this->page."&so=".$sonew."&s=".$this->GETVars['server']."'";
 						if ($orderdir == "asc") {
 							$arrow = "&uarr;";
 						} else if ($orderdir == "desc") {
@@ -551,7 +551,7 @@ class TSMMonitor {
 						}
 					} else {
 						$arrow = "";
-						$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&s=".$this->GETVars['server']."'";
+						$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".(urlencode($name))."&page=".$this->page."&s=".$this->GETVars['server']."'";
 					}
 					$tableheader = $tableheader."<th><a class='navhead' ".$link.">".ucfirst($name)." ".$arrow."</a></th>";
 				}
@@ -562,7 +562,7 @@ class TSMMonitor {
 			} else if ($orderdir == "desc") {
 				$arrow = "&dArr;";
 			}
-			$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".$name."&page=".$this->page."&so=".$sonew."'";
+			$link = "href='".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&sort=".(urlencode($name))."&page=".$this->page."&so=".$sonew."'";
 			$label = $fieldnames[0]['Field'];
 			$tableheader = $tableheader."<th><a class='navhead' ".$link.">".$label." ".$arrow."</a></th>";
 		}
@@ -794,14 +794,17 @@ class TSMMonitor {
 		$server = $this->GETVars['server'];
 		$outp = '';
 		$outp_cache = '';
-		$stop=FALSE;
+		$stop = FALSE;
 		$tablearray = array();
 		$bContinue = TRUE;
+        $num_cols = array('Version', 'OS Level', 'Total GB', 'Pct of total files', 'GB', 'TX/GB', 'ELAPTIME (D HHMMSS)', 'MB', 'MB/s', 'GB sent', 'GB rcvd', 'Capacity (MB)', 'Usage (Pct)', 'Pct util', 'Pct mig', 'Pct reclaim', 'Write Err', 'Read Err', 'GB transfered');
 
 		if ($this->GETVars['ob'] != '' ) {
-			$sqlappend = " order by `".$this->GETVars['ob']."` ".$this->GETVars['orderdir'];
+            if (in_array($this->GETVars['ob'], $num_cols)) $num_order = " + 0";
+			$sqlappend = " order by (`".$this->GETVars['ob']."`".$num_order.") ".$this->GETVars['orderdir'];
 		} elseif ($this->configarray["queryarray"][$this->GETVars['qq']]["orderby"] != '') {
-			$sqlappend = " order by `".$this->configarray["queryarray"][$this->GETVars['qq']]["orderby"]."` ".$this->GETVars['orderdir'];
+            if (in_array($this->configarray["queryarray"][$this->GETVars['qq']]["orderby"], $num_cols)) $num_order = " + 0";
+			$sqlappend = " order by (`".$this->configarray["queryarray"][$this->GETVars['qq']]["orderby"]."`".$num_order.") ".$this->GETVars['orderdir'];
 		}
 
 		$qtable = $this->configarray["queryarray"][$this->GETVars['qq']]["name"];
@@ -846,6 +849,7 @@ class TSMMonitor {
 
 		//execute the constructed query
 		$sql = "SELECT ".$columnnames." from res_".$qtable."_".$server.$timestampquery.$wc.$sqlappend;
+echo "TEST 1: $sql<br>\n";
 
 		$_SESSION["lastsql"] = $sql;
 		if ($sqlres) $this->message = $sql;
