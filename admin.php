@@ -233,9 +233,9 @@ if ($_POST["css"] != "") {
 									$sqlresth = $adodb->fetchArrayDB($sqlth);
 									$colarray = array();
 									$colarray['id'] = $_POST['id'];
-									$set = "";
-									$sqlcols = "";
-									$sqlvals = "";
+									$set = array();
+									$sqlcols = array();
+									$sqlvals = array();
 
 									// get all table fields to be selected
 									foreach ($sqlresth as $col) {
@@ -252,34 +252,36 @@ if ($_POST["css"] != "") {
 //											if ($val != "") {
 												if ($_POST['AddSave'] == "Save") {
 													$colarray["`".$col['Field']."`"] = $val;
-													$sqlcols .= $col['Field'];
-													$sqlvals .= "'".$val."'";
-													$sqlcols .= ", ";
-													$sqlvals .= ", ";
+                                                    $val = "'".$val."'";
+                                                    array_push($sqlcols, $col['Field']);
+                                                    array_push($sqlvals, $val);
 												} else if ($_POST['EditSave'] == "Save") {
 													$colarray["`".$col['Field']."`"] = $val;
-													$set .= $col['Field']."='".$val."'";
-													$set .= ", ";
+													array_push($set, $col['Field']."='".$val."'");
 												}
 //											}
 										}
 									}
-									$sqlcols = ereg_replace(", $", "", $sqlcols);
-									$sqlvals = ereg_replace(", $", "", $sqlvals);
 									if ($_POST['AddSave'] == "Save") {
-										$sql = "INSERT into cfg_".$_GET['q']." (".$sqlcols.") values (".$sqlvals.")";
+										$sql = "INSERT into cfg_".$_GET['q']." (".(implode(",", $sqlcols)).") values (".(implode(",", $sqlvals)).")";
 									} else if ($_POST['EditSave'] == "Save") {
-										$sql = "UPDATE cfg_".$_GET['q']." set ".$set." where id='".$_POST['id']."' LIMIT 1";
+										$sql = "UPDATE cfg_".$_GET['q']." set ".(implode(",", $set))." where id='".$_POST['id']."' LIMIT 1";
 									}
 									$adodb->updateDB("cfg_".$_GET['q'], $colarray, 'id');
 								}
 								echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
 								echo "<table class='zebra'>";
-								echo $tsmmonitor->getTableheader();
-								echo $tsmmonitor->getAdminTables("list");
+								$thead = $tsmmonitor->getTableheader();
+                                echo $thead["header"];
+								$tbody = $tsmmonitor->getAdminTables("list");
+                                if ($tbody != "") {
+                                    echo $tbody;
+                                } else {
+                                    echo "<tr class='d0'><td colspan='".($thead["numfields"]+1)."' align='center'>No entries found in database.</td></tr>";
+                                }
 								$nav = $tsmmonitor->showPageNavigation("40");
 								if ($nav!="") {
-									echo "<tr><td colspan='0' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
+									echo "<tr><td colspan='".($thead["numfields"]+1)."' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
 								}
 								echo "</table>";
 								echo "<input type='submit' class='button' name='Add' value='Add' onclick='submit();'>";

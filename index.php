@@ -185,11 +185,16 @@ include_once "includes/page_head.php";
                             }
 							echo "<table class='zebra'>";
 							$thead = $tsmmonitor->getTableheader();
-							echo $thead;
-							echo $tsmmonitor->execute('table');
+							echo $thead["header"];
+							$tbody = $tsmmonitor->execute('table');
+                            if ($tbody != "") {
+                                echo $tbody;
+                            } else {
+                                echo "<tr class='d0'><td colspan='".$thead["numfields"]."' align='center'>No entries found in database.</td></tr>";
+                            }
 							$nav = $tsmmonitor->showPageNavigation("40");
 							if ($nav != "") {
-								echo "<tr><td colspan='".substr_count($thead, "<th>")."' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
+								echo "<tr><td colspan='".$thead["numfields"]."' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
 							}
 							echo "</table>";
 						}

@@ -570,7 +570,7 @@ class TSMMonitor {
 			$tableheader = $tableheader."<th colspan=2><a class='navhead'></a></th>";
 		}
 		$tableheader=$tableheader."</tr>";
-		return $tableheader;
+		return array("numfields" => sizeof($fieldnames), "header" => "$tableheader");
 	}
 
 
@@ -701,23 +701,18 @@ class TSMMonitor {
 	 * @return void
 	 */
 	function getTableFields($tablename="") {
-
-		$sqlth = "SELECT * from ".$tablename." LIMIT 1";
-
-		$sqlresth = $this->adodb->fetchArrayDB($sqlth);
-		$columnnames = "";
+		$sqltf = "SHOW COLUMNS FROM ".$tablename;
+		$sqlrestf = $this->adodb->fetchArrayDB($sqltf);
+		$fieldnames = array();
 
 		// get all table fields to be selected
-		foreach ($sqlresth as $row) {
-			foreach ($row as $colname => $colval) {
-				if ($colname != "timestamp") {
-					$columnnames .= "`".$colname."`";
-					if ( $i < $numfields-1) $columnnames .= ", ";
-				}
+        foreach ($sqlrestf as $field) {
+            if ($field['Field'] != "timestamp") {
+                $tmp_field = "`".$field['Field']."`";
+                array_push($fieldnames, $tmp_field);
 			}
 		}
-		$columnnames = ereg_replace(", $", "", $columnnames);
-		return $columnnames;
+		return implode(",", $fieldnames);
 	}
 
 
@@ -1489,6 +1484,9 @@ class TSMMonitor {
 		$ret = array();
 		while (list ($key, $val) = each ($rows)) {
 			$ret[$val['servername']] = (array)$val;
+            if ($retArray["defaultserver"] == "") {
+                $retArray["defaultserver"] = $val['servername'];
+            }
 			if ($val['default'] == 1) {
 				$retArray["defaultserver"] = $val['servername'];
 			}
