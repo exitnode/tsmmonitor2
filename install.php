@@ -29,6 +29,7 @@
  */
 
 include_once "includes/global.php";
+$_SESSION["stylesheet"] = "style_classic.css";
 if ($_REQUEST["step"] != "80" || $_REQUEST["refresh"] != "") {
     include_once "includes/page_head.php";
 }
@@ -188,6 +189,15 @@ if (empty($_REQUEST["step"])) {
             } else {
                 $_SESSION["install"]["paths"]["path_tmlog"]["default"] = $config["base_path"] . "tsmmonitor.log";
             }
+            
+            // PollD logfile path
+            $_SESSION["install"]["paths"]["path_polldlog"]["name"] = "PollD Logfile Path";
+            $_SESSION["install"]["paths"]["path_polldlog"]["desc"] = "The path to the PollD log file.";
+            if (isset($tsmmonitor->configarray["settings"]["paths"]["path_polldlog"])) {
+                $_SESSION["install"]["paths"]["path_polldlog"]["default"] = $tsmmonitor->configarray["settings"]["path_polldlog"];
+            } else {
+                $_SESSION["install"]["paths"]["path_polldlog"]["default"] = $config["base_path"] . "tsmmonitor.log";
+            }
         }
     }
     // Refresh of binary and logfile path page or server definition page
@@ -245,7 +255,12 @@ if (empty($_REQUEST["step"])) {
             if ($input_err == "") {
                 $dsmadmc = $_SESSION["install"]["paths"]["path_dsmadmc"]["default"];
                 if (file_exists($dsmadmc) && is_executable($dsmadmc)) {
-                    $oh = popen($dsmadmc." -se=".$server['srv_servername']." -id=".$server['srv_username']." -password=".$server['srv_password']." -TCPServeraddress=".$server['srv_ip']." -COMMMethod=TCPIP -TCPPort=".$server['srv_port']." -dataonly=yes -TAB \"SELECT SERVER_HLA,SERVER_LLA FROM status\" ", 'r');
+                    if ($config["server_os"] == "win32") {
+                        $popen_flags = "r";
+                    } elseif ($config["server_os"] == "unix") {
+                        $popen_flags = "rb";
+                    }
+                    $oh = popen($dsmadmc." -se=".$server['srv_servername']." -id=".$server['srv_username']." -password=".$server['srv_password']." -TCPServeraddress=".$server['srv_ip']." -COMMMethod=TCPIP -TCPPort=".$server['srv_port']." -dataonly=yes -TAB \"SELECT SERVER_HLA,SERVER_LLA FROM status\" ", "$popen_flags");
                     if ($oh != 0) {
                         while (!feof($oh)) {
                             $read = fgets($oh, 4096);
@@ -310,6 +325,7 @@ if ($_REQUEST["step"] == "90") {
     // set new version, disable installer and redirect to login page
     $adodb->updateDB('cfg_config', array(confkey => 'version', confval => $config['tsm_monitor_version']), 'confkey');
     $adodb->closeDB();
+    $_SESSION["stylesheet"] = "";
     header("Location: index.php");
     exit;
 } elseif (($_REQUEST["step"] == "60") && ($_REQUEST["install_type"] == "20")) {
