@@ -255,11 +255,7 @@ if (empty($_REQUEST["step"])) {
             if ($input_err == "") {
                 $dsmadmc = $_SESSION["install"]["paths"]["path_dsmadmc"]["default"];
                 if (file_exists($dsmadmc) && is_executable($dsmadmc)) {
-                    if ($config["server_os"] == "win32") {
-                        $popen_flags = "r";
-                    } elseif ($config["server_os"] == "unix") {
-                        $popen_flags = "rb";
-                    }
+                    $popen_flags = ($os == "win32") ? 'rb' : 'r';
                     $oh = popen($dsmadmc." -se=".$server['srv_servername']." -id=".$server['srv_username']." -password=".$server['srv_password']." -TCPServeraddress=".$server['srv_ip']." -COMMMethod=TCPIP -TCPPort=".$server['srv_port']." -dataonly=yes -TAB \"SELECT SERVER_HLA,SERVER_LLA FROM status\" ", "$popen_flags");
                     if ($oh != 0) {
                         while (!feof($oh)) {

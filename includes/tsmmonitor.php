@@ -87,15 +87,15 @@ class TSMMonitor {
 		$_SESSION['configarray'] = $this->getConfigArray();
 
 		// GET-variables
-		$this->GETVars["menu"] = $_GET['m'];
-		$this->GETVars["qq"] = $_GET['q'];
-		$this->GETVars['ob'] = $_GET['sort'];
-		$this->GETVars['orderdir'] = $_GET['so'];
+		$this->GETVars["menu"] = urlencode($_GET['m']);
+		$this->GETVars["qq"] = urlencode($_GET['q']);
+		$this->GETVars['ob'] = urlencode($_GET['sort']);
+		$this->GETVars['orderdir'] = urlencode($_GET['so']);
 
 		if ($_POST['s'] != '') {
-			$this->GETVars['server'] = $_POST['s'];
+			$this->GETVars['server'] = urlencode($_POST['s']);
 		} else {
-			$this->GETVars['server'] = $_GET['s'];
+			$this->GETVars['server'] = urlencode($_GET['s']);
 		}
 
 
@@ -117,14 +117,12 @@ class TSMMonitor {
 		if ($this->GETVars['server'] == "") { $this->GETVars['server']=$this->configarray["defaultserver"]; }
 		if ($this->GETVars['orderdir'] == "") { $this->GETVars['orderdir'] = "asc"; }
 
-		//if ($_SESSION['timeshift'] == '' ||  !strstr($this->GETVars["qq"], 'dynamictimetable')) {
 		if ($_SESSION['timeshift'] == '' ||  $this->configarray["queryarray"][$this->GETVars['qq']]["timetablefields"] == "") {
 			$_SESSION['timeshift'] = 0 ;
 		}
 
 		$this->menu = $this->configarray["menuarray"];
 		$this->adminmenu = $this->configarray["adminmenuarray"];
-		//$query = $this->configarray["queryarray"][$this->GETVars['qq']]["tsmquery"];
 		$this->queryarray = $this->configarray["queryarray"];
 
 		$_SESSION["GETVars"] = $this->GETVars;
@@ -231,10 +229,10 @@ class TSMMonitor {
 		$this->page = intval($_GET['page']);
 		if ($this->page == "") $this->page = 1;
 		$so = $_GET['so'];
-		$sortcol = $_GET['sort'];
+		$sortcol = urlencode($_GET['sort']);
 
-		$getvars = 'q='.$_GET['q'].'&m='.$_GET['m'].'&s='.$this->GETVars['server'].'&sort='.(urlencode($sortcol))."&so=".$so;
-		$self = htmlspecialchars($_SERVER['PHP_SELF']);
+		$getvars = 'q='.$_GET['q'].'&m='.$_GET['m'].'&s='.$this->GETVars['server'].'&sort='.$sortcol."&so=".$so;
+		$self = urlencode($_SERVER['PHP_SELF']);
 		$navelement = '<a class="tablefooter" href="'.$self.'?'.$getvars.'&page=';
 
 		$fp = "First";
@@ -1037,7 +1035,7 @@ class TSMMonitor {
 			$listip = $serveritems["ip"];
 			$listdescription = $serveritems["description"];
 			$listport = $serveritems["port"];
-			$listlink = $_SERVER['PHP_SELF']."?q=".$_SESSION["from"]."&m=".$this->GETVars['menu']."&s=".$servername;
+			$listlink = $_SERVER['PHP_SELF']."?q=".$_SESSION["from"]."&m=".$this->GETVars['menu']."&s=".(urlencode($servername));
 			$row = array("<a class='nav' href='".$listlink."'>".$servername."</a>", $listdescription, $listip, $listport);
 			$ret .= $this->renderZebraTableRow($row, $i%2, "", "", "");
 			$i++;

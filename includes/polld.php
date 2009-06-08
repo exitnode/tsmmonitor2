@@ -44,6 +44,7 @@ class PollD {
 
 	var $servers;
 	var $queries;
+    var $os;
 	var $overviewqueries;
 	var $adodb;
 	var $debuglevel; // VERBOSE=4, INFO=3, WARN=2, ERROR=1, OFF=0
@@ -62,7 +63,7 @@ class PollD {
 	 * @access public
 	 * @return void
 	 */
-	function PollD($adodb) {
+	function PollD($adodb, $os) {
 
 		$this->setDebuglevel("INFO");
 		$this->adodb = $adodb;
@@ -238,7 +239,8 @@ class PollD {
 		$query = ereg_replace("NOTEQUAL","<>",$query);
 		$query = ereg_replace("LESS","<",$query);
 
-		$handle = popen("dsmadmc -se=$servername -id=$user -password=$pass -TCPServeraddress=$ip -COMMMethod=TCPIP -TCPPort=$port -dataonly=yes -TAB \"$query\" ", 'r');
+        $popen_flags = ($os == "win32") ? 'rb' : 'r';
+		$handle = popen("dsmadmc -se=$servername -id=$user -password=$pass -TCPServeraddress=$ip -COMMMethod=TCPIP -TCPPort=$port -dataonly=yes -TAB \"$query\" ", "$popen_flags");
 
 		$hashstring = "";
 
