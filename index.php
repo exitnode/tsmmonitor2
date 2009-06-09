@@ -133,7 +133,7 @@ include_once "includes/page_head.php";
 
 						// show normal table layout
 					} else {
-						if ($_SESSION["tabletype"]!="" && $_SESSION["tabletype"] == "timetable") {
+						if ($_SESSION["tabletype"] != "" && $_SESSION["tabletype"] == "timetable") {
 
 							if ($_POST["back"] != "") {
 								$_SESSION['timeshift'] += $_SESSION['selectedtimestep'];
@@ -149,6 +149,21 @@ include_once "includes/page_head.php";
 							$headerarray = $queryarray[$tsmmonitor->GETVars['qq']]["header"]["column"];
 							echo $tsmmonitor->generateTimetable($tablearray, $headerarray[0]);
 
+                        } else if ($_SESSION["tabletype"] != "" && $_SESSION["tabletype"] == "timetable2") {
+
+                            if ($_POST["back"] != "") {
+                            	$_SESSION['timeshift'] += $_SESSION['selectedtimestep'];
+                            }
+                            if ($_POST["forward"] != "") {
+                            	$_SESSION['timeshift'] -= $_SESSION['selectedtimestep'];
+                            }
+                            if ($_SESSION['timeshift'] < 0) {
+                            	$_SESSION['timeshift'] = 0;
+                            }
+
+                            $tablearray = $tsmmonitor->execute('timetable2');
+                            $headerarray = $queryarray[$tsmmonitor->GETVars['qq']]["header"]["column"];
+                            echo $tsmmonitor->generateTimetable2($tablearray, $headerarray[0]);
 
 						} else {
 

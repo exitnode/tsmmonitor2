@@ -39,7 +39,7 @@
 		if ($tsmmonitor->configarray["queryarray"][$tsmmonitor->GETVars['qq']]["timetablefields"] != "") {
 
 			echo "<select name='tabletype' size=1 onChange='submit();' class='button topnavbutton'>";
-			$types = array('normal view', 'timetable');
+			$types = array('normal view', 'timetable', 'timetable2');
 			foreach ($types as $type) {
 				echo '<option value="'.$type.'"';
 				if ($_SESSION['tabletype'] == $type){echo "SELECTED";}

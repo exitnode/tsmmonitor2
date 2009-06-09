@@ -232,7 +232,7 @@ class TSMMonitor {
 		$sortcol = urlencode($_GET['sort']);
 
 		$getvars = 'q='.$_GET['q'].'&m='.$_GET['m'].'&s='.$this->GETVars['server'].'&sort='.$sortcol."&so=".$so;
-		$self = urlencode($_SERVER['PHP_SELF']);
+		$self = $_SERVER['PHP_SELF'];
 		$navelement = '<a class="tablefooter" href="'.$self.'?'.$getvars.'&page=';
 
 		$fp = "First";
@@ -396,7 +396,7 @@ class TSMMonitor {
         for ($i=1;$i<$this->menuindent;$i++){
             $indent .= "&nbsp;&nbsp;&nbsp;";
         }
-		while(list($key, $val) = each($menu)) {
+		while (list($key, $val) = each($menu)) {
 
 			$bCont = TRUE;
 			$q = $this->GetBetween($key,"q=","&m=");
@@ -745,7 +745,7 @@ class TSMMonitor {
 			if ($type=="list") {
 				$modrow = array();
 				$widths = array();
-				while(list($keycell, $valcell) = each($row)) {
+				while (list($keycell, $valcell) = each($row)) {
 					if ($keycell == "id") {
 						$id = $valcell;
                     } else if ($valcell == "version") {
@@ -837,7 +837,7 @@ class TSMMonitor {
 			$wc= " ";
 		}
 
-		if ($type == "timetable") {
+		if ($type == "timetable" || $type == "timetable2") {
 			$columnnames = $this->configarray["queryarray"][$this->GETVars['qq']]["timetablefields"];
 		} else {
 			$columnnames = $this->getTableFields("res_".$qtable."_".$server);
@@ -885,7 +885,7 @@ class TSMMonitor {
 				$outp = array();
 				foreach ($sqlres as $row) {
 					$rowarray2 = array();
-					while(list($keycell, $valcell) = each($row)) {
+					while (list($keycell, $valcell) = each($row)) {
 						if ($keycell == "Start Time" || $keycell == "Actual Start" || $keycell == "End Time") {
 							$date = $row[$keycell];
 							$rowarray2[] = mktime(substr($date,11,2),substr($date,14,2),substr($date,17,2),substr($date,5,2),substr($date,8,2),substr($date,0,4));
@@ -894,6 +894,27 @@ class TSMMonitor {
 						}
 					}
 					array_push($outp, $rowarray2);
+				}
+			}
+			else if ($type == "timetable2") {
+				$sqlres = $this->adodb->fetchArrayDB($sql);
+				$outp = array();
+				foreach ($sqlres as $row) {
+					$rowarray2 = array();
+					while (list($keycell, $valcell) = each($row)) {
+						if ($keycell == "Start Time" || $keycell == "Actual Start" || $keycell == "End Time") {
+							$date = $row[$keycell];
+							$rowarray2[] = mktime(substr($date,11,2),substr($date,14,2),substr($date,17,2),substr($date,5,2),substr($date,8,2),substr($date,0,4));
+                        } else if ($keycell == "Node Name") {
+                            $nodename = $valcell;
+                            if ($outp[$nodename] == "") {
+                                $outp[$nodename] = array();
+                            }
+						} else {
+							$rowarray2[] = $valcell;
+						}
+					}
+					array_push($outp[$nodename], $rowarray2);
 				}
 			}
 		}
@@ -919,7 +940,7 @@ class TSMMonitor {
 		$colorsarray = $this->configarray["colorsarray"];
 		$outp = $outp."<tr class='d".$shade."'>";
 
-		while(list($keycell, $valcell) = each($row)) {
+		while (list($keycell, $valcell) = each($row)) {
 
 			if (isset($cellproperties) && $cellproperties[$keycell] != "") {
 				$cellproperty = " ".$cellproperties[$keycell]." ";
@@ -1031,7 +1052,7 @@ class TSMMonitor {
 		$i = 0;
 		$ret = "<table class='zebra'>";
 		$ret .= "<tr><th>Servername</th><th>Description</th><th>IP-Address</th><th>Port</th></tr>";
-		while(list($servername,$serveritems) = each($serverlist)) {
+		while (list($servername,$serveritems) = each($serverlist)) {
 			$listip = $serveritems["ip"];
 			$listdescription = $serveritems["description"];
 			$listport = $serveritems["port"];
@@ -1093,7 +1114,7 @@ class TSMMonitor {
 		$rs = $this->fetchSplitArrayDB($sql,$lpp);
 		foreach ($rs as $row) {
 			$modrow = array();
-			while(list($keycell, $valcell) = each($row)) {
+			while (list($keycell, $valcell) = each($row)) {
 				if ($keycell == "timestamp") {
 					$valcell = strftime("%Y/%m/%d %T", $valcell);
 				}
@@ -1123,7 +1144,7 @@ class TSMMonitor {
 		$out="";
 		$i=0;
 
-		while(list($key, $val) = each($subindexqueryarray)) {
+		while (list($key, $val) = each($subindexqueryarray)) {
 
 			$comperator = "";
 			$alertval = "";
@@ -1174,15 +1195,16 @@ class TSMMonitor {
 	 *
 	 * @param string $startpunkt I forgot that one
 	 * @param string $FirstCol first field of result table
+     * @param integer $pxperHour Width of a on hour field in pixels
 	 * @return string
 	 */
-	function generateTimetableHeader($startpunkt = '', $FirstCol = '') {
+	function generateTimetableHeader($startpunkt = '', $FirstCol = '', $pxperHour = 30) {
 
 		$header = $FirstCol["label"];
 		$out= "<tr align='left'><th>".$header."</th><th>";
 		for ($count = 0; $count <= 24; $count++) {
-			$imagename = strftime("%H", $startpunkt+($count*3600));
-			$out .= "<img src='images/".$imagename.".gif' height=20px width=30px title='".strftime("%H:00 (%D)", $startpunkt+($count*$hour))."' />";
+			$imagename = strftime("%H", $startpunkt + ($count * 3600));
+			$out .= "<img src='images/".$imagename.".gif' height=20px width=".$pxperHour."px title='".strftime("%H:00 (%D)", $startpunkt+($count*$hour))."' />";
 		}
 
 		$out .= "</th></tr>";
@@ -1214,7 +1236,7 @@ class TSMMonitor {
 		$out .= "<input type='submit' class='button' name='back' value='<-' onclick='submit();'>";
 		$out .= "<select name='timestep' class='button' size=1 onChange='submit();'>";
 		// build combobox
-		while(list($label,$value) = each($timesteps)) {
+		while (list($label,$value) = each($timesteps)) {
 			$out .= '<option value="'.$value.'"';
 			if ($_SESSION['selectedtimestep'] == $value){$out .=  "SELECTED";}
 			$out .= '> '.$label.'</option>';
@@ -1243,51 +1265,53 @@ class TSMMonitor {
 		$now = time();
 		$out = '';
 		$height = 8;
-		$faktor = 120;
+		$factor = 120;
 		$oneday = 86400;
 		$onehour = 3600;
 		$tolerance = 1200;
 
 		$this->timetablestarttime = 24 + $_SESSION['timeshift'];
 
-		$startpunkt = ((ceil($now/$onehour)*$onehour)-$onehour-$oneday)-(($this->timetablestarttime-24)*$onehour);
+		$startpunkt = ((ceil($now / $onehour) * $onehour) - $onehour - $oneday) - (($this->timetablestarttime - 24) * $onehour);
 		$endpunkt = $startpunkt + $oneday + $onehour;
-		$lastpoint = ($endpunkt - $startpunkt)/$faktor;
+		$lastpoint = ($endpunkt - $startpunkt) / $factor;
 
 		$out .= "<table class='timetable' width='".$lastpoint."'>";
 		$out .= $this->generateTimetableNavigation();
 		$out .= $this->generateTimetableHeader($startpunkt, $FirstCol);
 		$out .= "</td></tr>";
 
-		$lasttimepoint=$now-($this->timetablestarttime*$onehour)-$tolerance;
+		$lasttimepoint = $now - ($this->timetablestarttime * $onehour) - $tolerance;
 
 		$repeatingcol = "";
-		$ii=1;
+		$ii = 1;
 
-		while(list($keyrow, $valrow) = each($tablearray)) {
+		while (list($keyrow, $valrow) = each($tablearray)) {
 			if ($valrow[1] <= $endpunkt && $valrow[2] > $lasttimepoint) {
 				$name = $valrow[0];
 				$status = $valrow[3];
 				$statusmsg = "";
-				$dur = strftime("%H:%M", ($valrow[2]-$valrow[1])-$onehour);
-				$shade="";
+				$dur = strftime("%H:%M", ($valrow[2] - $valrow[1]) - $onehour);
+				$shade = "";
 				if ($valrow[1] < $lasttimepoint) {
 					// cut the bar at the left side to fit into table
 					$start = 0;
 				} else {
-					$start = ($valrow[1]-$startpunkt)/$faktor;
+					$start = ($valrow[1] - $startpunkt) / $factor;
 				}
-				$end = ($valrow[2]-$startpunkt)/$faktor;
+				$end = ($valrow[2] - $startpunkt) / $factor;
 				$duration = $end - $start;
 				// fake a longer time for better visibility
-				if ($duration < 2) {$duration=2;}
+				if ($duration < 2) {
+                    $duration = 2;
+                }
 				// cut the bar at the right side to fit into table
-				if (($start+$duration)>$lastpoint) {
-					$duration = $lastpoint-$start;
-					$shade="light";
+				if (($start + $duration) > $lastpoint) {
+					$duration = $lastpoint - $start;
+					$shade = "light";
 				}
 				if ($valrow[1] < $lasttimepoint) {
-					$shade="light";
+					$shade = "light";
 				}
 				if (isset($status)) {
 					if ($status == "YES" || $status == "Completed") {
@@ -1314,7 +1338,7 @@ class TSMMonitor {
 				} else {
 					$out .= "<td>".$valrow[0]."</td>";
 				}
-				if ($valrow[3] != 'Missed') {
+				if ($status != 'Missed') {
 					$out .= "<td class='content'>";
 					$out .= "<img src='images/trans.gif' height=1px width=".$start."px />";
 					$out .= "<img src='images/".$barcol.".gif' height=".$height."px width=".$duration."px title='".strftime("%H:%M", $valrow[1])." - ".strftime("%H:%M", $valrow[2])." (".$name.", ".$dur."h".$statusmsg.")' />";
@@ -1330,8 +1354,146 @@ class TSMMonitor {
 		$out .= "</table>";
 
 		return $out;
-
 	}
+
+
+
+
+    /**
+     * generateTimetable2 - generates HTML code for graphical timetables (version 2)
+     *
+     * @param array $tablearray Array containing an SQL query result
+     * @param string $FirstCol first field of result table
+     * @return string
+     */
+    function generateTimetable2($tablearray = '', $FirstCol = '') {
+
+        $now = time();
+        $out = '';
+        $height = 8;
+        $pxperhour = 30;
+        $oneday = 86400;
+        $onehour = 3600;
+        $resolution = ($onehour / $pxperhour);
+        $tolerance = 1200;
+
+        $this->timetablestarttime = 24 + $_SESSION['timeshift'];
+
+        $startpoint = ((ceil($now / $onehour) * $onehour) - $onehour - $oneday) - (($this->timetablestarttime - 24) * $onehour);
+        $endpoint = $startpoint + $oneday + $onehour;
+        $lastpoint = ($oneday + $onehour) / $resolution;
+
+        $out .= "<table class='timetable' width='".$lastpoint."'>";
+        $out .= $this->generateTimetableNavigation();
+        $out .= $this->generateTimetableHeader($startpoint, $FirstCol, $pxperhour);
+        $out .= "</td></tr>";
+
+        $lasttimepoint = $now - ($this->timetablestarttime * $onehour) - $tolerance;
+
+        $ii = 1;
+
+        // every node with events
+        while (list($nodename, $keyrow) = each($tablearray)) {
+            $egroup = array();
+            end($keyrow);
+            $last = key($keyrow);
+            reset($keyrow);
+
+            if ($ii == 1) {
+                $out .= "<tr class='d0' width=".$lastpoint.">";
+            } else {
+                $out .= "<tr class='d1' width=".$lastpoint.">";
+                $ii = 0;
+            }
+            $out .= "<td style='color:#000000;'>".$nodename."</td>";
+            $out .= "<td class='content'>";
+ 
+            $pend = 0;
+            $line = "";
+            $lstartpx = 0;
+            $ldurpx = 0;
+            // every event for the current backup
+            while (list($key, $valrow) = each($keyrow)) {
+                $ebegin = $valrow[0];
+                $eend = $valrow[1];
+                // event within display range
+                if ($ebegin <= $endpoint && $eend > $lasttimepoint) {
+                    if (empty($egroup)) {
+                        array_push($egroup, $valrow);
+                    } else {
+                        $pendround = (ceil($pend / $resolution) * $resolution);
+                        if ($ebegin <= $pendround) {
+                            array_push($egroup, $valrow);
+                        } else if ($ebegin > $pendround || $key == $last) {
+                            $cbegin = (floor($egroup[0][0] / $resolution) * $resolution);
+                            $cend = (ceil($egroup[(count($egroup) - 1)][1] / $resolution) * $resolution);
+                            $cstatus = array();
+                            $cstatusmsg = array();
+                            $cshade = "";
+
+                            if ($cbegin < $lasttimepoint) {
+                                // cut the bar at the left side to fit into table
+                                $startpx = 0;
+                            } else {
+                                $startpx = ($cbegin - $startpoint) / $resolution;
+                            }
+                            $endpx = ($cend - $startpoint) / $resolution;
+                            $durpx = ceil($endpx - $startpx);
+                            // cut the bar at the right side to fit into table
+                            if (($startpx + $durpx) > $lastpoint) {
+                                $durpx = ceil($lastpoint - $startpx);
+                                $cshade = "light";
+                            }
+                            if ($cbegin < $lasttimepoint) {
+                                $cshade = "light";
+                            }
+                            $barcol = $cshade."green";
+                            while (list($ckey, $cvalrow) = each($egroup)) {
+                                $cestatus = $cvalrow[2];
+                                $cedur = strftime("%H:%M", ($cvalrow[1] - $cvalrow[0]) - $onehour);
+                                if (isset($cestatus)) {
+                                    if ($cestatus == "YES" || $cestatus == "Completed") {
+                                        array_push($cstatusmsg, $cedur."h, Status was OK");
+                                    } else {
+                                        $barcol = $cshade."red";
+                                        array_push($cstatusmsg, $cedur."h, Status was UNSUCCESSFUL");
+                                    }
+                                } else {
+                                    $barcol = $cshade."grey";
+                                    array_push($cstatusmsg, "");
+                                }
+                            }
+
+                            if ($line == "") {
+                                $line .= "<img src='images/trans.gif' height=1px width=".$startpx."px />";
+                            } else {
+                                $line .= "<img src='images/trans.gif' height=1px width=".($startpx - $lstartpx - $ldurpx)."px />";
+                            }
+                            $line .= "<img src='images/".$barcol.".gif' height=".$height."px width=".$durpx."px title='".$nodename." ".strftime("%H:%M", $cbegin)." - ".strftime("%H:%M", $cend)." (".(join('; ', $cstatusmsg)).")' />";
+
+                            // clearup for next event
+                            unset($egroup);
+                            $egroup = array();
+                            array_push($egroup, $valrow);
+                        }
+                    }
+                    $pend = $valrow[1];
+                    $lstartpx = $startpx;
+                    $ldurpx = $durpx;
+                }
+            }
+            $out .= $line;
+            $out .= "</td></tr>\n";
+            $ii++;
+            unset($egroup);
+            unset($line);
+        }
+        $out .= $this->generateTimetableHeader($startpoint);
+        $out .= $this->generateTimetableNavigation();
+        $out .= "</table>";
+
+        return $out;
+    }
 
 
 
