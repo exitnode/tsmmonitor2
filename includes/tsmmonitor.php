@@ -89,7 +89,7 @@ class TSMMonitor {
 		// GET-variables
 		$this->GETVars["menu"] = urlencode($_GET['m']);
 		$this->GETVars["qq"] = urlencode($_GET['q']);
-		$this->GETVars['ob'] = urlencode($_GET['sort']);
+		$this->GETVars['ob'] = urldecode($_GET['sort']);
 		$this->GETVars['orderdir'] = urlencode($_GET['so']);
 
 		if ($_POST['s'] != '') {
