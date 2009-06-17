@@ -288,22 +288,27 @@ class TSMMonitor {
 			}
 		}
 
-		$lines = array ("20", "50", "100", "200", "500");
-		$linesel = $_SESSION["lines"][$this->GETVars['qq']];
-		if ($linesel == "") $linesel = "20";
-        $linebox = "<form action=".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server']." method='post'><select name='lpp' size=1 onChange='submit();' class='button topnavbutton'>";
-
-		foreach ($lines as $line) {
-			$linebox .= '<option value="'.$line.'"';
-			if ($linesel == $line) {$linebox.= "SELECTED";}
-			$linebox .=  '> '.$line.' </option>';
-        }
-        $linebox .= "</select></form>";
-
 		if ($end > 1) {
+			$lines = array ("20", "50", "100", "200", "500");
+			$linesel = $_SESSION["lines"][$this->GETVars['qq']];
+			if ($linesel == "") $linesel = "20";
+			$linebox = "<form action=".$_SERVER['PHP_SELF']."?q=".$this->GETVars['qq']."&m=".$this->GETVars['menu']."&s=".$this->GETVars['server']." method='post'><select name='lpp' size=1 onChange='submit();' class='button'>";
+
+			foreach ($lines as $line) {
+				$linebox .= '<option value="'.$line.'"';
+				if ($linesel == $line) {$linebox.= "SELECTED";}
+				$linebox .=  '> '.$line.' </option>';
+			}
+			$linebox .= "</select></form>";
+
             $navline = $fp.'&nbsp;'.$pp.'&nbsp;'.$numbers.'&nbsp;'.$np.'&nbsp;'.$lp;
 		}
-        return '<table width="100%" align="center" cellpadding="1" cellspacing="0" border=0><tr><td width="10%" align="left"></td><td width="80%" align="center">'.$navline.'</td><td width="10%" align="right">'.$linebox.'</td></tr></table>';
+        //return '<table width="100%" align="center" cellpadding="1" cellspacing="0" border=0><tr><td width="10%" align="left"></td><td width="80%" align="center">'.$navline.'</td><td width="10%" align="right">'.$linebox.'</td></tr></table>';
+		if ($navline != "") {
+			return '<div id="pagecountbox">'.$linebox.'</div>'.$navline.'';
+		} else {
+			return "";
+		}
 
 	}
 

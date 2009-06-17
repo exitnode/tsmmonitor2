@@ -93,6 +93,11 @@ float:right;
 padding: 0 5px 0 5px;
 }
 
+#pagecountbox {
+height:25px;
+float:right;
+}
+
 #menue {
 width: 180px;
 padding: 0px;

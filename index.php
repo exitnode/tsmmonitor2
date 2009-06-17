@@ -209,7 +209,7 @@ include_once "includes/page_head.php";
                             }
 							$nav = $tsmmonitor->showPageNavigation("40");
 							if ($nav != "") {
-								echo "<tr><td colspan='".$thead["numfields"]."' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
+								echo "<tr><td colspan='".$thead["numfields"]."' align='center' class='footer'><a>".$nav."</a></td></tr>";
 							}
 							echo "</table>";
 						}
