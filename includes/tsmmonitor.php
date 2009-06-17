@@ -140,9 +140,15 @@ class TSMMonitor {
 
 		if ($_POST["Poll"] == "Poll Now!") {
 			$timestamp = time();
-			$tmonpolld = new PollD($this->adodb);
+			$tmonpolld = new PollD($this->adodb, $config["server_os"]);
 			$tmonpolld->adodb->setDebug($_SESSION["debug"]);
-			$tmonpolld->pollQuery($tmonpolld->queries[$this->GETVars['qq']], $tmonpolld->servers[$this->GETVars['server']], TRUE, $timestamp);
+			if ($this->GETVars['qq'] == "index") {
+				foreach ($tmonpolld->overviewqueries as $query) {
+					$tmonpolld->pollOverviewQuery($query, $tmonpolld->servers[$this->GETVars['server']], $timestamp);
+				}
+			} else {
+				$tmonpolld->pollQuery($tmonpolld->queries[$this->GETVars['qq']], $tmonpolld->servers[$this->GETVars['server']], TRUE, $timestamp);
+			}
 			$_SESSION['timemachine']['date'] = $timestamp;
 			$_SESSION['timemachine']['time'] = $timestamp;
 		}
