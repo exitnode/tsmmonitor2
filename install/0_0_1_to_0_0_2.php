@@ -22,7 +22,7 @@
 
 /**
  *
- * 0_1_to_0_1_1.php, TSM Monitor
+ * 0_0_1_to_0_0_2.php, TSM Monitor
  *
  * install php file
  *
@@ -30,7 +30,7 @@
  * @package tsmmonitor
  */
 
-function upgrade_to_0_1_1() {
+function upgrade_to_0_0_2() {
     // Put upgrade procedure here ...
 }
 

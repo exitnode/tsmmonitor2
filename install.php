@@ -338,15 +338,15 @@ if ($_REQUEST["step"] == "90") {
 
     // Loop over all versions up to the current and perform incremental updates
     for ($i = ($old_version_index+1); $i < count($tsm_monitor_versions); $i++) {
-        if ($tsm_monitor_versions[$i] == "0.1.0") {
-            include "install/0_1_0_to_0_1_1.php";
-            upgrade_to_0_1_1();
-        } /* elseif ($tsm_monitor_versions[$i] == "0.1.1") {
-            include "install/0_1_1_to_0_1_2.php";
-            upgrade_to_0_1_2();
-        } elseif ($tsm_monitor_versions[$i] == "0.1.2") {
-            include "install/0_1_2_to_0_1_3.php";
-            upgrade_to_0_1_3();
+        if ($tsm_monitor_versions[$i] == "0.0.1") {
+            include "install/0_0_1_to_0_0_2.php";
+            upgrade_to_0_0_2();
+        } /* elseif ($tsm_monitor_versions[$i] == "0.0.2") {
+            include "install/0_0_2_to_0_0_3.php";
+            upgrade_to_0_0_3();
+        } elseif ($tsm_monitor_versions[$i] == "0.0.3") {
+            include "install/0_0_3_to_0_0_4.php";
+            upgrade_to_0_0_4();
         } */
     }
 }
