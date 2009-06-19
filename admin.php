@@ -163,7 +163,6 @@ if ($_POST["css"] != "") {
 									echo "<table class='zebra'>";
 									echo "<tr><th>Key</th><th>Value</th></tr>";
 									foreach ($sqlresth as $col) {
-										echo "TEST: ".$col['Field']." -> $colval<br>\n";
 										if ($col['Field'] != "id") {
 											if ($i == 0) {
 												echo "<tr class='d0'>";
@@ -201,12 +200,18 @@ if ($_POST["css"] != "") {
 												$i = 0;
 											}
 											if ($keycell == "password") {
-												echo "<td><b>".$keycell."</b></td><td><input type='password' name='txt".$keycell."' value='' /></td></tr>";
+												echo "<td><b>".$keycell."</b></td><td><input type='password' name='txt".$keycell."' value='' /></td></tr>\n";
 											} else if ($keycell == "id") {
 												$id = $valcell;
 											} else {
-												echo "<td><b>".$keycell."</b></td><td><input type='text' size='50' name='txt".$keycell."' value='".$valcell."' /></td></tr>";
-											}
+                                                echo "<td><b>".$keycell."</b></td><td>";
+                                                if (strlen($valcell) < 150) {
+                                                    echo "<input type='text' size='50' maxlength='150' name='txt".$keycell."' value='".$valcell."' />";
+                                                } else {
+                                                    echo "<textarea name='txt".$keycell."' cols='60' rows='5'>$valcell</textarea>";
+                                                }
+                                                echo "</td></tr>\n";
+                                            }
 										}
 									}
 									echo "<tr><td colspan=2 class='footer'>";
@@ -239,6 +244,9 @@ if ($_POST["css"] != "") {
 
 									// get all table fields to be selected
 									foreach ($sqlresth as $col) {
+                                        if (get_magic_quotes_gpc() != 0) {
+                                            $_POST["txt".$col['Field']] = stripslashes($_POST["txt".$col['Field']]);
+                                        }
 										if ($col['Field'] != "id") {
 											if ($col['Field'] == "password") {
 												if ($_POST["txt".$col['Field']] != "") {
@@ -249,17 +257,15 @@ if ($_POST["css"] != "") {
 											} else {
 												$val = $_POST["txt".$col['Field']];
 											}
-//											if ($val != "") {
-												if ($_POST['AddSave'] == "Save") {
-													$colarray["`".$col['Field']."`"] = $val;
-                                                    $val = "'".$val."'";
-                                                    array_push($sqlcols, $col['Field']);
-                                                    array_push($sqlvals, $val);
-												} else if ($_POST['EditSave'] == "Save") {
-													$colarray["`".$col['Field']."`"] = $val;
-													array_push($set, $col['Field']."='".$val."'");
-												}
-//											}
+											if ($_POST['AddSave'] == "Save") {
+												$colarray["`".$col['Field']."`"] = $val;
+                                                $val = "'".$val."'";
+                                                array_push($sqlcols, $col['Field']);
+                                                array_push($sqlvals, $val);
+											} else if ($_POST['EditSave'] == "Save") {
+												$colarray["`".$col['Field']."`"] = $val;
+												array_push($set, $col['Field']."='".$val."'");
+											}
 										}
 									}
 									if ($_POST['AddSave'] == "Save") {

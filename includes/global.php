@@ -55,7 +55,7 @@ include(dirname(__FILE__) . "/config.php");
 $config = array();
 
 // ** Current TSM Monitor version ** //
-$config["tsm_monitor_version"] = '0.1.0';
+$config["tsm_monitor_version"] = '0.0.1';
 
 // ** Set TSM Monitor server OS to a general value (only 'unix' or 'win32') ** //
 $config["server_os"] = (strstr(PHP_OS, "WIN")) ? "win32" : "unix";
