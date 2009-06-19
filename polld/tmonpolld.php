@@ -35,9 +35,7 @@
 
 include_once("../includes/global.php");
 
-
 $tmonpolld = new PollD($adodb, $config["server_os"]);
-//$tmonpolld->setDebuglevel("WARN");
 $tmonpolld->controlPollD("on");
 $tmonpolld->poll();
 

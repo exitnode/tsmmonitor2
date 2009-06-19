@@ -82,7 +82,6 @@ class PollD {
 		$this->servers = $this->getServers();
 		$this->queries = $this->getQueries();
 		$this->overviewqueries = $this->getOverviewQueries();
-		//$this->controlPollD("off");
 	}
 
 
@@ -123,8 +122,6 @@ class PollD {
             }
 		}
 	}
-
-
 
 
 	/**
@@ -179,8 +176,6 @@ class PollD {
 	}
 
 
-
-
 	/**
 	 * getOverviewQueries - returns an array filled with all configured TSM overview queries
 	 *
@@ -211,9 +206,6 @@ class PollD {
 		}
 		return $servers;
 	}
-
-
-
 
 
 	/**
@@ -275,7 +267,7 @@ class PollD {
 		}
 		$return["sql"] = $out;
 		$return["md5"] = md5($hashstring);
-		if (!$stop || ($blank && $stop)){
+		if (!$stop || ($blank && $stop)) {
 			return $return;
 		} else {
 			return "";
@@ -291,7 +283,7 @@ class PollD {
 	 * @param string $hash md5 hash checksum of current resultSet
 	 * @return boolean
 	 */
-	function checkHash($tablename = '', $hash = ''){
+	function checkHash($tablename = '', $hash = '') {
 
 		$sql = "select count(*) from log_hashes where TABLENAME='".$tablename."' and HASH='".$hash."'";
 		$countobj = $this->adodb->fetchArrayDB($sql);
@@ -310,7 +302,6 @@ class PollD {
 		}
 
 	}
-
 
 
 	/**
@@ -334,7 +325,6 @@ class PollD {
 			return FALSE;
 		}
 	}
-
 
 
 	/**
@@ -367,7 +357,7 @@ class PollD {
 	 * @param boolean $ignorePollFreq
 	 * @param string $timestamp
 	 */
-	function pollQuery($query = "", $server = "", $ignorePollFreq = TRUE, $timestamp){
+	function pollQuery($query = "", $server = "", $ignorePollFreq = TRUE, $timestamp) {
         $starttquery = time();
         $querytime = 0;
 
@@ -389,7 +379,7 @@ class PollD {
 			$this->adodb->execDB($ctsql);
 		}
 		// execute query and store result in mysql db
-		if ($ignorePollFreq || !$this->checkFreq($tablename, $query["pollfreq"], $timestamp)){
+		if ($ignorePollFreq || !$this->checkFreq($tablename, $query["pollfreq"], $timestamp)) {
 			try {
 				$result = $this->execute($query["tsmquery"], $server["servername"], $tablename, $timestamp);
 			} catch (exception $e) {
@@ -440,7 +430,7 @@ class PollD {
 	 * @param boolean $ignorePollFreq
 	 * @param string $timestamp
 	 */
-	function pollOverviewQuery($query = "", $server = "", $timestamp){
+	function pollOverviewQuery($query = "", $server = "", $timestamp) {
         $starttquery = time();
         $querytime = 0;
 
@@ -463,8 +453,6 @@ class PollD {
 	}
 
 
-
-
 	/**
 	 * cleanupDatabase - cleans up database (single result tables and/or hash entry)
 	 *
@@ -473,7 +461,7 @@ class PollD {
 	 * @param string $overviewqueryname
 	 * @param string $hashonly do not drop table, just delete entry in log_hashes
 	 */
-	function cleanupDatabase($servername = "", $queryname = "", $overviewqueryname = "", $months = "9999" ,$hashonly = "yes"){
+	function cleanupDatabase($servername = "", $queryname = "", $overviewqueryname = "", $months = "9999" ,$hashonly = "yes") {
 
 		if ($servername != "" && $queryname != "" && $overviewqueryname != "") {
 			$time = time()-($months*30*24*60*60);
@@ -505,8 +493,6 @@ class PollD {
 	}
 
 
-
-
 	/**
 	 * setPollDStatus
 	 *
@@ -525,7 +511,6 @@ class PollD {
 	}
 
 
-
 	/**
 	 * isEnabled - returns true if PollD is enabled
 	 *
@@ -536,12 +521,11 @@ class PollD {
 		$sql = "select enabled from log_polldstat WHERE `id`='1'";
 		$result = $this->adodb->fetchArrayDB($sql);
 
-		if ($result != "" && $result[0]["enabled"] == "1"){
+		if ($result != "" && $result[0]["enabled"] == "1") {
 			return TRUE;
 		} else {
 			return FALSE;
 		}
-
 	}
 
 
@@ -575,8 +559,6 @@ class PollD {
 		$result = $this->adodb->fetchArrayDB($sql);
 
 		return $result[0]["status"];
-
-
 	}
 
 
@@ -585,33 +567,25 @@ class PollD {
 	 *
 	 * @return boolean
 	 */
-	function poll(){
-
+	function poll() {
 
 		$sleeptime = $this->getSleeptime();
 
-
 		$this->writeMSG("Sleeptime will be ".$sleeptime." seconds\n", "WARN");
-
 
 		// infinite loop
 		while(true) {
-
 			if ($this->isEnabled()) {	
-
 				$timestamp = time();
-
 				$this->writeMSG("running!\ntimestamp for this run is ".$timestamp."\n", "WARN");
-
 				$this->setPollDStatus("running", "", "");
-
 
 				foreach ($this->servers as $server) {
 					$this->log_timeneeded = time();
 					$this->log_unchangedresult = 0;
 					$this->log_pollfreqnoreached = 0;
 					$this->log_updated = 0;
-					// go through all queries defined in xml file
+
 					$this->writeMSG("---querying server ".$server["servername"]."\n", "WARN");
 					$this->writeMSG("------querying normal queries\n", "WARN");
 					foreach ($this->queries as $query) {
@@ -628,7 +602,6 @@ class PollD {
 
 
 				$this->writeMSG("needed ".(time()-$timestamp)." seconds for this run.\n", "INFO");
-				//$tempsleeptime = $sleeptime-(time()-$timestamp);
 				$tempsleeptime = 900 -(time()-$timestamp);
                 if ($tempsleeptime < 0) {
                     $tempsleeptime = 0;
@@ -647,10 +620,7 @@ class PollD {
 
 			}
 		}
-
 	}
-
 }
-
 
 ?>
