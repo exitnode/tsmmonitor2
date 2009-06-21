@@ -248,7 +248,7 @@ if ($_POST["css"] != "") {
                                             $_POST["txt".$col['Field']] = stripslashes($_POST["txt".$col['Field']]);
                                         }
 										if ($col['Field'] != "id") {
-											if ($col['Field'] == "password") {
+											if ($col['Field'] == "password" && $tsmmonitor->GETVars['qq'] != 'servers') {
 												if ($_POST["txt".$col['Field']] != "") {
 													$val = md5($_POST["txt".$col['Field']]);
 												} else {
