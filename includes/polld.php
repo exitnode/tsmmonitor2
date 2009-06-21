@@ -44,9 +44,12 @@ class PollD {
 
 	var $servers;
 	var $queries;
+    var $lastrun;
     var $os;
 	var $overviewqueries;
 	var $adodb;
+	var $dsmadmc;
+
 	var $debuglevel; // VERBOSE=4, INFO=3, WARN=2, ERROR=1, OFF=0
     var $loghandle;
 
@@ -69,16 +72,29 @@ class PollD {
 		$this->adodb = $adodb;
         $sql = "select confval from cfg_config WHERE `confkey`='loglevel_polld'";
         $loglevel = $this->adodb->fetchArrayDB($sql);
-        $loglevel = strtoupper($loglevel[0][confval]);
+        $loglevel = strtoupper($loglevel[0]["confval"]);
         $this->setDebuglevel("$loglevel");
         $sql = "select confval from cfg_config WHERE `confkey`='path_polldlog'";
         $logfile = $this->adodb->fetchArrayDB($sql);
-        if ($logfile[0][confval] != "") {
-            $this->loghandle = fopen($logfile[0][confval], 'at');
+        if ($logfile[0]["confval"] != "") {
+            $this->loghandle = fopen($logfile[0]["confval"], 'at');
             if (!$this->loghandle) {
-                echo "ERROR: Cannot open logfile: '".$logfile[0][confval]."' for writing. Falling back to STDOUT.\n";
+                echo "ERROR: Cannot open logfile: '".$logfile[0]["confval"]."' for writing. Falling back to STDOUT.\n";
             }
         }
+        $sql = "select confval from cfg_config WHERE `confkey`='path_dsmadmc'";
+        $tsmclient = $this->adodb->fetchArrayDB($sql);
+        if ($tsmclient[0]["confval"] != "") {
+            $this->dsmadmc = $tsmclient[0]["confval"];
+            if (!is_executable($this->dsmadmc)) {
+                $this->writeMSG("$this->dsmadmc is not executable.\n", "ERROR");
+                exit;
+            }
+        } else {
+            $this->writeMSG("TSM Monitor has not been installed correctly, path to dsmadmc could not be found.\n", "ERROR");
+            exit;
+        }
+        
 		$this->servers = $this->getServers();
 		$this->queries = $this->getQueries();
 		$this->overviewqueries = $this->getOverviewQueries();
@@ -230,9 +246,18 @@ class PollD {
 		$originalquery = $query;
 		$query = ereg_replace("NOTEQUAL","<>",$query);
 		$query = ereg_replace("LESS","<",$query);
+        if (ereg(" summary ", $query)) {
+            if ($this->lastrun > 0) {
+                $tdiff = $timestamp - $this->lastrun;
+                $tdiff = ceil($tdiff / 60) * 60;
+		        $query = ereg_replace(" @@@WHERE@@@ "," AND start_time>current_timestamp-($tdiff)seconds ",$query);
+            } else {
+		        $query = ereg_replace(" @@@WHERE@@@ "," ",$query);
+            }
+        }
 
         $popen_flags = ($os == "win32") ? 'rb' : 'r';
-		$handle = popen("dsmadmc -se=$servername -id=$user -password=$pass -TCPServeraddress=$ip -COMMMethod=TCPIP -TCPPort=$port -dataonly=yes -TAB \"$query\" ", "$popen_flags");
+		$handle = popen("$this->dsmadmc -se=$servername -id=$user -password=$pass -TCPServeraddress=$ip -COMMMethod=TCPIP -TCPPort=$port -dataonly=yes -TAB \"$query\" ", "$popen_flags");
 
 		$hashstring = "";
 
@@ -245,7 +270,6 @@ class PollD {
 				$stop = strstr($read, 'ANS1017E');
 				$stop = strstr($read, 'ANS8023E');
 				$blank = strstr($read, 'ANR2034E'); // dsmadmc runs correctly but result is empty (e.g. processes)
-				//$stop = strstr($read, 'ANS8023E');
 				if ($read != ' ' && $read != '' && !$stop) {
 					if ($blank == "") {
 						$read = preg_replace('/[\n]+/', '', $read);
@@ -261,7 +285,6 @@ class PollD {
 						$hashstring = "";
 						$stop = TRUE;
 					}
-					//$out[] = $read;
 				}
 			}
 		}
@@ -293,7 +316,6 @@ class PollD {
 		if ($count > 0) {
 			return TRUE;
 		} else {
-			$sql = 'INSERT INTO log_hashes VALUES ("'.$tablename.'", "'.$hash.'")';
 			$colarray = array();
 			$colarray["tablename"] = $tablename;
 			$colarray["hash"] = $hash;
@@ -319,7 +341,13 @@ class PollD {
 		$resarray = $res[0];
 		$lastinsert = $resarray["MAX(TimeStamp)"];
 
-		if ($lastinsert!="" && ($lastinsert+($pollfreq*60))>=$timestamp) {
+        if ($lastinsert != "") {
+            $this->lastrun = $lastinsert;
+        } else {
+            $this->lastrun = 0;
+        }
+
+		if ($lastinsert != "" && ($lastinsert+($pollfreq*60)) >= $timestamp) {
 			return TRUE;
 		} else {
 			return FALSE;
@@ -387,7 +415,7 @@ class PollD {
 			}
 			if ($result != "") {
 				if (!$this->checkHash($tablename, $result["md5"])) {
-					if ($query["polltype"]=="update") {
+					if ($query["polltype"] == "update") {
 						$dropsql = "truncate table ".$tablename;
 						try {
 							$this->adodb->execDB($dropsql);
@@ -399,7 +427,6 @@ class PollD {
 					foreach ($result["sql"] as $insertquery) {
 						try {
 							$this->adodb->execDB($insertquery);
-							//echo $insertquery;
 						} catch (exception $e) {
 							$this->writeMSG("Error while inserting into table (".$insertquery.")", "ERROR");
 						}
@@ -436,7 +463,6 @@ class PollD {
 
 		$tablename = "res_overview_".$server["servername"];
 		$this->writeMSG("---------".$query["name"].": ", "INFO");
-		//$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." LIKE smp_overview";
 		$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." ( `timestamp` int(11) collate utf8_unicode_ci NOT NULL, `name` varchar(35) collate utf8_unicode_ci NOT NULL, `result` varchar(255) collate utf8_unicode_ci NOT NULL, UNIQUE KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 		$this->adodb->execDB($ctsql);
 		$result = $this->execute($query["query"], $server["servername"], $tablename, $timestamp, $query["name"]);
@@ -476,7 +502,6 @@ class PollD {
 								$this->adodb->execDB($dropsql);
 							}
 							$delsql = "DELETE FROM log_hashes where `tablename` = '".$tablename."'";
-							//$this->fireMySQLQuery($delsql, FALSE);
 							$this->adodb->execDB($delsql);
 						}
 					}
