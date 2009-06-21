@@ -67,8 +67,6 @@ class TSMMonitor {
 
 		$this->adodb = $adodb;
 
-		//$this->adodb->setDebug($_SESSION["debug"]);
-
 		session_name("tsmmonitordev");
 		session_start();
 
@@ -102,13 +100,11 @@ class TSMMonitor {
 		// Session-variables
 		$this->configarray = $_SESSION['configarray'];
 
-		// timeout
+		// Timeout
 		if( !ini_get('safe_mode')) {
 			if (ini_get('max_execution_time') != $this->configarray["settings"]["timeout"]) {
 				ini_set('max_execution_time', $this->configarray["settings"]["timeout"]);
 			}
-			//ini_set('session.gc_maxlifetime', 10);
-			//ini_set('session.gc_divisor', 1);
 		}
 
 		// set defaults if vars are empty
@@ -127,7 +123,7 @@ class TSMMonitor {
 
 		$_SESSION["GETVars"] = $this->GETVars;
 
-		//Cleanup
+		// Cleanup
 		if ($_SESSION["from"] != $_GET['q']) {
 			$_SESSION['timemachine'] = "";
 			$_SESSION['tabletype'] = "";
@@ -187,7 +183,6 @@ class TSMMonitor {
 	 * @return array All results in an associative array
 	 */
 	function fetchSplitArrayDB($sql, $rows_per_page = '20') {
-		//    $this->conn->debug = true;
 		$this->page = intval($_GET['page']);
 
 		$sql = $this->adodb->sanitizeSQL($sql);
@@ -303,7 +298,6 @@ class TSMMonitor {
 
             $navline = $fp.'&nbsp;'.$pp.'&nbsp;'.$numbers.'&nbsp;'.$np.'&nbsp;'.$lp;
 		}
-        //return '<table width="100%" align="center" cellpadding="1" cellspacing="0" border=0><tr><td width="10%" align="left"></td><td width="80%" align="center">'.$navline.'</td><td width="10%" align="right">'.$linebox.'</td></tr></table>';
 		if ($navline != "") {
 			return '<div id="pagecountbox">'.$linebox.'</div>'.$navline.'';
 		} else {
@@ -366,7 +360,6 @@ class TSMMonitor {
 					$ret .= " SELECTED ";
 				}
 				$ret .= "> ".strftime('%H:%M:%S', $ts['timestamp'])."</option>";
-				//echo '> '.$ts->timestamp.'</option>';
 			}
 			$ret .= "</select>";
 			$ret .= "<br>";
@@ -691,8 +684,6 @@ class TSMMonitor {
 		$server = $this->GETVars['server'];
 		$ret = array();
 
-		//$qtable = $this->configarray["queryarray"][$this->GETVars['qq']]["name"];
-
 		$sql = "SELECT MAX(TimeStamp) from res_".$qq."_".$server;
 		$ret = $this->adodb->fetchArrayDB($sql);
 		$ret = (array)$ret[0];
@@ -855,7 +846,7 @@ class TSMMonitor {
 
 		if ($columnnames == "") $bContinue = FALSE;
 
-		//execute the constructed query
+		// execute the constructed query
 		$sql = "SELECT ".$columnnames." from res_".$qtable."_".$server.$timestampquery.$wc.$sqlappend;
 
 		$_SESSION["lastsql"] = $sql;
@@ -1608,7 +1599,6 @@ class TSMMonitor {
 			$query = "SELECT * from cfg_overviewqueries where parent='".$box['name']."' order by sortorder asc";
 			$queryoverview = $this->adodb->fetchArrayDB($query);
 			$temp = array ();
-			//print_r($queryoverview);
 			while (list ($subkey, $ovquery) = each ($queryoverview)) {
 				$ovquery['header'] = $queryoverview['name'];
 				$temp[] = (array)$ovquery;
