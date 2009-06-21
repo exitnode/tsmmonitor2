@@ -212,7 +212,11 @@ if (empty($_REQUEST["step"])) {
         }
         foreach ($_SESSION["install"]["paths"] as $name => $array) {
             if (isset($_POST[$name])) {
-                $_SESSION["install"]["paths"][$name]["default"] = $_POST[$name];
+                if (get_magic_quotes_gpc() != 0) {
+                    $_SESSION["install"]["paths"][$name]["default"] = stripslashes($_POST[$name]);
+                } else {
+                    $_SESSION["install"]["paths"][$name]["default"] = $_POST[$name];
+                }
             }
         }
     }
@@ -474,6 +478,27 @@ if ($_REQUEST["step"] == "90") {
                                     } else {
                                         $resStr = "<font color='#FF0000'>[NOT FOUND]</font> ";
                                         $capStr = "<span style='color:red'><br>[ERROR: FILE NOT FOUND]</span>";
+                                    }
+                                    
+                                    if ($name == "path_tmlog" || $name == "path_polldlog") {
+                                        $dir = dirname($file);
+                                        $base = basename($file);
+                                        if (file_exists($file) && is_file($file) && is_writable($file)) {
+                                            $resStr = "<font color='#008000'>[FOUND]</font> ";
+                                            $capStr = "<span style='color:green'><br>[OK: FILE FOUND]</span>";
+                                        } else if (file_exists($file) && is_dir($file) && is_writable($file)) {
+                                            $file = ereg_replace("\/*$", "", $file);
+                                            $file .= "/tsmmonitor.log";
+                                            $resStr = "<font color='#008000'>[FOUND]</font> ";
+                                            $capStr = "<span style='color:green'><br>[OK: DIRECTORY FOUND]</span>";
+                                        } else if (!file_exists($file) && is_dir($dir) && is_writable($dir)) {
+                                            $file = $dir."/".$base;
+                                            $resStr = "<font color='#008000'>[FOUND]</font> ";
+                                            $capStr = "<span style='color:green'><br>[OK: DIRECTORY FOUND]</span>";
+                                        } else {
+                                            $resStr = "<font color='#FF0000'>[NOT FOUND]</font> ";
+                                            $capStr = "<span style='color:red'><br>[ERROR: FILE OR DIRECTORY NOT FOUND OR NOT WRITEABLE]</span>";
+                                        }
                                     }
                                     echo "
                         <p>
