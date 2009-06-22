@@ -58,7 +58,10 @@ INSERT INTO `cfg_config` (`id`, `confkey`, `confval`, `description`) VALUES
 (1, 'timeout', '200', 'change this value to your desired php timeout'),
 (2, 'version', 'new_install', 'TSM Monitor version'),
 (3, 'path_tmlog', '', 'TSM Monitor Logfile Path'),
-(4, 'path_polldlog', '', 'PollD Logfile Path');
+(4, 'path_polldlog', '', 'PollD Logfile Path'),
+(5, 'loglevel_tm', 'INFO', 'TSM Monitor Log Level'),
+(6, 'loglevel_polld', 'INFO', 'PollD Log Level'),
+(7, 'path_dsmadmc', '/usr/bin/dsmadmc', '');
 
 -- --------------------------------------------------------
 
