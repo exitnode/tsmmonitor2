@@ -73,7 +73,7 @@ if ($_POST["css"] != "") {
 							// do nothing
 							// show settings page
 						} else if ($tsmmonitor->GETVars['qq'] == "settings") {
-							$tmonpolld = new PollD($adodb);
+							$tmonpolld = new PollD($adodb, $config["server_os"]);
 							$tmonpolld->adodb->setDebug($_SESSION["debug"]);
 
 							// If start/stop button was pressed
@@ -84,7 +84,6 @@ if ($_POST["css"] != "") {
 									$tmonpolld->controlPollD("off");	
 								}
 							}
-
 							if ($tmonpolld->isEnabled()=="1") {
 								$polldenabled = "enabled and ".$tmonpolld->getStatus();
 								//$cellcolor = "green";
@@ -92,7 +91,6 @@ if ($_POST["css"] != "") {
 								$polldenabled = "disabled";
 								//$cellcolor = "red";
 							}
-
 							echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
 							echo "<table class='zebra'>";
 							echo "<tr><th>Configuration</th><th>Action</th><th>Status</th></tr>";
