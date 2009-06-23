@@ -877,11 +877,9 @@ class TSMMonitor {
 					$outp .= $this->renderZebraTableRow($row, $i%2, $col, $color, "");
 					$i++;
 				}
-			}
-			else if ($type == "verticaltable") {
+			} else if ($type == "verticaltable") {
 				$outp = $this->adodb->fetchArrayDB($sql);
-			}
-			else if ($type == "timetable") {
+			} else if ($type == "timetable") {
 				$sqlres = $this->adodb->fetchArrayDB($sql);
 				$outp = array();
 				foreach ($sqlres as $row) {
@@ -896,8 +894,7 @@ class TSMMonitor {
 					}
 					array_push($outp, $rowarray2);
 				}
-			}
-			else if ($type == "timetable2") {
+			} else if ($type == "timetable2") {
 				$sqlres = $this->adodb->fetchArrayDB($sql);
 				$outp = array();
 				foreach ($sqlres as $row) {
@@ -1205,7 +1202,7 @@ class TSMMonitor {
 		$out= "<tr align='left'><th>".$header."</th><th>";
 		for ($count = 0; $count <= 24; $count++) {
 			$imagename = strftime("%H", $startpunkt + ($count * 3600));
-			$out .= "<img src='images/".$imagename.".gif' height=20px width=".$pxperHour."px title='".strftime("%H:00 (%D)", $startpunkt+($count*$hour))."' />";
+			$out .= "<img src='images/".$imagename.".gif' height=20px width=".$pxperHour."px title='".strftime("%H:00 (%D)", $startpunkt + ($count * 3600))."' />";
 		}
 
 		$out .= "</th></tr>";

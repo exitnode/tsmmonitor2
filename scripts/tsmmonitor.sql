@@ -61,7 +61,8 @@ INSERT INTO `cfg_config` (`id`, `confkey`, `confval`, `description`) VALUES
 (4, 'path_polldlog', '', 'PollD Logfile Path'),
 (5, 'loglevel_tm', 'INFO', 'TSM Monitor Log Level'),
 (6, 'loglevel_polld', 'INFO', 'PollD Log Level'),
-(7, 'path_dsmadmc', '/usr/bin/dsmadmc', '');
+(7, 'path_dsmadmc', '', 'dsmadmc Binary Path'),
+(8, 'path_php', '', 'PHP Binary Path');
 
 -- --------------------------------------------------------
 
