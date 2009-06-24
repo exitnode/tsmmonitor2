@@ -895,6 +895,7 @@ class TSMMonitor {
 					array_push($outp, $rowarray2);
 				}
 			} else if ($type == "timetable2") {
+                $sql = ereg_replace(" order by .*", " order by `Node Name`, (`Start Time`)", $sql);
 				$sqlres = $this->adodb->fetchArrayDB($sql);
 				$outp = array();
 				foreach ($sqlres as $row) {
@@ -1204,11 +1205,9 @@ class TSMMonitor {
 			$imagename = strftime("%H", $startpunkt + ($count * 3600));
 			$out .= "<img src='images/".$imagename.".gif' height=20px width=".$pxperHour."px title='".strftime("%H:00 (%D)", $startpunkt + ($count * 3600))."' />";
 		}
-
 		$out .= "</th></tr>";
 
 		return $out;
-
 	}
 
 
@@ -1220,7 +1219,6 @@ class TSMMonitor {
 	 * @return string
 	 */
 	function generateTimetableNavigation() {
-
 
 		$timesteps = array("1 hour" => "1", "6 hours" => "6", "12 hours" => "12", "24 hours" => "24");
 
@@ -1373,10 +1371,9 @@ class TSMMonitor {
         $oneday = 86400;
         $onehour = 3600;
         $resolution = ($onehour / $pxperhour);
-        $tolerance = 1200;
+        $tolerance = 120;
 
         $this->timetablestarttime = 24 + $_SESSION['timeshift'];
-
         $startpoint = ((ceil($now / $onehour) * $onehour) - $onehour - $oneday) - (($this->timetablestarttime - 24) * $onehour);
         $endpoint = $startpoint + $oneday + $onehour;
         $lastpoint = ($oneday + $onehour) / $resolution;
@@ -1387,12 +1384,14 @@ class TSMMonitor {
         $out .= "</td></tr>";
 
         $lasttimepoint = $now - ($this->timetablestarttime * $onehour) - $tolerance;
+        $lasttimepoint = $startpoint - $tolerance;
 
         $ii = 1;
 
         // every node with events
         while (list($nodename, $keyrow) = each($tablearray)) {
-            $egroup = array();
+            $dummy = array("", "", "dummy");
+            array_push($keyrow, $dummy);
             end($keyrow);
             $last = key($keyrow);
             reset($keyrow);
@@ -1406,7 +1405,13 @@ class TSMMonitor {
             $out .= "<td style='color:#000000;'>".$nodename."</td>";
             $out .= "<td class='content'>";
  
-            $pend = 0;
+            $egroup = array();
+            $ebegin = 0;    # event begin time
+            $eend = 0;      # event end time
+            $gbegin = 0;    # group begin time
+            $gend = 0;      # group end time
+            $pend = 0;      # previous event end time
+            $pendround = 0; # previous event end time rounded to the next pixel
             $line = "";
             $lstartpx = 0;
             $ldurpx = 0;
@@ -1415,67 +1420,77 @@ class TSMMonitor {
                 $ebegin = $valrow[0];
                 $eend = $valrow[1];
                 // event within display range
-                if ($ebegin <= $endpoint && $eend > $lasttimepoint) {
-                    if (empty($egroup)) {
-                        array_push($egroup, $valrow);
-                    } else {
-                        $pendround = (ceil($pend / $resolution) * $resolution);
-                        if ($ebegin <= $pendround) {
+                if (($ebegin <= $endpoint && $eend > $lasttimepoint) || ($valrow[2] == "dummy")) {
+                    if ($pend != 0) $pendround = (ceil($pend / $resolution) * $resolution);
+                    if ((floor($ebegin / $resolution) * $resolution) > $pendround || $key == $last || $valrow[2] == "dummy") {
+                        if (empty($egroup)) {
                             array_push($egroup, $valrow);
-                        } else if ($ebegin > $pendround || $key == $last) {
-                            $cbegin = (floor($egroup[0][0] / $resolution) * $resolution);
-                            $cend = (ceil($egroup[(count($egroup) - 1)][1] / $resolution) * $resolution);
-                            $cstatus = array();
-                            $cstatusmsg = array();
-                            $cshade = "";
-
-                            if ($cbegin < $lasttimepoint) {
-                                // cut the bar at the left side to fit into table
-                                $startpx = 0;
-                            } else {
-                                $startpx = ($cbegin - $startpoint) / $resolution;
-                            }
-                            $endpx = ($cend - $startpoint) / $resolution;
-                            $durpx = ceil($endpx - $startpx);
-                            // cut the bar at the right side to fit into table
-                            if (($startpx + $durpx) > $lastpoint) {
-                                $durpx = ceil($lastpoint - $startpx);
-                                $cshade = "light";
-                            }
-                            if ($cbegin < $lasttimepoint) {
-                                $cshade = "light";
-                            }
-                            $barcol = $cshade."green";
-                            while (list($ckey, $cvalrow) = each($egroup)) {
-                                $cestatus = $cvalrow[2];
-                                $cedur = strftime("%H:%M", ($cvalrow[1] - $cvalrow[0]) - $onehour);
-                                if (isset($cestatus)) {
-                                    if ($cestatus == "YES" || $cestatus == "Completed") {
-                                        array_push($cstatusmsg, $cedur."h, Status was OK");
-                                    } else {
-                                        $barcol = $cshade."red";
-                                        array_push($cstatusmsg, $cedur."h, Status was UNSUCCESSFUL");
-                                    }
-                                } else {
-                                    $barcol = $cshade."grey";
-                                    array_push($cstatusmsg, "");
-                                }
-                            }
-
-                            if ($line == "") {
-                                $line .= "<img src='images/trans.gif' height=1px width=".$startpx."px />";
-                            } else {
-                                $line .= "<img src='images/trans.gif' height=1px width=".($startpx - $lstartpx - $ldurpx)."px />";
-                            }
-                            $line .= "<img src='images/".$barcol.".gif' height=".$height."px width=".$durpx."px title='".$nodename." ".strftime("%H:%M", $cbegin)." - ".strftime("%H:%M", $cend)." (".(join('; ', $cstatusmsg)).")' />";
-
-                            // clearup for next event
-                            unset($egroup);
-                            $egroup = array();
-                            array_push($egroup, $valrow);
+                            $gbegin = $ebegin;
+                            $gend = $eend;
+                            $pend = $eend;
+                            $lstartpx = $startpx;
+                            $ldurpx = $durpx;
+                            if (count($keyrow) != 1) continue;
                         }
+                        $gstatus = array();
+
+                        // cut the bar at the left side to fit into table
+                        if ($gbegin < $lasttimepoint) {
+                            $startpx = 0;
+                            $gshade = "light";
+                        } else {
+                            $startpx = ceil(($gbegin - $startpoint) / $resolution);
+                            $gshade = "";
+                        }
+
+                        // cut the bar at the right side to fit into table
+                        $endpx = ceil(($gend - $startpoint) / $resolution);
+                        $durpx = ($endpx - $startpx);
+                        if ($durpx == 0) $durpx = 1;
+
+                        if (($startpx + $durpx) > $lastpoint) {
+                            $durpx = ceil($lastpoint - $startpx);
+                            $gshade = "light";
+                        } else {
+                            $gshade = "";
+                        }
+                        $barcol = $gshade."green";
+
+                        while (list($gkey, $gvalrow) = each($egroup)) {
+                            $cestatus = $gvalrow[2];
+                            $cedur = strftime("%H:%M:%S", ($gvalrow[1] - $gvalrow[0]) - $onehour);
+                            if (isset($cestatus)) {
+                                if ($cestatus == "YES" || $cestatus == "Completed") {
+                                    array_push($gstatus, $cedur."h, Status was OK");
+                                } else {
+                                    $barcol = $gshade."red";
+                                    array_push($gstatus, $cedur."h, Status was UNSUCCESSFUL");
+                                }
+                            } else {
+                                $barcol = $gshade."grey";
+                                array_push($gstatus, "");
+                            }
+                        }
+
+                        if ($line == "") {
+                            $line .= "<img src='images/trans.gif' height=1px width=".$startpx."px />";
+                        } else {
+                            $line .= "<img src='images/trans.gif' height=1px width=".($startpx - $lstartpx - $ldurpx)."px />";
+                        }
+                        $line .= "<img src='images/".$barcol.".gif' height=".$height."px width=".$durpx."px title='".$nodename." ".strftime("%H:%M:%S", $gbegin)." - ".strftime("%H:%M:%S", $gend)." (".(join('; ', $gstatus)).")' />";
+
+                        // cleanup for next event
+                        unset($egroup);
+                        $egroup = array();
+                        array_push($egroup, $valrow);
+                        $gbegin = $ebegin;
+                        $gend = $eend;
+                    } else if ((floor($ebegin / $resolution) * $resolution) <= $pendround) {
+                        array_push($egroup, $valrow);
+                        if ($ebegin < $gbegin) $gbegin = $ebegin;
+                        if ($eend > $gend) $gend = $eend;
                     }
-                    $pend = $valrow[1];
+                    $pend = $eend;
                     $lstartpx = $startpx;
                     $ldurpx = $durpx;
                 }
