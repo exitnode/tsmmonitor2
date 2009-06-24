@@ -133,6 +133,27 @@ include_once "includes/page_head.php";
 
 						// show normal table layout
 					} else {
+						$whereclause = array();
+    					$whereclause["field"] = $_POST["wcfield"];
+						$whereclause["val"] = $_POST["wcval"];
+						$whereclause["op"] = $_POST["wcop"];
+                        if ($whereclause["op"] == 'LIKE') {
+                            $whereclause["val"] = ereg_replace("\*","%",$whereclause["val"]);
+                            $_POST["wcval"] = $whereclause["val"];
+                        }
+						if ($whereclause["field"] != "" && $whereclause["val"] != "") {
+							if ($_POST["Clear"] == "Clear") {
+								$_SESSION["search"][$tsmmonitor->GETVars['qq']] = "";
+							} else {
+								if (!isset($_SESSION["search"])){
+									$temp = array();
+									$temp[$tsmmonitor->GETVars['qq']] = $whereclause;
+									$_SESSION["search"] = $temp;
+								} else {
+									$_SESSION["search"][$tsmmonitor->GETVars['qq']] = $whereclause;
+								}
+							}
+						}
 						if ($_SESSION["tabletype"] != "" && $_SESSION["tabletype"] == "timetable") {
 
 							if ($_POST["back"] != "") {
@@ -166,28 +187,6 @@ include_once "includes/page_head.php";
                             echo $tsmmonitor->generateTimetable2($tablearray, $headerarray[0]);
 
 						} else {
-
-							$whereclause = array();
-    						$whereclause["field"] = $_POST["wcfield"];
-							$whereclause["val"] = $_POST["wcval"];
-							$whereclause["op"] = $_POST["wcop"];
-                            if ($whereclause["op"] == 'LIKE') {
-                                $whereclause["val"] = ereg_replace("\*","%",$whereclause["val"]);
-                                $_POST["wcval"] = $whereclause["val"];
-                            }
-							if ($whereclause["field"] != "" && $whereclause["val"] != "") {
-								if ($_POST["Clear"] == "Clear") {
-									$_SESSION["search"][$tsmmonitor->GETVars['qq']] = "";
-								} else {
-									if (!isset($_SESSION["search"])){
-										$temp = array();
-										$temp[$tsmmonitor->GETVars['qq']] = $whereclause;
-										$_SESSION["search"] = $temp;
-									} else {
-										$_SESSION["search"][$tsmmonitor->GETVars['qq']] = $whereclause;
-									}
-								}
-							}
                             $lines = $_POST["lpp"];
                             if ($lines != "") {
                                 if (!isset($_SESSION["lines"])){
@@ -200,14 +199,17 @@ include_once "includes/page_head.php";
                             }
 							echo "<table class='zebra'>";
 							$thead = $tsmmonitor->getTableheader();
-							echo $thead["header"];
 							$tbody = $tsmmonitor->execute('table');
+							$nav = $tsmmonitor->showPageNavigation("40");
+							if ($nav != "") {
+								echo "<tr><td colspan='".$thead["numfields"]."' align='center' class='footer'><a>".$nav."</a></td></tr>";
+							}
+							echo $thead["header"];
                             if ($tbody != "") {
                                 echo $tbody;
                             } else {
                                 echo "<tr class='d0'><td colspan='".$thead["numfields"]."' align='center'>No entries found in database.</td></tr>";
                             }
-							$nav = $tsmmonitor->showPageNavigation("40");
 							if ($nav != "") {
 								echo "<tr><td colspan='".$thead["numfields"]."' align='center' class='footer'><a>".$nav."</a></td></tr>";
 							}
