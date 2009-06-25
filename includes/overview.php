@@ -47,7 +47,6 @@
 	<td width='48%' valign='top'>
 		<table class='zebra'>
 			<tr><th colspan="2">TSM Database</th></tr>
-			<?php //echo getOverviewRows(getInfobox("database")); ?>
 			<?php echo $tsmmonitor->getOverviewRows($tsmmonitor->configarray["infoboxarray"]["database"]); ?>
 		</table>
 	</td>
@@ -57,7 +56,6 @@
 		<td width='48%' valign='top'>
 			<table class='zebra'>
 				<tr><th colspan="2">Total Data</th></tr>
-				<?php //echo getOverviewRows(getInfobox("totaldata")); ?>
 				<?php echo $tsmmonitor->getOverviewRows($tsmmonitor->configarray["infoboxarray"]["totaldata"]); ?>
 			</table>
 		</td>
@@ -66,7 +64,6 @@
 		<td width='48%' valign='top'>
 			<table class='zebra'>
 				<tr><th colspan="2">Schedule Status</th></tr>
-				<?php //echo getOverviewRows(getInfobox("schedules")); ?>
 				<?php echo $tsmmonitor->getOverviewRows($tsmmonitor->configarray["infoboxarray"]["schedules"]); ?>
 			</table>
 		</td>

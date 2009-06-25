@@ -1156,6 +1156,7 @@ class TSMMonitor {
 			} else {
 				$sql = "SELECT name, result from res_overview_".$this->GETVars['server']." where name='".$subindexqueryarray[$key]["name"]."'";
 				$sqlres = $this->adodb->fetchArrayDB($sql);
+                if (empty($sqlres[0]["result"])) $sqlres[0]["result"] = 0;
 				$comperator = $subindexqueryarray[$key]["alert_comp"];
 				$alertval = $subindexqueryarray[$key]["alert_val"];
 				$alertcol = $subindexqueryarray[$key]["alert_col"];

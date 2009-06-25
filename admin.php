@@ -86,10 +86,8 @@ if ($_POST["css"] != "") {
 							}
 							if ($tmonpolld->isEnabled()=="1") {
 								$polldenabled = "enabled and ".$tmonpolld->getStatus();
-								//$cellcolor = "green";
 							} else {
 								$polldenabled = "disabled";
-								//$cellcolor = "red";
 							}
 							echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
 							echo "<table class='zebra'>";
@@ -250,7 +248,8 @@ if ($_POST["css"] != "") {
 												if ($_POST["txt".$col['Field']] != "") {
 													$val = md5($_POST["txt".$col['Field']]);
 												} else {
-													$val = "";
+                                                    $pwerr = "<p style='font-size: 14px; font-weight: bold; color: red;'>Password cannot be empty! Password was not reset.</p>";
+													continue;
 												}
 											} else {
 												$val = $_POST["txt".$col['Field']];
@@ -273,6 +272,7 @@ if ($_POST["css"] != "") {
 									}
 									$adodb->updateDB("cfg_".$_GET['q'], $colarray, 'id');
 								}
+                                if (!empty($pwerr)) echo $pwerr;
 								echo "<form action=".$_SERVER['PHP_SELF']."?q=".$tsmmonitor->GETVars['qq']."&m=".$tsmmonitor->GETVars['menu']." method='post'>";
 								echo "<table class='zebra'>";
 								$thead = $tsmmonitor->getTableheader();
@@ -281,12 +281,8 @@ if ($_POST["css"] != "") {
                                 if ($tbody != "") {
                                     echo $tbody;
                                 } else {
-                                    echo "<tr class='d0'><td colspan='".($thead["numfields"]+1)."' align='center'>No entries found in database.</td></tr>";
+                                    echo "<tr class='d0'><td colspan='".($thead["numfields"] + 1)."' align='center'>No entries found in database.</td></tr>";
                                 }
-								$nav = $tsmmonitor->showPageNavigation("40");
-								if ($nav!="") {
-									echo "<tr><td colspan='".($thead["numfields"]+1)."' align='center' class='footer'><a class='navhead'>".$nav."</a></td></tr>";
-								}
 								echo "</table>";
 								echo "<input type='submit' class='button' name='Add' value='Add' onclick='submit();'>";
 								echo "</form>";
