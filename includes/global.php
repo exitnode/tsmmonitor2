@@ -38,21 +38,21 @@
 
  */
 
+// ** Global configuration array ** //
+$config = array();
+
 // ** Default database settings ** //
-$db_type = 'mysql';
-$db_name = 'tsmmonitor';
-$db_user = 'tsmmonitor';
-$db_password = 'tsmmonitor';
-$db_host = 'localhost';
-$db_port = '3306';
-$db_charset = 'utf8';
-$db_collate = '';
+$config["db_type"] = 'mysql';
+$config["db_name"] = 'tsmmonitor';
+$config["db_user"] = 'tsmmonitor';
+$config["db_password"] = 'tsmmonitor';
+$config["db_host"] = 'localhost';
+$config["db_port"] = '3306';
+$config["db_charset"] = 'utf8';
+$config["db_collate"] = '';
 
 // ** Include user configureable definitions ** //
 include(dirname(__FILE__) . "/config.php");
-
-// ** Global configuration array ** //
-$config = array();
 
 // ** Current TSM Monitor version ** //
 $config["tsm_monitor_version"] = '0.0.1';
@@ -89,13 +89,13 @@ include_once($config["include_path"] . "/tsmmonitor.php");
 include_once($config["include_path"] . "/polld.php");
 
 // ** Connect to the database ** //
-$adodb = new ADOdb($db_host, $db_port, $db_user, $db_password, $db_name, $db_type);
+$adodb = new ADOdb($config["db_host"], $config["db_port"], $config["db_user"], $config["db_password"], $config["db_name"], $config["db_type"]);
 
 // ** instantiate TSMMonitor Class ** //
 $tsmmonitor = new TSMMonitor($adodb);
 
 // check to see if this is a new installation
-$version = $adodb->fetchCellDB("select confval from cfg_config where confkey='version'", '');
+$version = $adodb->fetchCellDB("SELECT confval FROM cfg_config WHERE confkey='version'", '');
 if ($version != $config["tsm_monitor_version"] && basename($_SERVER['REQUEST_URI']) != 'install.php') {
 	header("Location: install.php");
 	exit;

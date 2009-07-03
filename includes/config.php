@@ -30,12 +30,12 @@
  */
 
 // ** database settings ** //
-$db_type = 'mysql';             // Name of the DBMS hosting the tsmmonitor database
-$db_name = 'tsmmonitor';        // Name of the tsmmonitor database
-$db_user = 'tsmmonitor';        // Username used to connect to the tsmmonitor database
-$db_password = 'tsmmonitor';    // Password used to connect to the tsmmonitor database
-$db_host = 'localhost';         // Hostname or IP address the DBMS is listening on
-$db_port = '3306';              // Port number the DBMS is listening on
-$db_charset = 'utf8';
-$db_collate = '';
+$config["db_type"] = 'mysql';             // Name of the DBMS hosting the tsmmonitor database
+$config["db_name"] = 'tsmmonitor';        // Name of the tsmmonitor database
+$config["db_user"] = 'tsmmonitor';        // Username used to connect to the tsmmonitor database
+$config["db_password"] = 'tsmmonitor';    // Password used to connect to the tsmmonitor database
+$config["db_host"] = 'localhost';         // Hostname or IP address the DBMS is listening on
+$config["db_port"] = '3306';              // Port number the DBMS is listening on
+$config["db_charset"] = 'utf8';
+$config["db_collate"] = '';
 ?>

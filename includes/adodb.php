@@ -63,7 +63,7 @@ class ADOdb {
 		$hostport = $host . ":" . $port;
 		$this->conn = NewADOConnection($db_type);
 		while ($try <= $retries) {
-			if ($this->conn->PConnect($hostport,$user,$pass,$db_name)) {
+			if ($this->conn->NConnect($hostport,$user,$pass,$db_name)) {
 				$this->conn = $this->conn;
 				return 0;
 			}
