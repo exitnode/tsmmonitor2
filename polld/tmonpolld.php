@@ -35,6 +35,15 @@
 
 include_once("../includes/global.php");
 
+// If possible disable execution timeout.
+if (ini_get('safe_mode')) {
+    echo "\nWARN: PHP 'safe_mode' is on. Cannot disable 'max_execution_time' parameter.\n";
+    echo "      Please adjust 'max_execution_time' manually in ".get_cfg_var('cfg_file_path')."\n";
+    echo "      or turn off 'safe_mode' for the PHP CLI.\n\n";
+} else {
+    set_time_limit(0);
+}
+
 $tmonpolld = new PollD($adodb, $config["server_os"]);
 $tmonpolld->controlPollD("on");
 $tmonpolld->poll();
