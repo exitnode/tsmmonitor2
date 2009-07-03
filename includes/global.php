@@ -101,6 +101,13 @@ if ($version != $config["tsm_monitor_version"] && basename($_SERVER['REQUEST_URI
 	exit;
 }
 
+$polld_maxproc = $adodb->fetchCellDB("SELECT confval FROM cfg_config WHERE confkey='polld_maxproc'", '');
+if (isset($polld_maxproc)) {
+    $config["polld_maxproc"] = $polld_maxproc;
+} else {
+    $config["polld_maxproc"] = 5;
+}
+
 // ** Include generic code and external libraries ** //
 // ... more includes here
 

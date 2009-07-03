@@ -62,7 +62,8 @@ INSERT INTO `cfg_config` (`id`, `confkey`, `confval`, `description`) VALUES
 (5, 'loglevel_tm', 'INFO', 'TSM Monitor Log Level'),
 (6, 'loglevel_polld', 'INFO', 'PollD Log Level'),
 (7, 'path_dsmadmc', '', 'dsmadmc Binary Path'),
-(8, 'path_php', '', 'PHP Binary Path');
+(8, 'path_php', '', 'PHP Binary Path'),
+(9, 'polld_maxproc', '5', 'PollD maximum concurrent processes');
 
 -- --------------------------------------------------------
 
@@ -364,3 +365,21 @@ CREATE TABLE IF NOT EXISTS `log_polldstat` (
 
 INSERT INTO `log_polldstat` (`id`, `enabled`, `status`, `lastrun`, `nextrun`) VALUES
 (1, 0, '', 0, 0);
+
+
+-- --------------------------------------------------------
+
+
+--
+-- Table structure for table `job_list`
+--
+
+CREATE TABLE IF NOT EXISTS `job_list` (
+  `id` int(11) NOT NULL auto_increment,
+  `servername` varchar(35) collate utf8_unicode_ci NOT NULL,
+  `status` varchar(35) collate utf8_unicode_ci NOT NULL,
+  `pid` int(11) default NULL,
+  `lastrun` int(11) default NULL,
+  `nextrun` int(11) default NULL
+  PRIMARY KEY  (`id`)
+  ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
