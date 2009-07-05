@@ -157,28 +157,28 @@ if (empty($_REQUEST["step"])) {
             // dsmadmc binary path
             $_SESSION["install"]["paths"]["path_dsmadmc"]["name"] = "dsmadmc Binary Path";
             $_SESSION["install"]["paths"]["path_dsmadmc"]["desc"] = "The path to the TSM admin client binary.";
-            $which_dsmadmc = $tsmmonitor->findPath("dsmadmc", $config["search_path"]);
+            $which_dsmadmc = $tsmmonitor->findPath("dsmadmc".$config["binary_suffix"], $config["search_path"]);
             if (isset($tsmmonitor->configarray["settings"]["paths"]["path_dsmadmc"])) {
                 $_SESSION["install"]["paths"]["path_dsmadmc"]["default"] = $tsmmonitor->configarray["settings"]["path_dsmadmc"];
             } else if (!empty($which_dsmadmc)) {
                 $_SESSION["install"]["paths"]["path_dsmadmc"]["default"] = $which_dsmadmc;
             } else {
-                $_SESSION["install"]["paths"]["path_dsmadmc"]["default"] = "dsmadmc";
+                $_SESSION["install"]["paths"]["path_dsmadmc"]["default"] = "dsmadmc".$config["binary_suffix"];
             }
             
             // php/php5 binary path
             $_SESSION["install"]["paths"]["path_php"]["name"] = "PHP Binary Path";
             $_SESSION["install"]["paths"]["path_php"]["desc"] = "The path to the PHP binary.";
-            $which_php = $tsmmonitor->findPath("php", $config["search_path"]);
+            $which_php = $tsmmonitor->findPath("php".$config["binary_suffix"], $config["search_path"]);
             if(!isset($which_php)) {
-                $which_php = $tsmmonitor->findPath("php5", $config["search_path"]);
+                $which_php = $tsmmonitor->findPath("php5".$config["binary_suffix"], $config["search_path"]);
             }
             if (isset($tsmmonitor->configarray["settings"]["paths"]["path_php"])) {
                 $_SESSION["install"]["paths"]["path_php"]["default"] = $tsmmonitor->configarray["settings"]["path_php"];
             } else if (!empty($which_php)) {
                 $_SESSION["install"]["paths"]["path_php"]["default"] = $which_php;
             } else {
-                $_SESSION["install"]["paths"]["path_php"]["default"] = "php";
+                $_SESSION["install"]["paths"]["path_php"]["default"] = "php".$config["binary_suffix"];
             }
             
             // Logfile path
@@ -259,7 +259,7 @@ if (empty($_REQUEST["step"])) {
             if ($input_err == "") {
                 $dsmadmc = $_SESSION["install"]["paths"]["path_dsmadmc"]["default"];
                 if (file_exists($dsmadmc) && is_executable($dsmadmc)) {
-                    $popen_flags = ($os == "win32") ? 'rb' : 'r';
+                    $popen_flags = ($config["server_os"] == "win32") ? 'rb' : 'r';
                     $oh = popen($dsmadmc." -se=".$server['srv_servername']." -id=".$server['srv_username']." -password=".$server['srv_password']." -TCPServeraddress=".$server['srv_ip']." -COMMMethod=TCPIP -TCPPort=".$server['srv_port']." -dataonly=yes -TAB \"SELECT SERVER_HLA,SERVER_LLA FROM status\" ", "$popen_flags");
                     if ($oh != 0) {
                         while (!feof($oh)) {
@@ -469,6 +469,11 @@ if ($_REQUEST["step"] == "90") {
                             foreach ($_SESSION["install"]["paths"] as $name => $array) {
                                 if (isset($_SESSION["install"]["paths"][$name])) {
                                     $file = $array["default"];
+                                    if ($name == "path_dsmadmc" || $name == "path_php") {
+                                        if ($config["server_os"] == "win32" && !ereg(".exe$", $file)) {
+                                            $file = $file.$config["binary_suffix"];
+                                        }
+                                    }
                                     $resStr = "";
                                     $capStr = "";
 

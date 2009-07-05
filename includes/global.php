@@ -62,9 +62,11 @@ $config["server_os"] = (strstr(PHP_OS, "WIN")) ? "win32" : "unix";
 
 // ** Search paths for external programs (dsmadmc, php, ...) ** //
 if ($config["server_os"] == "win32") {
-	$config["search_path"] = array('c:/php', 'c:/progra~1/php', 'd:/php', 'd:/progra~1/php', 'c:/progra~1/tivoli/tsm/baclient', 'd:/progra~1/tivoli/tsm/baclient');
+	$config["search_path"] = array('c:/php', 'c:/progra~1/php', 'c:/progra~2/php', 'c:/xampp/php', 'd:/php', 'd:/progra~1/php', 'd:/progra~2/php', 'd:/xampp/php', 'c:/progra~1/tivoli/tsm/baclient', 'c:/progra~2/tivoli/tsm/baclient', 'd:/progra~1/tivoli/tsm/baclient', 'd:/progra~2/tivoli/tsm/baclient');
+	$config["binary_suffix"] = ".exe";
 } elseif ($config["server_os"] == "unix") {
 	$config["search_path"] = array('/bin', '/sbin', '/usr/bin', '/usr/sbin', '/usr/local/bin', '/usr/local/sbin', '/usr/tivoli/tsm/client/admin/bin', '/opt/tivoli/tsm/client/ba/bin');
+	$config["binary_suffix"] = "";
 }
 
 // ** Paths (libraries, includes, ...) ** //
