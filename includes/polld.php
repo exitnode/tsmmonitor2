@@ -226,6 +226,36 @@ class PollD {
 
 
 	/**
+	 * getServerVersion - returns version of selected server
+	 *
+	 * @param $server
+	 * @return string version
+	 */
+	function getServerVersion($server) {
+
+		$ip = $server["ip"];
+		$port = $server["port"];
+		$user = $server["username"];
+		$pass = $server["password"];
+		$servername = $server["servername"];
+		$out = "";
+
+		$query = "select version from status";
+        $popen_flags = ($os == "win32") ? 'rb' : 'r';
+
+		$handle = popen("$this->dsmadmc -se=$servername -id=$user -password=$pass -TCPServeraddress=$ip -COMMMethod=TCPIP -TCPPort=$port -dataonly=yes -TAB \"$query\" ", "$popen_flags");
+
+		if ($handle) {
+			while (!feof($handle) && !$stop) {
+				$read = fgets($handle, 1024);
+					$out .= $read;
+			}
+		}
+		return $out[0];
+
+	}
+
+	/**
 	 * execute - executes a TSM query on a TSM server and returns an array containing SQL insert statements including the results
 	 *
 	 * @param string $query TSM query
@@ -390,6 +420,8 @@ class PollD {
         $starttquery = time();
         $querytime = 0;
 
+		$version = $this->getServerVersion($server);
+		
 		$queryname = $query["name"];
 		$tablename = "res_".$queryname."_".$server["servername"];
 		if (!$ignorePollFreq) {
@@ -407,10 +439,11 @@ class PollD {
 			}
 			$this->adodb->execDB($ctsql);
 		}
+
 		// execute query and store result in mysql db
 		if ($ignorePollFreq || !$this->checkFreq($tablename, $query["pollfreq"], $timestamp)) {
 			try {
-				$result = $this->execute($query["tsmquery"], $server["servername"], $tablename, $timestamp);
+				$result = $this->execute($query["tsmquery_v".$version], $server["servername"], $tablename, $timestamp);
 			} catch (exception $e) {
 				$this->writeMSG("Problem while querying from TSM Server!", "ERROR");
 			}
@@ -462,11 +495,13 @@ class PollD {
         $starttquery = time();
         $querytime = 0;
 
+		$version = $this->getServerVersion($server);
+
 		$tablename = "res_overview_".$server["servername"];
 		$this->writeMSG("---------".$query["name"].": ", "INFO");
 		$ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." ( `timestamp` int(11) collate utf8_unicode_ci NOT NULL, `name` varchar(35) collate utf8_unicode_ci NOT NULL, `result` varchar(255) collate utf8_unicode_ci NOT NULL, UNIQUE KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 		$this->adodb->execDB($ctsql);
-		$result = $this->execute($query["query"], $server["servername"], $tablename, $timestamp, $query["name"]);
+		$result = $this->execute($query["query_v".$version], $server["servername"], $tablename, $timestamp, $query["name"]);
 		if ($result != "") {
 			foreach ($result["sql"] as $insertquery) {
 				$this->adodb->execDB($insertquery);
@@ -872,6 +907,37 @@ class PollD_MP {
     }
 
 
+	/**
+	 * getServerVersion - returns version of selected server
+	 *
+	 * @param $server
+	 * @return string version
+	 */
+	function getServerVersion($server) {
+
+		$ip = $server["ip"];
+		$port = $server["port"];
+		$user = $server["username"];
+		$pass = $server["password"];
+		$servername = $server["servername"];
+		$out = "";
+
+		$query = "select version from status";
+        $popen_flags = ($os == "win32") ? 'rb' : 'r';
+
+		$handle = popen("$this->dsmadmc -se=$servername -id=$user -password=$pass -TCPServeraddress=$ip -COMMMethod=TCPIP -TCPPort=$port -dataonly=yes -TAB \"$query\" ", "$popen_flags");
+
+		if ($handle) {
+			while (!feof($handle) && !$stop) {
+				$read = fgets($handle, 1024);
+					$out .= $read;
+			}
+		}
+		return $out[0];
+
+	}
+
+
     /**
      * updateJoblist - update the job list for the worker processes
      *
@@ -1069,6 +1135,8 @@ class PollD_MP {
         $starttquery = time();
         $querytime = 0;
 
+		$version = $this->getServerVersion($server["servername"]);
+
         $logprefix = "Worker(".$this->child_pid.") ".sprintf('%-16s', $server)." ---------".$query["name"];
         $tablename = "res_".$query["name"]."_".$server;
 
@@ -1087,7 +1155,7 @@ class PollD_MP {
         // execute query and store result in mysql db
         if ($ignorePollFreq || !$this->checkFreq($tablename, $query["pollfreq"], $timestamp)) {
             try {
-                $result = $this->execute($query["tsmquery"], $server, $tablename, $timestamp);
+                $result = $this->execute($query["tsmquery_v".$version], $server, $tablename, $timestamp);
             } catch (exception $e) {
                 $this->writeMSG($logprefix.": Problem while querying from TSM Server!\n", "ERROR");
             }
@@ -1140,11 +1208,13 @@ class PollD_MP {
         $starttquery = time();
         $querytime = 0;
 
+		$version = $this->getServerVersion($server["servername"]);
+
         $tablename = "res_overview_".$server;
         $logprefix = "Worker(".$this->child_pid.") ".sprintf('%-16s', $server)." ---------".$query["name"];
         $ctsql = "CREATE TABLE IF NOT EXISTS ".$tablename." ( `timestamp` int(11) collate utf8_unicode_ci NOT NULL, `name` varchar(35) collate utf8_unicode_ci NOT NULL, `result` varchar(255) collate utf8_unicode_ci NOT NULL, UNIQUE KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
         $this->adodb->execDB($ctsql);
-        $result = $this->execute($query["query"], $server, $tablename, $timestamp, $query["name"]);
+        $result = $this->execute($query["query_v".$version], $server, $tablename, $timestamp, $query["name"]);
         if ($result != "") {
             foreach ($result["sql"] as $insertquery) {
                 $this->adodb->execDB($insertquery);
