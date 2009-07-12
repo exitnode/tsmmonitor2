@@ -30,7 +30,7 @@
 
 include_once "includes/global.php";
 $_SESSION["stylesheet"] = "style_classic.css";
-if ($_REQUEST["step"] != "80" || $_REQUEST["refresh"] != "") {
+if (($_REQUEST["step"] != "80" && $_REQUEST["step"] != "60" ) || $_REQUEST["refresh"] != "") {
     include_once "includes/page_head.php";
 }
 
@@ -50,7 +50,7 @@ $error_head = "<p style='font-size: 16px; font-weight: bold; color: red;'>Error<
 $funcs = array("popen");
 $func_ena = true;
 foreach ($funcs as $func) {
-    if (!function_exists($func)){
+    if (!function_exists($func)) {
         $func_ena = false;
         $func_miss .= "        <li style='font-size: 12px;'>$func</li>\n";
     }
@@ -71,7 +71,7 @@ $func_miss
 $exts = array("session", "sockets");
 $ext_load = true;
 foreach ($exts as $ext) {
-    if (!extension_loaded($ext)){
+    if (!extension_loaded($ext)) {
         $ext_load = false;
         $ext_miss .= "        <li style='font-size: 12px;'>$ext</li>\n";
     }
@@ -89,7 +89,7 @@ $ext_miss
 }
 
 // Try to find current (old) version in the array
-$tsm_monitor_versions = array("0.1.0", "0.1.1");
+$tsm_monitor_versions = array("0.0.1", "0.0.2");
 $old_tsm_monitor_version = $adodb->fetchCellDB("SELECT confval FROM cfg_config WHERE confkey='version'", '');
 $old_version_index = array_search($old_tsm_monitor_version, $tsm_monitor_versions);
 
@@ -110,6 +110,20 @@ if ($old_tsm_monitor_version == $config["tsm_monitor_version"]) {
     echo $page_foot;
     exit;
 }
+
+function upgradeDB($version, $sql) {
+    global $adodb;
+    $sql_cache = (isset($_SESSION["install"]["sql_cache"]) ? $_SESSION["install"]["sql_cache"] : array());
+
+    if ($adodb->execDB($sql)) {
+        $sql_cache{sizeof($sql_cache)}[$version][1] = $sql;
+    } else {
+        $sql_cache{sizeof($sql_cache)}[$version][0] = $sql;
+    }
+
+    $_SESSION["install"]["sql_cache"] = $sql_cache;
+}
+
 
 // Default for the install type
 if (!isset($_REQUEST["install_type"])) {
@@ -288,7 +302,12 @@ if (empty($_REQUEST["step"])) {
     }
     // Update page
     elseif ($_REQUEST["step"] == "60") {
-        $_REQUEST["step"] = "80";
+        // set new version, disable installer and redirect to login page
+        $adodb->updateDB('cfg_config', array(confkey => 'version', confval => $config['tsm_monitor_version']), 'confkey');
+        $adodb->closeDB();
+        $_SESSION["stylesheet"] = "";
+        header("Location: index.php");
+        exit;
     }
     // Refresh on php limits page or finish and flush data to db
     elseif ($_REQUEST["step"] == "80") {
@@ -342,13 +361,13 @@ if ($_REQUEST["step"] == "90") {
 
     // Loop over all versions up to the current and perform incremental updates
     for ($i = ($old_version_index+1); $i < count($tsm_monitor_versions); $i++) {
-        if ($tsm_monitor_versions[$i] == "0.0.1") {
+        if ($tsm_monitor_versions[$i] == "0.0.2") {
             include "install/0_0_1_to_0_0_2.php";
-            upgrade_to_0_0_2();
-        } /* elseif ($tsm_monitor_versions[$i] == "0.0.2") {
+            upgrade_to_0_0_2($adodb);
+        } /* elseif ($tsm_monitor_versions[$i] == "0.0.3") {
             include "install/0_0_2_to_0_0_3.php";
             upgrade_to_0_0_3();
-        } elseif ($tsm_monitor_versions[$i] == "0.0.3") {
+        } elseif ($tsm_monitor_versions[$i] == "0.0.4") {
             include "install/0_0_3_to_0_0_4.php";
             upgrade_to_0_0_4();
         } */
@@ -655,11 +674,45 @@ if ($_REQUEST["step"] == "90") {
                             } elseif ($_REQUEST["step"] == "60") {
                         ?>
 
-                        <p>
-                          Sorry, this is the initial TSM Monitor version, there are currently no
-                          updates from previous versions available. Please choose "New install"
-                          on the previous page.
-                        </p>
+                        <p>Upgrade results:</p>
+                        <?php
+                        $current_version  = "";
+                        $upgrade_results = "";
+                        $failed_sql_query = false;
+
+                        $fail_text = "<span style='color: red; font-weight: bold; font-size: 12px;'>[Fail]</span>&nbsp;";
+                        $success_text = "<span style='color: green; font-weight: bold; font-size: 12px;'>[Success]</span>&nbsp;";
+
+                        if (isset($_SESSION["install"]["sql_cache"])) {
+                            while (list($index, $arr1) = each($_SESSION["install"]["sql_cache"])) {
+                                while (list($version, $arr2) = each($arr1)) {
+                                    while (list($status, $sql) = each($arr2)) {
+                                        if ($current_version != $version) {
+                                            $version_index = array_search($version, $tsm_monitor_versions);
+                                            $upgrade_results .= "<p><strong>From version " . $tsm_monitor_versions{$version_index-1}  . " to version " . $tsm_monitor_versions{$version_index} . "</strong></p>\n";
+                                        }
+                                        $upgrade_results .= "<p class='code'>" . (($status == 0) ? $fail_text : $success_text) . nl2br($sql) . "</p>\n";
+
+                                        if ($status == 0) {
+                                            $failed_sql_query = true;
+                                        }
+
+                                        $current_version = $version;
+                                    }
+                                }
+                            }
+                            unset($_SESSION["install"]["sql_cache"]);
+                        } else {
+                            print "<em>No SQL queries have been executed.</em>";
+                        }
+
+                        if ($failed_sql_query == true) {
+                            print "<p><strong><font color='#FF0000'>WARNING:</font></strong> One or more of the SQL queries needed to upgraded your TSM Monitor installation has failed. Please see below for more details. Your TSM Monitor MySQL user must have <strong>SELECT, INSERT, UPDATE, DELETE, ALTER, CREATE, and DROP</strong> permissions. You should try executing the failed queries as 'root' on the MySQL command line to ensure that you do not have a permissions problem.</p>\n";
+                        }
+
+                        print $upgrade_results;
+
+                        ?>
                         <?php // Installation Step 80 (PHP Limits)
                             } elseif ($_REQUEST["step"] == "80") {
                         ?>
@@ -750,9 +803,6 @@ if ($_REQUEST["step"] == "90") {
                           be performed, so please make sure the above settings are correct! Any of
                           the above settings can later on be changed with the TSM Monitor admin web
                           interface.
-                          <br>
-                          If you did choose to upgrade from a previous version of TSM Monitor, the
-                          database will also be upgraded by clicking "Finish".
                         </p>
                         <?php } ?>
 
@@ -777,7 +827,7 @@ if ($_REQUEST["step"] == "90") {
 
                       <td align="right">
                         <p>
-                        <?php if ($_REQUEST["step"] == "80") { ?>
+                        <?php if (($_REQUEST["step"] == "80") || ($_REQUEST["step"] == "60")) { ?>
 
                           <input style='display: block; width: auto; background: #eaeaea; margin-bottom: 2px; padding: 3px 30px 3px 30px; color: #000000; font-size: 11px; font-weight: bold; text-decoration: none; border: 1px solid #ffffff;' type="submit" name="finish" value="Finish">
                         <?php } else { ?>
