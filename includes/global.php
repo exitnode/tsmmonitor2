@@ -85,6 +85,7 @@ header("Pragma: no-cache");
 //error_reporting(E_ALL);
 
 // ** Include generic code and external libraries ** //
+include ($config["library_path"] . "/adodb5/adodb-exceptions.inc.php");
 include ($config["library_path"] . "/adodb5/adodb.inc.php");
 include_once($config["include_path"] . "/adodb.php");
 include_once($config["include_path"] . "/tsmmonitor.php");
@@ -94,11 +95,11 @@ include_once($config["include_path"] . "/polld.php");
 $adodb = new ADOdb($config["db_host"], $config["db_port"], $config["db_user"], $config["db_password"], $config["db_name"], $config["db_type"]);
 
 // ** instantiate TSMMonitor Class ** //
-$tsmmonitor = new TSMMonitor($adodb);
+if (isset($_SERVER['HTTP_USER_AGENT'])) $tsmmonitor = new TSMMonitor($adodb);
 
 // check to see if this is a new installation
 $version = $adodb->fetchCellDB("SELECT confval FROM cfg_config WHERE confkey='version'", '');
-if ($version != $config["tsm_monitor_version"] && basename($_SERVER['REQUEST_URI']) != 'install.php') {
+if (isset($_SERVER['HTTP_USER_AGENT']) && $version != $config["tsm_monitor_version"] && basename($_SERVER['REQUEST_URI']) != 'install.php') {
 	header("Location: install.php");
 	exit;
 }

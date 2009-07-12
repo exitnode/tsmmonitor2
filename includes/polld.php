@@ -80,6 +80,8 @@ class PollD {
             $this->loghandle = fopen($logfile[0]["confval"], 'at');
             if (!$this->loghandle) {
                 echo "ERROR: Cannot open logfile: '".$logfile[0]["confval"]."' for writing. Falling back to STDOUT.\n";
+            } else {
+                $this->adodb->setLogfile($logfile[0]["confval"]);
             }
         }
         $sql = "select confval from cfg_config WHERE `confkey`='path_dsmadmc'";
@@ -732,7 +734,7 @@ class PollD_MP {
         
         // Check if PHP has pcntl_fork() enabled.
         foreach ($funcs as $func) {
-            if (!function_exists($func)){
+            if (!function_exists($func)) {
                 $func_ena = false;
                 array_push($func_miss, $func);
             }
@@ -803,19 +805,23 @@ class PollD_MP {
         }
 
         if ($this->debuglevel >= $ilevel) {
-            if ($loghandle = fopen($this->logfile, 'a')) {
-                $starttime = microtime();
-                do {
-                    $lock = flock($loghandle, LOCK_EX);
-                    if (!$lock) usleep(round(rand(0, 100) * 1000));
-                } while (!$lock && ((microtime() - $starttime) < 1000));
+            if ($this->logfile != "") {
+                if ($loghandle = fopen($this->logfile, 'a')) {
+                    $starttime = microtime();
+                    do {
+                        $lock = flock($loghandle, LOCK_EX);
+                        if (!$lock) usleep(round(rand(0, 100) * 1000));
+                    } while (!$lock && ((microtime() - $starttime) < 1000));
 
-                if ($lock) {
-                    fwrite($loghandle, $level.": ".$msg);
+                    if ($lock) {
+                        fwrite($loghandle, $level.": ".$msg);
+                    }
+                    fclose($loghandle);
+                } else {
+                    echo "ERROR: Cannot open logfile: '".$logfile."' for writing. Falling back to STDOUT.\n";
+                    echo $level.": ".$msg;
                 }
-                fclose($loghandle);
             } else {
-                echo "ERROR: Cannot open logfile: '".$logfile."' for writing. Falling back to STDOUT.\n";
                 echo $level.": ".$msg;
             }
         }
@@ -1302,7 +1308,7 @@ class PollD_MP {
         if ($this->isEnabled()) {
             // Main loop for dispatcher
             while(true) {
-                $this->adodb = new ADOdb($this->cfg["db_host"], $this->cfg["db_port"], $this->cfg["db_user"], $this->cfg["db_password"], $this->cfg["db_name"], $this->cfg["db_type"]);
+                $this->adodb = new ADOdb($this->cfg["db_host"], $this->cfg["db_port"], $this->cfg["db_user"], $this->cfg["db_password"], $this->cfg["db_name"], $this->cfg["db_type"], "", "", $this->logfile);
                 $this->updateJoblist($this->adodb);
                 $query = "SELECT * FROM job_list";
                 $jobs = $this->adodb->fetchArrayDB($query);
@@ -1352,7 +1358,7 @@ class PollD_MP {
                                 $this->child_pid = posix_getpid();
                                 $timestamp = time();
                                 $this->writeMSG("Worker(".$this->child_pid.") ".sprintf('%-16s', $server)." Timestamp for this run is $timestamp.\n", INFO);
-                                $this->adodb = new ADOdb($this->cfg["db_host"], $this->cfg["db_port"], $this->cfg["db_user"], $this->cfg["db_password"], $this->cfg["db_name"], $this->cfg["db_type"]);
+                                $this->adodb = new ADOdb($this->cfg["db_host"], $this->cfg["db_port"], $this->cfg["db_user"], $this->cfg["db_password"], $this->cfg["db_name"], $this->cfg["db_type"], "", "", $this->logfile);
                                 $this->setPollDStatus($server, "running", $this->child_pid, $timestamp, "");
 
                                 // Process job
