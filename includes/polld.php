@@ -695,6 +695,7 @@ class PollD {
 class PollD_MP {
 
     var $cfg;
+	var $servers;
     var $queries;
     var $lastrun;
     var $overviewqueries;
@@ -908,6 +909,7 @@ class PollD_MP {
         $servers = array();
         while (list ($key, $val) = each ($rows)) {
             $servers[$val["servername"]] = (array)$val;
+            $servers[$val["servername"]]["version"] = $this->getServerVersion($val);
         }
         return $servers;
     }
@@ -1141,7 +1143,7 @@ class PollD_MP {
         $starttquery = time();
         $querytime = 0;
 
-		$version = $this->getServerVersion($server["servername"]);
+		$version = $this->servers[$server]["version"];
 
         $logprefix = "Worker(".$this->child_pid.") ".sprintf('%-16s', $server)." ---------".$query["name"];
         $tablename = "res_".$query["name"]."_".$server;
@@ -1214,7 +1216,7 @@ class PollD_MP {
         $starttquery = time();
         $querytime = 0;
 
-		$version = $this->getServerVersion($server["servername"]);
+		$version = $this->servers[$server]["version"];
 
         $tablename = "res_overview_".$server;
         $logprefix = "Worker(".$this->child_pid.") ".sprintf('%-16s', $server)." ---------".$query["name"];

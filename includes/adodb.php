@@ -258,7 +258,7 @@ class ADOdb {
         $recordArray = array();
         $this->conn->SetFetchMode(ADODB_FETCH_ASSOC);
         try {
-            $recordSet = $this->conn->Execute($sql);
+            $recordSet = &$this->conn->Execute($sql);
         } catch (exception $e) {
             $this->writeMSG(adodb_backtrace($e->gettrace()));
             exit;
