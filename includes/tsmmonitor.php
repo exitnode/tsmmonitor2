@@ -290,7 +290,7 @@ class TSMMonitor {
 
 		foreach ($lines as $line) {
 			$linebox .= '<option value="'.$line.'"';
-			if ($linesel == $line) {$linebox.= "SELECTED";}
+			if ($linesel == $line) $linebox.= "SELECTED";
 			$linebox .=  '> '.$line.' </option>';
 		}
 		$linebox .= "</select></form>";
@@ -396,7 +396,7 @@ class TSMMonitor {
 
 		if (!isset($menu)) { return ""; };
         $this->menuindent++;
-        for ($i=1;$i<$this->menuindent;$i++){
+        for ($i=1;$i<$this->menuindent;$i++) {
             $indent .= "&nbsp;&nbsp;&nbsp;";
         }
 		while (list($key, $val) = each($menu)) {
@@ -492,7 +492,7 @@ class TSMMonitor {
 					$fileName = str_replace('.css', '', $file);
 					$fileName = str_replace('style_', '', $fileName);
 					$ret .=  '<option value="' . $file . '"';
-					if ($_SESSION['stylesheet'] == $file){ $ret .= "SELECTED"; }
+					if ($_SESSION['stylesheet'] == $file) $ret .= "SELECTED";
 					$ret .=  '>' . $fileName . '</option>';
 				}
 			}
@@ -985,17 +985,17 @@ class TSMMonitor {
         $searcharr = $_SESSION["search"][$this->GETVars['qq']];
         if ($_POST["wcfield"] != "") {
             $arrfield = $_POST["wcfield"];
-        } else if (isset($searcharr)){
+        } else if (isset($searcharr)) {
             $arrfield = $searcharr["field"];
         }
         if ($_POST["wcval"] != "") {
             $arrval = $_POST["wcval"];
-        } else if (isset($searcharr)){
+        } else if (isset($searcharr)) {
             $arrval = $searcharr["val"];
         }
         if ($_POST["wcop"] != "") {
             $arrop = $_POST["wcop"];
-        } else if (isset($searcharr)){
+        } else if (isset($searcharr)) {
             $arrop = $searcharr["op"];
         }
 		$sql = "SHOW COLUMNS FROM res_".$this->configarray["queryarray"][$this->GETVars['qq']]["name"]."_".$this->GETVars['server'];
@@ -1006,7 +1006,7 @@ class TSMMonitor {
 		foreach ($fieldnames as $field) {
 			if ($field['Field'] != "timestamp") {
 				$fieldbox.= '<option value="'.$field['Field'].'"';
-				if ($arrfield == $field['Field']) {$fieldbox.= "SELECTED";}
+				if ($arrfield == $field['Field']) $fieldbox.= "SELECTED";
 				$fieldbox.=  '> '.$field['Field'].' </option>';
 			}
 		}
@@ -1017,7 +1017,7 @@ class TSMMonitor {
 		$opbox = "<select name='wcop' size=1 onChange='' class='button topnavbutton'>";
 		foreach ($operators as $op) {
 			$opbox.= '<option value="'.$op.'"';
-			if ($arrop == $op) {$opbox.= "SELECTED";}
+			if ($arrop == $op) $opbox.= "SELECTED";
 			$opbox.=  '> '.$op.' </option>';
 		}
 		$opbox.= "</select>";
@@ -1234,7 +1234,7 @@ class TSMMonitor {
 		// build combobox
 		while (list($label,$value) = each($timesteps)) {
 			$out .= '<option value="'.$value.'"';
-			if ($_SESSION['selectedtimestep'] == $value){$out .=  "SELECTED";}
+			if ($_SESSION['selectedtimestep'] == $value) $out .=  "SELECTED";
 			$out .= '> '.$label.'</option>';
 		}
 		$out .= "</select>";

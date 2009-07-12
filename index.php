@@ -86,8 +86,8 @@ include_once "includes/page_head.php";
 			<?php
 
 			// main content, right of menu
-			if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"]) && $tsmmonitor->GETVars['qq'] != "logout" && $_SESSION["logindata"]["loggedin"]){
-				if ($tsmmonitor->GETVars['qq'] != "" && $tsmmonitor->GETVars['qq'] != "overview"){
+			if (isset($_SESSION["logindata"]["user"]) && isset($_SESSION["logindata"]["pass"]) && $tsmmonitor->GETVars['qq'] != "logout" && $_SESSION["logindata"]["loggedin"]) {
+				if ($tsmmonitor->GETVars['qq'] != "" && $tsmmonitor->GETVars['qq'] != "overview") {
 
 					// show overview page
 					if ($tsmmonitor->GETVars['qq'] == "index") {
@@ -97,7 +97,7 @@ include_once "includes/page_head.php";
 					} else if ($tsmmonitor->GETVars['qq'] == "polldstat") {
                         $lines = $_POST["lpp"];
                         if ($lines != "") {
-                            if (!isset($_SESSION["lines"])){
+                            if (!isset($_SESSION["lines"])) {
                                 $temp = array();
                                 $temp[$tsmmonitor->GETVars['qq']] = $lines;
                                 $_SESSION["lines"] = $temp;
@@ -145,7 +145,7 @@ include_once "includes/page_head.php";
 							if ($_POST["Clear"] == "Clear") {
 								$_SESSION["search"][$tsmmonitor->GETVars['qq']] = "";
 							} else {
-								if (!isset($_SESSION["search"])){
+								if (!isset($_SESSION["search"])) {
 									$temp = array();
 									$temp[$tsmmonitor->GETVars['qq']] = $whereclause;
 									$_SESSION["search"] = $temp;
@@ -189,7 +189,7 @@ include_once "includes/page_head.php";
 						} else {
                             $lines = $_POST["lpp"];
                             if ($lines != "") {
-                                if (!isset($_SESSION["lines"])){
+                                if (!isset($_SESSION["lines"])) {
                                     $temp = array();
                                     $temp[$tsmmonitor->GETVars['qq']] = $lines;
                                     $_SESSION["lines"] = $temp;
@@ -219,7 +219,7 @@ include_once "includes/page_head.php";
 					}
 				}
 			} else {
-				if (isset($_SESSION["logindata"])){
+				if (isset($_SESSION["logindata"])) {
 					$errormsg = "Login failed!";
 				}else{
 					$errormsg = "Login";

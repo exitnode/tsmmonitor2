@@ -39,7 +39,7 @@ if ($isAdmin) {
 
 ?>
 
-<form action="<?php echo $_SERVER['PHP_SELF']; if ($GETVars['qq'] != 'logout'){ echo '?q='.$GETVars['qq'].'&m='.$GETVars['menu']; } ?>" method="post">
+<form action="<?php echo $_SERVER['PHP_SELF']; if ($GETVars['qq'] != 'logout') { echo '?q='.$GETVars['qq'].'&m='.$GETVars['menu']; } ?>" method="post">
 	<br>
 	<br>
 	<br>

@@ -42,7 +42,7 @@
 			$types = array('normal view', 'timetable', 'timetable2');
 			foreach ($types as $type) {
 				echo '<option value="'.$type.'"';
-				if ($_SESSION['tabletype'] == $type){echo "SELECTED";}
+				if ($_SESSION['tabletype'] == $type) echo "SELECTED";
 				echo '> '.$type.'</option>';
 			}
 			echo "</select>";
@@ -56,7 +56,7 @@
 
 		while(list($servername,$serveritems) = each($tsmmonitor->configarray["serverlist"])) {
 			echo '<option value="'.$servername.'"';
-			if ($tsmmonitor->GETVars['server'] == $servername){echo "SELECTED";}
+			if ($tsmmonitor->GETVars['server'] == $servername) echo "SELECTED";
 			echo '> '.$servername.' ('.$serveritems["description"].')</option>';
 		}
 		echo "</select>";
