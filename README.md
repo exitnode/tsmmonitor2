@@ -68,7 +68,9 @@ mysql> SHOW DATABASES;
 3 rows in set (0.00 sec)
 mysql> quit</pre>
   
-* Import the default tsmmonitor database (e.g. with MySQL):<pre>shell> mysql --user=root --password tsmmonitor < scripts/tsmmonitor.sql</pre> Verify the database was successfully imported (e.g. with MySQL):
+* Import the default tsmmonitor database (e.g. with MySQL):<pre>shell> mysql --user=root --password tsmmonitor < scripts/tsmmonitor.sql</pre>  
+  
+Verify the database was successfully imported (e.g. with MySQL):
   
 <pre>shell> mysql --user=root --password tsmmonitor
 mysql> SHOW TABLES;
