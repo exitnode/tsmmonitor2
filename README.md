@@ -70,7 +70,7 @@ mysql> quit</pre>
   
 * Import the default tsmmonitor database (e.g. with MySQL):<pre>shell> mysql --user=root --password tsmmonitor < scripts/tsmmonitor.sql</pre>  
   
-Verify the database was successfully imported (e.g. with MySQL):
+* Verify the database was successfully imported (e.g. with MySQL):
   
 <pre>shell> mysql --user=root --password tsmmonitor
 mysql> SHOW TABLES;
