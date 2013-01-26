@@ -53,7 +53,8 @@ Documentation
 * Extract the package to your htdocs folder: <pre>shell> tar zxvf tsmmonitor-version.tar.gz</pre>
 * Make the tsmmonitor files accessible by your Apache/www-User (e.g. 'www-data' user for the Debian Apache2 package): <pre>shell> chown -R www-data:root tsmmonitor/</pre>
 * Make your dsmerror.log file writetable to the Apache/www-User(e.g. 'www-data' user for the Debian Apache2 package): <pre>shell> chown www-data:root <path-to-dsmerror.log>/dsmerror.log</pre>
-* Create the database (e.g. with MySQL):<pre>shell> mysqladmin --user=root --password create tsmmonitor</pre> Verify the database was successfully created (e.g. with MySQL):
+* Create the database (e.g. with MySQL):<pre>shell> mysqladmin --user=root --password create tsmmonitor</pre> 
+* Verify the database was successfully created (e.g. with MySQL):
   
 <pre>
 shell> mysql --user=root --password
@@ -98,7 +99,9 @@ mysql> quit</pre>
 mysql> CREATE USER 'tsmmonitor'@'localhost' IDENTIFIED BY 'somepassword';
 mysql> GRANT ALL PRIVILEGES ON `tsmmonitor`.* TO 'tsmmonitor'@'localhost';
 mysql> flush privileges;
-mysql> quit</pre> 
+mysql> quit
+
+</pre> 
   
 * Verify the user was successfully created and has the appropriate permissions (e.g. with MySQL):
   
