@@ -16,12 +16,9 @@ TSM Monitor 2 is a rewrite of the first version which differs in how it collects
 Screenshots
 -----------
   
-<gallery>
-
-File:4576df88c0a4270389a7ce9df3d2ac9d.media.900x617.jpg|Overview
-File:8249d8fea06b3e4544789fbb8951393b.media.900x652.jpg|Timetable
-File:ca3e1a6448d9aa86ead34d41b4696d4c.media.899x692.jpg|Paths
-</gallery>
+https://github.com/exitnode/tsmmonitor2/blob/master/screenshots/overview.jpg|Overview
+https://github.com/exitnode/tsmmonitor2/blob/master/screenshots/backup_timetable.jpg|Timetable
+https://github.com/exitnode/tsmmonitor2/blob/master/screenshots/paths.jpg|Paths
   
 Documentation
 -------------
@@ -321,6 +318,8 @@ You can check the output by consulting the automatically created nohup.out file
   http://yourserver/path_to_tsm_monitor/index.php
   
 This is the main application. Here you can access the [[projects:TSMMonitor2:CollectingData|collected data]] and check health statuses.
+
+Screenshot: https://github.com/exitnode/tsmmonitor2/blob/master/screenshots/Tsmmonitorgui.jpg
   
 #### Backend ####
   
