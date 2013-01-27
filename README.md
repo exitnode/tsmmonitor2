@@ -16,9 +16,9 @@ TSM Monitor 2 is a rewrite of the first version which differs in how it collects
 Screenshots
 -----------
   
-https://github.com/exitnode/tsmmonitor2/blob/master/screenshots/overview.jpg|Overview
-https://github.com/exitnode/tsmmonitor2/blob/master/screenshots/backup_timetable.jpg|Timetable
-https://github.com/exitnode/tsmmonitor2/blob/master/screenshots/paths.jpg|Paths
+Overview: https://github.com/exitnode/tsmmonitor2/blob/master/screenshots/overview.jpg
+Timetable: https://github.com/exitnode/tsmmonitor2/blob/master/screenshots/backup_timetable.jpg
+Paths: https://github.com/exitnode/tsmmonitor2/blob/master/screenshots/paths.jpg
   
 Documentation
 -------------
